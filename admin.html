@@ -1893,6 +1893,7 @@
           <!-- LEFT WORKSPACE COLUMN -->
           <div class="workspace-main">
             <!-- ══ TAB: EVENT ══ -->
+            <!-- ══ TAB: EVENT ══ -->
             <div class="pane active" id="pane-event">
               <!-- Stat cards -->
               <div class="stats-container">
@@ -1901,7 +1902,7 @@
                     <i class="ti ti-users" aria-hidden="true"></i>
                   </div>
                   <div class="stat-data">
-                    <div class="stat-num">12</div>
+                    <div class="stat-num" id="stat-total-tamu">-</div>
                     <div class="stat-lbl">Tamu Foto</div>
                   </div>
                 </div>
@@ -1910,26 +1911,26 @@
                     <i class="ti ti-microphone" aria-hidden="true"></i>
                   </div>
                   <div class="stat-data">
-                    <div class="stat-num">9</div>
+                    <div class="stat-num" id="stat-total-voice">-</div>
                     <div class="stat-lbl">Voice Note</div>
                   </div>
                 </div>
                 <div class="stat-card">
                   <div class="stat-icon-wrap">
-                    <i class="ti ti-sparkles" aria-hidden="true"></i>
+                    <i class="ti ti-calendar-event" aria-hidden="true"></i>
                   </div>
                   <div class="stat-data">
-                    <div class="stat-num">3</div>
-                    <div class="stat-lbl">Foto Baru</div>
+                    <div class="stat-num" id="stat-active-event-slug" style="font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">-</div>
+                    <div class="stat-lbl">Event Aktif</div>
                   </div>
                 </div>
                 <div class="stat-card">
                   <div class="stat-icon-wrap">
-                    <i class="ti ti-circle-check" aria-hidden="true"></i>
+                    <i class="ti ti-list" aria-hidden="true"></i>
                   </div>
                   <div class="stat-data">
-                    <div class="stat-num">2</div>
-                    <div class="stat-lbl">Event Aktif</div>
+                    <div class="stat-num" id="stat-total-events">-</div>
+                    <div class="stat-lbl">Total Event</div>
                   </div>
                 </div>
               </div>
@@ -1945,68 +1946,53 @@
                 <p class="card-sub">
                   Kelola semua event photobooth yang terdaftar
                 </p>
-                <div class="card-content event-list-container">
-                  <div class="event-row">
-                    <div class="event-status-indicator"></div>
-                    <div class="event-info">
-                      <div class="event-name">
-                        Pernikahan Rizky &amp; Nabila
-                      </div>
-                      <div class="event-meta">
-                        <span><i class="ti ti-calendar"></i> 7 Jun 2026</span>
-                        <span>·</span>
-                        <span><i class="ti ti-users"></i> 12 tamu</span>
-                        <span>·</span>
-                        <span><i class="ti ti-map-pin"></i> Bandung</span>
-                      </div>
+                <div class="card-content event-list-container" id="event-list-container">
+                  <!-- Dynamic event rows will be loaded here -->
+                </div>
+              </div>
+
+              <!-- Detail Event Aktif card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-edit" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Detail Event Aktif</h3>
+                </div>
+                <p class="card-sub">
+                  Ubah konfigurasi detail untuk event yang sedang dibuka
+                </p>
+                <div class="card-content">
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="edit-event-host">Nama Pengantin / Host</label>
+                      <input
+                        type="text"
+                        id="edit-event-host"
+                        placeholder="cth: Rizky &amp; Nabila"
+                        oninput="syncEventEdit()"
+                      />
                     </div>
-                    <div class="event-actions">
-                      <span
-                        class="event-badge"
-                        style="align-self: center; margin-right: 12px"
-                        >Live</span
-                      >
-                      <button
-                        class="btn"
-                        style="padding: 6px 12px; font-size: 13px"
-                        onclick="
-                          switchTab(
-                            'appearance',
-                            document.querySelector(
-                              '.sidebar-nav button:nth-child(2)',
-                            ),
-                          )
-                        "
-                      >
-                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
-                      </button>
+                    <div class="field">
+                      <label for="edit-event-date">Tanggal Acara</label>
+                      <input type="date" id="edit-event-date" oninput="syncEventEdit()" />
                     </div>
                   </div>
-
-                  <div class="event-row">
-                    <div class="event-status-indicator draft"></div>
-                    <div class="event-info">
-                      <div class="event-name">Ulang Tahun Budi ke-30</div>
-                      <div class="event-meta">
-                        <span><i class="ti ti-calendar"></i> 15 Jun 2026</span>
-                        <span>·</span>
-                        <span><i class="ti ti-users"></i> 0 tamu</span>
-                        <span>·</span>
-                        <span><i class="ti ti-map-pin"></i> Jakarta</span>
-                      </div>
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="edit-event-loc">Lokasi</label>
+                      <input
+                        type="text"
+                        id="edit-event-loc"
+                        placeholder="cth: Bandung"
+                        oninput="syncEventEdit()"
+                      />
                     </div>
-                    <div class="event-actions">
-                      <span
-                        class="event-badge draft"
-                        style="align-self: center; margin-right: 12px"
-                        >Draft</span
-                      >
-                      <button
-                        class="btn"
-                        style="padding: 6px 12px; font-size: 13px"
-                      >
-                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
-                      </button>
+                    <div class="field">
+                      <label>Clean URL Event</label>
+                      <div class="qr-link-display" id="edit-event-url" style="margin-top: 8px; font-size: 11px; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); word-break: break-all; line-height: 1.5;">
+                        https://virtual-photobooth-bingkis-kaca.vercel.app/...
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2026,53 +2012,36 @@
                 <div class="card-content">
                   <div class="grid-2">
                     <div class="field">
-                      <label for="event-title-input">Nama Event</label>
+                      <label for="create-event-host">Nama Pengantin / Host</label>
                       <input
                         type="text"
-                        id="event-title-input"
-                        placeholder="cth: Pernikahan Ana &amp; Budi"
+                        id="create-event-host"
+                        placeholder="cth: Ana &amp; Budi"
                       />
                     </div>
                     <div class="field">
-                      <label for="event-date-input">Tanggal Acara</label>
-                      <input type="date" id="event-date-input" />
+                      <label for="create-event-date">Tanggal Acara</label>
+                      <input type="date" id="create-event-date" />
                     </div>
                   </div>
                   <div class="grid-2">
                     <div class="field">
-                      <label for="event-host-input"
-                        >Nama Pengantin / Host</label
-                      >
+                      <label for="create-event-loc">Lokasi</label>
                       <input
                         type="text"
-                        id="event-host-input"
-                        placeholder="cth: Ana &amp; Budi"
-                        oninput="syncEventCreation()"
-                      />
-                    </div>
-                    <div class="field">
-                      <label for="event-loc-input">Lokasi</label>
-                      <input
-                        type="text"
-                        id="event-loc-input"
+                        id="create-event-loc"
                         placeholder="cth: Jakarta Selatan"
                       />
                     </div>
-                  </div>
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: flex-end;
-                      margin-top: 4px;
-                    "
-                  >
-                    <button
-                      class="btn btn-primary"
-                      onclick="showSaved('Event baru berhasil dibuat!')"
-                    >
-                      <i class="ti ti-plus" aria-hidden="true"></i> Buat Event
-                      Baru
-                    </button>
+                    <div class="field" style="display: flex; align-items: flex-end;">
+                      <button
+                        class="btn btn-primary"
+                        onclick="createNewEvent()"
+                        style="width: 100%; height: 42px;"
+                      >
+                        <i class="ti ti-plus" aria-hidden="true"></i> Buat Event Baru
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2379,80 +2348,12 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
                   tamu dapat langsung scan
                 </p>
                 <div class="card-content qr-container">
-                  <div class="qr-card-wrap">
-                    <svg
-                      viewBox="0 0 120 120"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="160"
-                      height="160"
-                    >
-                      <rect width="120" height="120" fill="#ffffff" rx="10" />
-                      <g fill="#0f172a">
-                        <rect
-                          x="10"
-                          y="10"
-                          width="40"
-                          height="40"
-                          rx="4"
-                          fill="none"
-                          stroke="#0f172a"
-                          stroke-width="4"
-                        />
-                        <rect x="18" y="18" width="24" height="24" rx="2" />
-                        <rect
-                          x="70"
-                          y="10"
-                          width="40"
-                          height="40"
-                          rx="4"
-                          fill="none"
-                          stroke="#0f172a"
-                          stroke-width="4"
-                        />
-                        <rect x="78" y="18" width="24" height="24" rx="2" />
-                        <rect
-                          x="10"
-                          y="70"
-                          width="40"
-                          height="40"
-                          rx="4"
-                          fill="none"
-                          stroke="#0f172a"
-                          stroke-width="4"
-                        />
-                        <rect x="18" y="78" width="24" height="24" rx="2" />
-                        <rect x="70" y="70" width="6" height="6" />
-                        <rect x="80" y="70" width="6" height="6" />
-                        <rect x="90" y="70" width="6" height="6" />
-                        <rect x="100" y="70" width="6" height="6" />
-                        <rect x="70" y="80" width="6" height="6" />
-                        <rect x="86" y="80" width="6" height="6" />
-                        <rect x="100" y="80" width="6" height="6" />
-                        <rect x="70" y="90" width="6" height="6" />
-                        <rect x="80" y="90" width="16" height="6" />
-                        <rect x="100" y="90" width="6" height="6" />
-                        <rect x="70" y="100" width="6" height="6" />
-                        <rect x="80" y="100" width="6" height="6" />
-                        <rect x="90" y="100" width="6" height="6" />
-                        <rect x="100" y="100" width="6" height="6" />
-                        <rect x="70" y="110" width="36" height="6" />
-                      </g>
-                      <text
-                        x="60"
-                        y="65"
-                        text-anchor="middle"
-                        font-size="6.5"
-                        fill="#64748b"
-                        font-family="'Outfit', sans-serif"
-                        font-weight="700"
-                      >
-                        SCAN ME
-                      </text>
-                    </svg>
+                  <div class="qr-card-wrap" id="qr-card-wrap" style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+                    <!-- Dynamic QR code image loaded in JS -->
                   </div>
 
-                  <div class="qr-link-display">
-                    https://photobooth.app/event/rizky-nabila-2026
+                  <div class="qr-link-display" id="qr-event-link-display">
+                    https://virtual-photobooth-bingkis-kaca.vercel.app/demo
                   </div>
 
                   <div style="display: flex; gap: 12px">
@@ -2465,9 +2366,7 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
                     </button>
                     <button
                       class="btn btn-primary"
-                      onclick="
-                        showToast('QR Code berhasil diunduh!', 'success')
-                      "
+                      onclick="showToast('Unduh QR Code...', 'info')"
                     >
                       <i class="ti ti-download" aria-hidden="true"></i> Unduh
                       File QR
@@ -3418,25 +3317,50 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
         markUnsaved();
       }
 
-      // ── SYNC EVENT CREATION FOR MOCKUP PHONE ──
-      function syncEventCreation() {
-        const coupleName = document
-          .getElementById("event-host-input")
-          .value.trim();
-        const eventDate = document.getElementById("event-date-input").value;
+      // ── SLUG GENERATION UTILITY ──
+      function generateSlug(text) {
+        return text
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")          // Replace spaces with -
+          .replace(/&/g, "-dan-")        // Replace & with 'dan'
+          .replace(/[^\w\-]+/g, "")      // Remove all non-word chars
+          .replace(/\-\-+/g, "-")        // Replace multiple - with single -
+          .replace(/^-+/, "")            // Trim - from start
+          .replace(/-+$/, "");           // Trim - from end
+      }
+
+      // ── COPY TEXT UTILITY ──
+      function copyText(text, label) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`${label} disalin ke clipboard!`, "success");
+        }).catch(err => {
+          showToast("Gagal menyalin link: " + err, "danger");
+        });
+      }
+
+      // ── SYNC EVENT EDIT FOR MOCKUP PHONE ──
+      function syncEventEdit() {
+        const coupleName = document.getElementById("edit-event-host").value.trim();
+        const eventDate = document.getElementById("edit-event-date").value;
+        const eventLoc = document.getElementById("edit-event-loc").value.trim();
 
         if (coupleName) {
           document.getElementById("phone-mock-couple").textContent = coupleName;
-          document.getElementById("prev-couple").textContent = coupleName;
+          const prevCouple = document.getElementById("prev-couple");
+          if (prevCouple) prevCouple.textContent = coupleName;
         }
         if (eventDate) {
           const dateObj = new Date(eventDate);
           const options = { day: "numeric", month: "long", year: "numeric" };
           const formattedDate = dateObj.toLocaleDateString("id-ID", options);
 
-          document.getElementById("phone-mock-date").textContent =
-            formattedDate;
-          document.getElementById("prev-date").textContent = formattedDate;
+          document.getElementById("phone-mock-date").textContent = formattedDate;
+          const prevDate = document.getElementById("prev-date");
+          if (prevDate) {
+            prevDate.textContent = formattedDate + (eventLoc ? " · " + eventLoc : "");
+          }
         }
         markUnsaved();
       }
@@ -3470,18 +3394,13 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
           showToast("Semua perubahan disimpan ke database!", "success");
         }
 
-        // Update sidebar info if event creation was filled
-        const coupleInput = document
-          .getElementById("event-host-input")
-          .value.trim();
-        const dateInput = document.getElementById("event-date-input").value;
-        const locInput = document
-          .getElementById("event-loc-input")
-          .value.trim();
+        // Update sidebar info if event editing was filled
+        const coupleInput = document.getElementById("edit-event-host").value.trim();
+        const dateInput = document.getElementById("edit-event-date").value;
+        const locInput = document.getElementById("edit-event-loc").value.trim();
 
         if (coupleInput) {
-          document.getElementById("sidebar-event-name").textContent =
-            coupleInput;
+          document.getElementById("sidebar-event-name").textContent = coupleInput;
           const topbarSub = document.querySelector(".topbar-sub");
           if (topbarSub) topbarSub.textContent = "Event: " + coupleInput;
 
@@ -3536,6 +3455,204 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
         }, 2800);
       }
 
+      // ── DYNAMIC EVENTS LIST & STATS ──
+      async function loadEventsList() {
+        const listContainer = document.getElementById("event-list-container");
+        if (!listContainer) return;
+
+        try {
+          // Fetch all events
+          const { data: eventsList, error: evErr } = await db
+            .from("events")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (evErr) throw evErr;
+
+          // Fetch all submissions for counting guests
+          const { data: subs } = await db.from("submissions").select("id, event_id");
+          const guestCounts = {};
+          if (subs) {
+            subs.forEach(s => {
+              guestCounts[s.event_id] = (guestCounts[s.event_id] || 0) + 1;
+            });
+          }
+
+          // Populate stats cards
+          const activeEvent = eventsList.find(e => e.id === currentEventId);
+          if (activeEvent) {
+            document.getElementById("stat-active-event-slug").textContent = activeEvent.slug.substring(0, 10) + (activeEvent.slug.length > 10 ? "..." : "");
+            document.getElementById("stat-active-event-slug").title = activeEvent.slug;
+            
+            // Active event specific stats
+            const activeSubs = subs ? subs.filter(s => s.event_id === currentEventId) : [];
+            document.getElementById("stat-total-tamu").textContent = activeSubs.length;
+            
+            // Fetch voice note count for current event
+            const { count: voiceCount } = await db
+              .from("submissions")
+              .select("id", { count: "exact", head: true })
+              .eq("event_id", currentEventId)
+              .not("voice_url", "is", null);
+            document.getElementById("stat-total-voice").textContent = voiceCount || 0;
+          }
+          
+          document.getElementById("stat-total-events").textContent = eventsList.length;
+
+          // Clear container
+          listContainer.innerHTML = "";
+
+          eventsList.forEach(event => {
+            const isCurrent = event.id === currentEventId;
+            const row = document.createElement("div");
+            row.className = "event-row";
+            if (isCurrent) {
+              row.style.borderColor = "var(--primary)";
+              row.style.background = "var(--bg-secondary)";
+            }
+
+            const dateStr = event.event_date
+              ? new Date(event.event_date).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })
+              : "Tanggal belum diatur";
+
+            const guestCount = guestCounts[event.id] || 0;
+            const vercelDomain = window.location.origin; // Dynamically use the current domain (e.g. Vercel domain or localhost)
+            const guestLink = `${vercelDomain}/${event.slug}`;
+            const dashLink = `${vercelDomain}/dashboard/${event.slug}`;
+
+            row.innerHTML = `
+              <div class="event-status-indicator ${event.is_active ? "" : "draft"}"></div>
+              <div class="event-info" style="flex: 1;">
+                <div class="event-name" style="font-weight: 600; font-size: 14px; color: var(--text-primary);">
+                  ${event.couple_name} 
+                  ${isCurrent ? '<span style="font-size: 10px; padding: 2px 6px; background: var(--primary); color: #fff; border-radius: 12px; margin-left: 6px; font-weight: 500;">Aktif</span>' : ""}
+                </div>
+                <div class="event-meta" style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+                  <span><i class="ti ti-link"></i> /${event.slug}</span>
+                  <span><i class="ti ti-calendar"></i> ${dateStr}</span>
+                  <span><i class="ti ti-users"></i> ${guestCount} tamu</span>
+                  <span><i class="ti ti-map-pin"></i> ${event.event_location || "Lokasi belum diatur"}</span>
+                </div>
+              </div>
+              <div class="event-actions" style="display: flex; gap: 8px; align-items: center; margin-left: 12px;">
+                <button class="btn btn-secondary" onclick="copyText('${guestLink}', 'Link Tamu')" title="Salin Link Tamu" style="padding: 6px; min-width: 32px;">
+                  <i class="ti ti-link"></i>
+                </button>
+                <button class="btn btn-secondary" onclick="copyText('${dashLink}', 'Link Dashboard')" title="Salin Link Dashboard" style="padding: 6px; min-width: 32px;">
+                  <i class="ti ti-device-laptop"></i>
+                </button>
+                <button class="btn" style="padding: 6px 12px; font-size: 13px; ${isCurrent ? "background: var(--primary); color: #fff; border-color: var(--primary);" : ""}" onclick="manageEvent('${event.slug}')">
+                  <i class="ti ti-settings" aria-hidden="true"></i> Kelola
+                </button>
+                <button class="btn btn-danger" style="padding: 6px; min-width: 32px; background: var(--danger); color: #fff; border-color: var(--danger);" onclick="deleteEvent('${event.id}', '${event.couple_name}')" title="Hapus Event">
+                  <i class="ti ti-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            `;
+            listContainer.appendChild(row);
+          });
+        } catch (e) {
+          console.error("Gagal memuat list event:", e);
+          listContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-secondary);">Gagal memuat daftar event: ${e.message}</div>`;
+        }
+      }
+
+      // ── MANAGE EVENT (URL SWITCH) ──
+      function manageEvent(slug) {
+        window.location.search = `?event=${slug}`;
+      }
+
+      // ── DELETE EVENT ──
+      async function deleteEvent(id, name) {
+        if (id === currentEventId) {
+          alert("Event ini sedang aktif dikelola. Silakan beralih kelola ke event lain terlebih dahulu sebelum menghapusnya!");
+          return;
+        }
+        if (!confirm(`Apakah Anda yakin ingin menghapus event "${name}"? Semua data frames, submissions, dan ucapan terkait juga akan terhapus secara permanen!`)) return;
+
+        try {
+          showToast("Menghapus event...", "info");
+          const { error } = await db
+            .from("events")
+            .delete()
+            .eq("id", id);
+          
+          if (error) throw error;
+          showToast(`Event "${name}" berhasil dihapus!`, "success");
+          await loadEventsList();
+        } catch (e) {
+          showToast("Gagal menghapus event: " + e.message, "danger");
+        }
+      }
+
+      // ── CREATE NEW EVENT ──
+      async function createNewEvent() {
+        const host = document.getElementById("create-event-host").value.trim();
+        const date = document.getElementById("create-event-date").value;
+        const loc = document.getElementById("create-event-loc").value.trim();
+
+        if (!host) {
+          alert("Nama Pengantin / Host wajib diisi! 😊");
+          return;
+        }
+
+        showToast("Membuat event baru...", "info");
+
+        try {
+          // Generate clean unique slug
+          let baseSlug = generateSlug(host);
+          if (!baseSlug) baseSlug = "wedding";
+          let slug = baseSlug;
+          
+          // Check if slug is unique
+          let isUnique = false;
+          let attempts = 0;
+          while (!isUnique && attempts < 10) {
+            const { data, error } = await db
+              .from("events")
+              .select("id")
+              .eq("slug", slug);
+            
+            if (error) throw error;
+            
+            if (!data || data.length === 0) {
+              isUnique = true;
+            } else {
+              attempts++;
+              slug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
+            }
+          }
+
+          // Insert new event
+          const { error: insertError } = await db
+            .from("events")
+            .insert({
+              slug: slug,
+              couple_name: host,
+              event_date: date || null,
+              event_location: loc || null,
+              theme_color: "#c9a96e",
+              is_active: true
+            });
+
+          if (insertError) throw insertError;
+
+          showToast("Event baru berhasil dibuat!", "success");
+          
+          // Redirect to manage the new event (which will automatically seed frames)
+          setTimeout(() => {
+            window.location.search = `?event=${slug}`;
+          }, 1000);
+        } catch (e) {
+          console.error(e);
+          showToast("Gagal membuat event: " + e.message, "danger");
+        }
+      }
+
       // ── SAVE SETTINGS TO DB ──
       async function saveAllSettings() {
         if (!currentEventId) {
@@ -3545,9 +3662,9 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
 
         showToast("Menyimpan perubahan...", "info");
 
-        const couple = document.getElementById("event-host-input").value.trim();
-        const date = document.getElementById("event-date-input").value;
-        const loc = document.getElementById("event-loc-input").value.trim();
+        const couple = document.getElementById("edit-event-host").value.trim();
+        const date = document.getElementById("edit-event-date").value;
+        const loc = document.getElementById("edit-event-loc").value.trim();
 
         const selectedSwatch = document.querySelector(".color-swatch.selected");
         const customHex = document.getElementById("color-custom").value;
@@ -3594,6 +3711,9 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
 
           coupleName = couple;
           showSaved("Pengaturan berhasil disimpan ke database!");
+          
+          // Refresh list to show updated details
+          await loadEventsList();
         } catch (e) {
           console.error("Gagal menyimpan:", e);
           showToast("Gagal menyimpan: " + e.message, "danger");
@@ -3619,18 +3739,45 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
           coupleName = eventData.couple_name;
 
           // Fill input fields
-          document.getElementById("event-host-input").value =
-            eventData.couple_name;
+          document.getElementById("edit-event-host").value = eventData.couple_name;
           if (eventData.event_date) {
-            document.getElementById("event-date-input").value =
-              eventData.event_date;
+            document.getElementById("edit-event-date").value = eventData.event_date;
           }
-          document.getElementById("event-loc-input").value =
-            eventData.event_location || "";
+          document.getElementById("edit-event-loc").value = eventData.event_location || "";
+
+          // Clean URL display
+          const vercelDomain = window.location.origin;
+          document.getElementById("edit-event-url").innerHTML = `
+            <strong>Link Tamu:</strong> <a href="${vercelDomain}/${eventData.slug}" target="_blank" style="color: var(--primary); text-decoration: underline;">${vercelDomain}/${eventData.slug}</a><br>
+            <strong style="display: inline-block; margin-top: 4px;">Link Dashboard:</strong> <a href="${vercelDomain}/dashboard/${eventData.slug}" target="_blank" style="color: var(--primary); text-decoration: underline;">${vercelDomain}/dashboard/${eventData.slug}</a>
+          `;
+
+          // Clean QR Code tab displays
+          const eventUrl = `${vercelDomain}/${eventData.slug}`;
+          const qrLinkDisplay = document.getElementById("qr-event-link-display");
+          if (qrLinkDisplay) {
+            qrLinkDisplay.innerHTML = `<a href="${eventUrl}" target="_blank" style="color: var(--primary); text-decoration: underline; word-break: break-all;">${eventUrl}</a>`;
+            const copyBtn = qrLinkDisplay.nextElementSibling.querySelector("button");
+            if (copyBtn) {
+              copyBtn.setAttribute("onclick", `copyText('${eventUrl}', 'Link Tamu')`);
+            }
+          }
+          
+          const qrCardWrap = document.getElementById("qr-card-wrap");
+          if (qrCardWrap) {
+            qrCardWrap.innerHTML = `
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(eventUrl)}&margin=10" 
+                   alt="QR Code" width="160" height="160" style="border-radius: 8px; box-shadow: var(--shadow-sm); border: 1px solid var(--border);"/>
+            `;
+            const downloadBtn = qrCardWrap.parentElement.querySelector("button.btn-primary");
+            if (downloadBtn) {
+              const downloadUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(eventUrl)}&margin=10`;
+              downloadBtn.setAttribute("onclick", `window.open('${downloadUrl}', '_blank'); showToast('QR Code dibuka di tab baru untuk diunduh!', 'success')`);
+            }
+          }
 
           // Sync sidebar
-          document.getElementById("sidebar-event-name").textContent =
-            eventData.couple_name;
+          document.getElementById("sidebar-event-name").textContent = eventData.couple_name;
           const topbarSub = document.querySelector(".topbar-sub");
           if (topbarSub)
             topbarSub.textContent = "Event: " + eventData.couple_name;
@@ -3651,14 +3798,16 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
             meta || "Detail belum diisi";
 
           // Theme color
-          document.getElementById("color-custom").value =
-            eventData.theme_color || "#c9a96e";
+          document.getElementById("color-custom").value = eventData.theme_color || "#c9a96e";
           updateThemeColor(eventData.theme_color || "#c9a96e");
 
           // Switch toggles state
           setSwitchState(null, "voice", eventData.allow_voice);
           setSwitchState(null, "reqname", eventData.require_name);
           setSwitchState(null, "retake", eventData.allow_retake);
+
+          // Update dynamic event list and stats
+          await loadEventsList();
 
           // Load frames from DB
           await loadFrames();
@@ -3668,9 +3817,9 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
             e.message,
           );
           // Set values default
-          document.getElementById("event-host-input").value = "Rizky & Nabila";
-          document.getElementById("event-date-input").value = "2026-06-07";
-          document.getElementById("event-loc-input").value = "Bandung";
+          document.getElementById("edit-event-host").value = "Rizky & Nabila";
+          document.getElementById("edit-event-date").value = "2026-06-07";
+          document.getElementById("edit-event-loc").value = "Bandung";
 
           activeFrames = defaultFrames.map((f, i) => ({
             id: `local-${i}`,
@@ -3702,6 +3851,8 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
       // ── ATTACH DETECTOR TO ALL INPUTS ──
       document.querySelectorAll("input, select, textarea").forEach((el) => {
         el.addEventListener("input", () => {
+          // Ignore create-event inputs so they don't trigger the save bar warning
+          if (el.id.startsWith("create-")) return;
           document.getElementById("save-msg-text").textContent =
             "Ada perubahan baru — belum disimpan";
           markUnsaved();
