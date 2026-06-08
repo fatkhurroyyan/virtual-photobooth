@@ -84,18 +84,19 @@ ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "events_select_public" ON public.events
   FOR SELECT USING (true);
 
--- Hanya user yang login (admin) yang bisa tulis/edit/hapus
-CREATE POLICY "events_modify_admin" ON public.events
-  FOR ALL USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+-- Diubah agar public/anon bisa modifikasi (karena admin panel berjalan client-side tanpa login)
+CREATE POLICY "events_modify_public" ON public.events
+  FOR ALL USING (true)
+  WITH CHECK (true);
 
 -- ── FRAMES ──
 CREATE POLICY "frames_select_public" ON public.frames
   FOR SELECT USING (true);
 
-CREATE POLICY "frames_modify_admin" ON public.frames
-  FOR ALL USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+-- Diubah agar public/anon bisa modifikasi (tambah/hapus frame dari admin panel)
+CREATE POLICY "frames_modify_public" ON public.frames
+  FOR ALL USING (true)
+  WITH CHECK (true);
 
 -- ── SUBMISSIONS ──
 -- Tamu (tidak login) bisa INSERT kiriman mereka

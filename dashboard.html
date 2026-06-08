@@ -768,7 +768,7 @@
       <div class="photo-inner">
         <div class="photo-area" style="background:${bgColors[frameIdx]}">
           ${photoContent}
-          <div class="frame-overlay-sim">${frames[frameIdx]}</div>
+          ${sub.photo_url ? "" : `<div class="frame-overlay-sim">${frames[frameIdx]}</div>`}
           ${badgeVoice}${badgeNew}
         </div>
         <div class="photo-strip">
@@ -822,13 +822,17 @@
         const mp = document.getElementById("modal-photo");
         mp.style.background = bgColors[frameIdx];
         if (sub.photo_url) {
-          mp.innerHTML = `<img src="${sub.photo_url}" alt="${sub.guest_name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>`;
+          mp.innerHTML = `
+            <img src="${sub.photo_url}" alt="${sub.guest_name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>
+            <div class="modal-frame-ov" id="modal-frame-ov"></div>
+          `;
         } else {
-          document.getElementById("modal-emoji").textContent = getInitialEmoji(
-            sub.guest_name,
-          );
+          mp.innerHTML = `
+            <span id="modal-emoji">${getInitialEmoji(sub.guest_name)}</span>
+            <div class="modal-frame-ov" id="modal-frame-ov"></div>
+          `;
+          document.getElementById("modal-frame-ov").innerHTML = frames[frameIdx];
         }
-        document.getElementById("modal-frame-ov").innerHTML = frames[frameIdx];
         document.getElementById("modal-guest").textContent = sub.guest_name;
         document.getElementById("modal-time").textContent =
           `Dikirim pukul ${timeStr} · Bingkai ${frameNames[frameIdx]}`;
