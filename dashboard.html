@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Pengantin — Virtual Photobooth</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- Tabler Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+    />
+  </head>
+  <body>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+      @font-face {
+        font-family: "SF Pro";
+        src: url("SF-Pro.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Gyahegi";
+        src: url("Gyahegi Italic.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --gold: #c9a96e;
+        --gold-light: #e8d5b0;
+        --rose: #d4847a;
+        --rose-light: #f5d5d0;
+        --brown: #6b4c2a;
+        --brown-dark: #3d2b14;
+        --cream: #faf6f0;
+        --warm: #f5ede0;
+        --white: #fff;
+        --color-text-primary: #2c1810;
+        --color-text-secondary: #9c7c5e;
+        --color-background-secondary: #f5ede0;
+        --border-radius-lg: 16px;
+        --border-radius-md: 10px;
+      }
+      body {
+        font-family: "SF Pro", "DM Sans", sans-serif;
+        background: var(--cream);
+        min-height: 100vh;
+        padding: 20px 16px;
+      }
+      .dash {
+        width: 100%;
+        max-width: 680px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        position: relative;
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+        height: 220px;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(
+          135deg,
+          #3d2b14 0%,
+          #6b4c2a 50%,
+          #8b5e3c 100%
+        );
+      }
+      .hero-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.7;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(30, 15, 5, 0.2) 0%,
+          rgba(30, 15, 5, 0.65) 100%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.25rem 1.5rem;
+      }
+      .hero-event {
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: rgba(232, 213, 176, 0.8);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .hero-couple {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 32px;
+        font-style: italic;
+        font-weight: 500;
+        color: #faf6f0;
+        line-height: 1.2;
+      }
+      .hero-date {
+        font-size: 12px;
+        color: rgba(232, 213, 176, 0.7);
+        margin-top: 4px;
+      }
+      .hero-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(201, 169, 110, 0.9);
+        color: #3d2b14;
+        border-radius: var(--border-radius-md);
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #3d2b14;
+        animation: blink 1.2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 1.5rem;
+      }
+      .stat-card {
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-md);
+        padding: 10px 6px;
+        text-align: center;
+      }
+      .stat-num {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+      .stat-lbl {
+        font-size: 10px;
+        color: var(--color-text-secondary);
+        margin-top: 2px;
+        letter-spacing: 0.3px;
+      }
+      @media (min-width: 480px) {
+        .stats {
+          gap: 12px;
+        }
+        .stat-card {
+          padding: 12px 14px;
+        }
+        .stat-num {
+          font-size: 24px;
+        }
+        .stat-lbl {
+          font-size: 11px;
+        }
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+      .section-title {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 22px;
+        font-style: italic;
+        font-weight: 500;
+        color: var(--color-text-primary);
+      }
+      .filter-row {
+        display: flex;
+        gap: 6px;
+      }
+      .pill {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        border: 0.5px solid var(--color-border-secondary);
+        background: var(--color-background-primary);
+        color: var(--muted);
+        transition: 0.15s;
+      }
+      .pill.active {
+        background: var(--color-text-primary);
+        color: var(--color-background-primary);
+        border-color: var(--color-text-primary);
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 1.5rem;
+      }
+      @media (min-width: 600px) {
+        .gallery {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+      }
+      .photo-card {
+        border-radius: var(--border-radius-md);
+        overflow: hidden;
+        cursor: pointer;
+        border: 0.5px solid var(--color-border-tertiary);
+        position: relative;
+        aspect-ratio: 3/4;
+        background: var(--color-background-secondary);
+        transition: transform 0.15s;
+      }
+      .photo-card:hover {
+        transform: scale(1.02);
+      }
+      .photo-inner {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .photo-area {
+        flex: 1;
+        background: var(--color-background-secondary);
+        position: relative;
+        overflow: hidden;
+      }
+      .photo-sim {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+      }
+      .frame-overlay-sim {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .photo-strip {
+        background: var(--color-background-primary);
+        border-top: 0.5px solid var(--color-border-tertiary);
+        padding: 6px 8px;
+      }
+      .photo-guest {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .photo-time {
+        font-size: 10px;
+        color: var(--muted);
+      }
+      .voice-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: rgba(212, 132, 122, 0.9);
+        color: #fff;
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .new-badge {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        background: rgba(201, 169, 110, 0.9);
+        color: #3d2b14;
+        border-radius: 20px;
+        padding: 2px 7px;
+        font-size: 10px;
+        font-weight: 500;
+      }
+
+      .modal-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        overflow-y: auto;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--color-background-primary);
+        border-radius: var(--border-radius-lg);
+        width: 100%;
+        max-width: 360px;
+        border: 0.5px solid var(--color-border-tertiary);
+        overflow: hidden;
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-photo {
+        aspect-ratio: 3/4;
+        background: var(--color-background-secondary);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        flex-shrink: 0;
+      }
+      .modal-body {
+        padding: 1.25rem;
+        overflow-y: auto;
+      }
+      .modal-guest {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 24px;
+        font-style: italic;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        margin-bottom: 2px;
+      }
+      .modal-time {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 1rem;
+      }
+      .voice-player {
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-md);
+        padding: 12px 14px;
+      }
+      .vp-label {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+      }
+      .vp-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .play-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--color-text-primary);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-background-primary);
+        font-size: 14px;
+        flex-shrink: 0;
+        transition: 0.15s;
+      }
+      .play-btn:hover {
+        opacity: 0.8;
+      }
+      .progress-wrap {
+        flex: 1;
+        height: 4px;
+        background: var(--color-border-tertiary);
+        border-radius: 2px;
+        cursor: pointer;
+        position: relative;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 2px;
+        background: var(--color-text-primary);
+        transition: width 0.1s;
+      }
+      .vp-time {
+        font-size: 11px;
+        color: var(--muted);
+        min-width: 28px;
+        text-align: right;
+      }
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+        font-size: 16px;
+      }
+      .no-voice {
+        font-size: 12px;
+        color: var(--muted);
+        font-style: italic;
+      }
+      .modal-frame-ov {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .load-more {
+        width: 100%;
+        padding: 11px;
+        border-radius: var(--border-radius-md);
+        background: transparent;
+        border: 0.5px solid var(--color-border-secondary);
+        font-family: "SF Pro", "DM Sans", sans-serif;
+        font-size: 14px;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .load-more:hover {
+        background: var(--color-background-secondary);
+      }
+    </style>
+
+    <!-- <h2 class="sr-only">Dashboard pengantin — galeri foto dan ucapan tamu</h2> -->
+
+    <div class="dash">
+      <!-- HEADER LOGO -->
+      <header
+        style="
+          display: flex;
+          justify-content: center;
+          padding: 12px 0;
+          margin-bottom: 8px;
+        "
+      >
+        <img
+          src="Logo Bingkiskaca.png"
+          alt="Logo Bingkis Kaca"
+          style="height: 38px; object-fit: contain"
+        />
+      </header>
+
+      <!-- HERO -->
+      <div class="hero" id="hero-section">
+        <img
+          id="hero-couple-img"
+          class="hero-photo"
+          src=""
+          alt="Foto Pengantin"
+          style="display: none"
+        />
+        <svg
+          id="hero-fallback-bg"
+          class="hero-photo"
+          viewBox="0 0 680 220"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect width="680" height="220" fill="#4a2f18" />
+          <ellipse
+            cx="200"
+            cy="110"
+            rx="160"
+            ry="130"
+            fill="#6b4030"
+            opacity=".6"
+          />
+          <ellipse
+            cx="480"
+            cy="80"
+            rx="120"
+            ry="100"
+            fill="#8b5a35"
+            opacity=".4"
+          />
+          <circle cx="340" cy="110" r="80" fill="#7a4828" opacity=".3" />
+        </svg>
+        <div class="hero-overlay">
+          <div class="hero-event" id="hero-event-label">Pernikahan Bahagia</div>
+          <div class="hero-couple" id="hero-couple-name">Memuat...</div>
+          <div class="hero-date" id="hero-event-date">—</div>
+        </div>
+        <div class="hero-badge">
+          <div class="live-dot"></div>
+          Live
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-num" id="total-count">12</div>
+          <div class="stat-lbl">Total Tamu</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="voice-count">9</div>
+          <div class="stat-lbl">Voice Note</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="new-count">3</div>
+          <div class="stat-lbl">Baru Masuk</div>
+        </div>
+      </div>
+
+      <!-- GALLERY HEADER -->
+      <div class="section-head">
+        <div class="section-title">Kenangan Tamu</div>
+        <div class="filter-row">
+          <div class="pill active" onclick="filterGallery('all', this)">
+            Semua
+          </div>
+          <div class="pill" onclick="filterGallery('voice', this)">
+            Ada Suara
+          </div>
+          <div class="pill" onclick="filterGallery('new', this)">Terbaru</div>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="gallery" id="gallery"></div>
+
+      <button class="load-more">
+        Lihat semua foto tamu
+        <i class="ti ti-chevron-down" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+      <div class="modal" id="modal">
+        <div style="position: relative">
+          <div class="modal-photo" id="modal-photo">
+            <span id="modal-emoji"></span>
+            <div class="modal-frame-ov" id="modal-frame-ov"></div>
+          </div>
+          <button class="modal-close" onclick="closeModalDirect()">
+            <i class="ti ti-x" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-guest" id="modal-guest"></div>
+          <div class="modal-time" id="modal-time"></div>
+          <div id="modal-voice-wrap"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ════════════════════════════════════════════════════
+      // ── SUPABASE CONFIG — sama dengan yang di guest app ──
+      // ════════════════════════════════════════════════════
+      const SUPABASE_URL = "https://hzrfiyqvyilnojrwwdyu.supabase.co/"; // ← GANTI
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6cmZpeXF2eWlsbm9qcnd3ZHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTY2NDMsImV4cCI6MjA5NjQ3MjY0M30.AD0cAPOE1RnyrtxfgkvNLiVxjLs2D8AqwyXEHQpGBzA"; // ← GANTI
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // Slug event dari URL: /dashboard.html?event=ahmad-siti-2024
+      const urlParams = new URLSearchParams(window.location.search);
+      const EVENT_SLUG = urlParams.get("event") || "demo";
+
+      // ── FRAME SVG ─────────────────────────────────────────────────
+      const frames = [
+        `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="1" y="1" width="98" height="131" rx="2" fill="none" stroke="#c9a96e" stroke-width="3"/><rect x="4" y="4" width="92" height="92" fill="none" stroke="#e8d5b0" stroke-width="1" stroke-dasharray="3 2"/><rect x="1" y="110" width="98" height="22" fill="rgba(255,255,255,0.9)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#9c7c5e" font-family="Georgia,serif" font-style="italic">Garden Rose</text></svg>`,
+        `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="1" y="1" width="98" height="131" rx="1" fill="none" stroke="#c9a96e" stroke-width="3"/><path d="M1 14 L1 1 L14 1" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M86 1 L99 1 L99 14" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M1 119 L1 131 L14 131" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M86 131 L99 131 L99 119" fill="none" stroke="#b8843a" stroke-width="2"/><rect x="1" y="110" width="98" height="22" fill="rgba(255,250,240,0.95)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#6b4c2a" font-family="Georgia,serif">Vintage Gold</text></svg>`,
+        `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="3" y="3" width="94" height="127" rx="4" fill="none" stroke="#f0c4be" stroke-width="5"/><rect x="6" y="6" width="88" height="88" rx="2" fill="none" stroke="#d4847a" stroke-width="1"/><circle cx="13" cy="10" r="4" fill="rgba(212,132,122,0.4)"/><circle cx="87" cy="10" r="4" fill="rgba(212,132,122,0.4)"/><rect x="3" y="110" width="94" height="22" fill="rgba(255,255,255,0.95)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#d4847a" font-family="Georgia,serif">Floral White</text></svg>`,
+        `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="0" y="0" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="123" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="94" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="6" y="110" width="88" height="13" fill="rgba(250,246,240,0.95)"/><text x="50" y="119" text-anchor="middle" font-size="5.5" fill="#6b4c2a" font-family="Courier,monospace" letter-spacing="2">CLASSIC FILM</text></svg>`,
+      ];
+
+      // ── STATE ────────────────────────────────────────────────────
+      let guests = []; // Array submission dari Supabase
+      let currentFilter = "all";
+      let playInterval = null;
+      let isPlaying = false;
+      let playProgress = 0;
+      let currentDuration = 0;
+      let currentAudio = null; // HTMLAudioElement untuk voice note asli
+      let newGuestIds = new Set(); // ID submission yang baru masuk (untuk badge "Baru")
+
+      // ── LOAD DATA DARI SUPABASE ───────────────────────────────────
+      async function loadDashboard() {
+        try {
+          // 1. Load event info
+          const { data: event, error: evErr } = await db
+            .from("events")
+            .select(
+              "id, couple_name, event_date, event_location, couple_photo_url",
+            )
+            .eq("slug", EVENT_SLUG)
+            .single();
+
+          if (evErr || !event) throw new Error("Event tidak ditemukan");
+
+          // Update hero
+          document.getElementById("hero-couple-name").textContent =
+            event.couple_name || "—";
+          const dateStr = event.event_date
+            ? new Date(event.event_date).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
+            : "";
+          document.getElementById("hero-event-date").textContent = [
+            dateStr,
+            event.event_location,
+          ]
+            .filter(Boolean)
+            .join(" · ");
+
+          // Foto pengantin sebagai background
+          if (event.couple_photo_url) {
+            const img = document.getElementById("hero-couple-img");
+            img.src = event.couple_photo_url;
+            img.style.display = "block";
+            document.getElementById("hero-fallback-bg").style.display = "none";
+          }
+
+          // 2. Load submissions
+          const { data: subs, error: subErr } = await db
+            .from("submissions")
+            .select("*")
+            .eq("event_id", event.id)
+            .order("created_at", { ascending: false });
+
+          if (!subErr && subs) {
+            guests = subs;
+            renderGallery();
+            updateStats();
+          }
+
+          // 3. Realtime subscription — auto-refresh saat tamu baru kirim foto
+          db.channel("dashboard-" + event.id)
+            .on(
+              "postgres_changes",
+              {
+                event: "INSERT",
+                schema: "public",
+                table: "submissions",
+                filter: `event_id=eq.${event.id}`,
+              },
+              (payload) => {
+                const newSub = payload.new;
+                newGuestIds.add(newSub.id); // Tandai sebagai "Baru"
+                guests.unshift(newSub); // Tambah ke awal array
+                renderGallery();
+                updateStats();
+                showNewGuestToast(newSub.guest_name); // Notifikasi kecil di pojok
+              },
+            )
+            .subscribe();
+        } catch (err) {
+          console.error("Dashboard error:", err);
+          document.getElementById("hero-couple-name").textContent =
+            "Gagal memuat data";
+        }
+      }
+
+      function updateStats() {
+        const withVoice = guests.filter((g) => g.voice_url);
+        const isNew = (g) => {
+          const d = new Date(g.created_at);
+          return Date.now() - d.getTime() < 30 * 60 * 1000; // < 30 menit
+        };
+        document.getElementById("total-count").textContent = guests.length;
+        document.getElementById("voice-count").textContent = withVoice.length;
+        document.getElementById("new-count").textContent =
+          guests.filter(isNew).length;
+      }
+
+      function showNewGuestToast(name) {
+        const toast = document.createElement("div");
+        toast.style.cssText = `position:fixed;bottom:20px;right:20px;background:#c9a96e;color:#3d2b14;
+    padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;
+    box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:slideIn .3s ease`;
+        toast.textContent = `📸 ${name} baru kirim foto!`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+
+      // ── FILTER & RENDER ───────────────────────────────────────────
+      function filterGallery(f, el) {
+        currentFilter = f;
+        document
+          .querySelectorAll(".pill")
+          .forEach((p) => p.classList.remove("active"));
+        el.classList.add("active");
+        renderGallery();
+      }
+
+      function renderGallery() {
+        const g = document.getElementById("gallery");
+        g.innerHTML = "";
+
+        const isNew = (sub) =>
+          newGuestIds.has(sub.id) ||
+          Date.now() - new Date(sub.created_at).getTime() < 30 * 60 * 1000;
+
+        let list = guests;
+        if (currentFilter === "voice") list = guests.filter((g) => g.voice_url);
+        if (currentFilter === "new") list = guests.filter((g) => isNew(g));
+
+        if (list.length === 0) {
+          g.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9c7c5e;font-size:14px">
+      ${currentFilter === "all" ? "📸 Belum ada kiriman tamu." : "Tidak ada kiriman yang cocok."}
+    </div>`;
+          return;
+        }
+
+        list.forEach((sub, i) => {
+          const card = document.createElement("div");
+          card.className = "photo-card";
+          card.onclick = () => openModal(guests.indexOf(sub));
+
+          const frameIdx = Math.min(sub.frame_index ?? 0, frames.length - 1);
+          const bgColors = ["#d4c4b0", "#c8b89a", "#ddd0bc", "#e0ceba"];
+          const timeStr = new Date(sub.created_at).toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const badgeNew = isNew(sub)
+            ? `<div class="new-badge">Baru</div>`
+            : "";
+          const badgeVoice = sub.voice_url
+            ? `<div class="voice-badge"><i class="ti ti-microphone" aria-hidden="true" style="font-size:10px"></i></div>`
+            : "";
+
+          // Jika ada foto real, tampilkan. Jika tidak, tampilkan placeholder
+          const photoContent = sub.photo_url
+            ? `<img src="${sub.photo_url}" alt="${sub.guest_name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px"/>`
+            : `<div class="photo-sim">${getInitialEmoji(sub.guest_name)}</div>`;
+
+          card.innerHTML = `
+      <div class="photo-inner">
+        <div class="photo-area" style="background:${bgColors[frameIdx]}">
+          ${photoContent}
+          <div class="frame-overlay-sim">${frames[frameIdx]}</div>
+          ${badgeVoice}${badgeNew}
+        </div>
+        <div class="photo-strip">
+          <div class="photo-guest">${sub.guest_name}</div>
+          <div class="photo-time">${timeStr}</div>
+        </div>
+      </div>`;
+          g.appendChild(card);
+        });
+      }
+
+      // Buat emoji inisial sederhana dari nama
+      function getInitialEmoji(name) {
+        const emojis = [
+          "👩",
+          "👨",
+          "👩‍🦱",
+          "👨‍💼",
+          "👩‍🦰",
+          "🧔",
+          "👩‍🎓",
+          "👴",
+          "👩‍⚕️",
+          "👱‍♂️",
+          "👧",
+          "🧑",
+        ];
+        const idx = (name.charCodeAt(0) || 0) % emojis.length;
+        return `<span style="font-size:32px">${emojis[idx]}</span>`;
+      }
+
+      // ── MODAL ─────────────────────────────────────────────────────
+      function openModal(idx) {
+        const sub = guests[idx];
+        if (!sub) return;
+
+        const frameIdx = Math.min(sub.frame_index ?? 0, frames.length - 1);
+        const bgColors = ["#d4c4b0", "#c8b89a", "#ddd0bc", "#e0ceba"];
+        const timeStr = new Date(sub.created_at).toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const frameNames = [
+          "Garden Rose",
+          "Vintage Gold",
+          "Floral White",
+          "Classic Film",
+        ];
+
+        // Tampilkan foto asli jika ada
+        const mp = document.getElementById("modal-photo");
+        mp.style.background = bgColors[frameIdx];
+        if (sub.photo_url) {
+          mp.innerHTML = `<img src="${sub.photo_url}" alt="${sub.guest_name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>`;
+        } else {
+          document.getElementById("modal-emoji").textContent = getInitialEmoji(
+            sub.guest_name,
+          );
+        }
+        document.getElementById("modal-frame-ov").innerHTML = frames[frameIdx];
+        document.getElementById("modal-guest").textContent = sub.guest_name;
+        document.getElementById("modal-time").textContent =
+          `Dikirim pukul ${timeStr} · Bingkai ${frameNames[frameIdx]}`;
+
+        // Voice player — pakai URL asli dari Supabase
+        const wrap = document.getElementById("modal-voice-wrap");
+        if (sub.voice_url) {
+          if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+          }
+          currentAudio = new Audio(sub.voice_url);
+          currentAudio.addEventListener("timeupdate", () => {
+            const pct =
+              (currentAudio.currentTime / currentAudio.duration) * 100;
+            const fill = document.getElementById("prog-fill");
+            const timer = document.getElementById("vp-time");
+            if (fill) fill.style.width = pct + "%";
+            if (timer) {
+              const rem = Math.ceil(
+                currentAudio.duration - currentAudio.currentTime,
+              );
+              const m = Math.floor(rem / 60),
+                s = rem % 60;
+              timer.textContent = `${m}:${s.toString().padStart(2, "0")}`;
+            }
+          });
+          currentAudio.addEventListener("ended", () => {
+            isPlaying = false;
+            const pi = document.getElementById("play-icon");
+            if (pi) pi.className = "ti ti-player-play";
+          });
+          wrap.innerHTML = `
+      <div class="voice-player">
+        <div class="vp-label"><i class="ti ti-microphone" aria-hidden="true"></i>&ensp;Ucapan dari ${sub.guest_name.split(" ")[0]}</div>
+        <div class="vp-row">
+          <button class="play-btn" id="play-btn" onclick="togglePlay()" aria-label="Play voice note">
+            <i class="ti ti-player-play" id="play-icon" aria-hidden="true"></i>
+          </button>
+          <div class="progress-wrap" onclick="seekVoice(event)">
+            <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+          </div>
+          <div class="vp-time" id="vp-time">--:--</div>
+        </div>
+      </div>`;
+        } else {
+          wrap.innerHTML = `<div class="no-voice">Tamu ini tidak merekam ucapan</div>`;
+        }
+
+        document.getElementById("modal-bg").classList.add("open");
+      }
+
+      function togglePlay() {
+        if (!currentAudio) return;
+        if (isPlaying) {
+          currentAudio.pause();
+          isPlaying = false;
+          document.getElementById("play-icon").className = "ti ti-player-play";
+        } else {
+          currentAudio.play();
+          isPlaying = true;
+          document.getElementById("play-icon").className = "ti ti-player-pause";
+        }
+      }
+
+      function seekVoice(e) {
+        if (!currentAudio || !currentAudio.duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        currentAudio.currentTime = pct * currentAudio.duration;
+      }
+
+      function closeModal(e) {
+        if (e.target === document.getElementById("modal-bg"))
+          closeModalDirect();
+      }
+      function closeModalDirect() {
+        if (currentAudio) {
+          currentAudio.pause();
+          isPlaying = false;
+        }
+        document.getElementById("modal-bg").classList.remove("open");
+      }
+
+      // ── BOOT ──────────────────────────────────────────────────────
+      loadDashboard();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3577 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Virtual Photobooth</title>
+
+    <!-- Tabler Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+    />
+
+    <!-- Google Fonts & Custom Fonts -->
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap");
+
+      @font-face {
+        font-family: "SF Pro";
+        src: url("SF-Pro.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Gyahegi";
+        src: url("Gyahegi Italic.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+
+    <style>
+      :root {
+        /* Colors */
+        --bg-primary: #f8fafc;
+        --bg-secondary: #f1f5f9;
+        --card-bg: #ffffff;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #94a3b8;
+
+        --sidebar-bg: #0f172a;
+        --sidebar-text: #f8fafc;
+        --sidebar-text-muted: #64748b;
+        --sidebar-border: #1e293b;
+
+        --gold: #c9a96e;
+        --gold-dark: #b8843a;
+        --gold-light: #faf6f0;
+
+        --rose: #d4847a;
+        --rose-light: #f0c4be;
+
+        --success: #10b981;
+        --success-bg: #d1fae5;
+        --success-text: #065f46;
+
+        --danger: #ef4444;
+        --danger-bg: #fee2e2;
+        --danger-text: #991b1b;
+
+        --border: #e2e8f0;
+        --border-focus: #c9a96e;
+
+        /* Radii */
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md:
+          0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        --shadow-lg:
+          0 10px 15px -3px rgba(0, 0, 0, 0.05),
+          0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        --shadow-premium:
+          0 20px 25px -5px rgba(0, 0, 0, 0.03),
+          0 8px 10px -6px rgba(0, 0, 0, 0.03);
+
+        /* Animation */
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "SF Pro", "Outfit", "DM Sans", sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        display: flex;
+      }
+
+      /* ── DASHBOARD LAYOUT ── */
+      .dashboard-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        width: 100%;
+        min-height: 100vh;
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        border-right: 1px solid var(--sidebar-border);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        transition: var(--transition);
+      }
+
+      .sidebar-header {
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid var(--sidebar-border);
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, var(--gold), var(--rose));
+        border-radius: var(--radius-sm);
+        color: #fff;
+      }
+
+      .sidebar-logo {
+        height: 38px;
+        max-width: 120px;
+        object-fit: contain;
+      }
+
+      .logo-container i {
+        font-size: 20px;
+      }
+
+      .logo-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .logo-title {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 18px;
+        font-style: italic;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        background: linear-gradient(90deg, #faf6f0, var(--gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .logo-subtitle {
+        font-size: 11px;
+        color: var(--sidebar-text-muted);
+        letter-spacing: 1px;
+      }
+
+      .current-event-panel {
+        padding: 16px 20px;
+        margin: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-md);
+      }
+
+      .current-event-title {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--sidebar-text-muted);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .current-event-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .current-event-meta {
+        font-size: 11px;
+        color: var(--sidebar-text-muted);
+        margin-top: 2px;
+      }
+
+      .sidebar-nav {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border: none;
+        background: transparent;
+        color: var(--sidebar-text-muted);
+        font-family: "Outfit", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        text-align: left;
+        transition: var(--transition);
+        width: 100%;
+      }
+
+      .nav-item i {
+        font-size: 18px;
+        transition: var(--transition);
+      }
+
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.02);
+        color: #fff;
+      }
+
+      .nav-item.active {
+        background: linear-gradient(
+          90deg,
+          rgba(201, 169, 110, 0.15) 0%,
+          rgba(201, 169, 110, 0.02) 100%
+        );
+        color: var(--gold);
+        border-left: 3px solid var(--gold);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding-left: 13px;
+      }
+
+      .nav-item.active i {
+        color: var(--gold);
+      }
+
+      .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid var(--sidebar-border);
+        text-align: center;
+        font-size: 11px;
+        color: var(--sidebar-text-muted);
+      }
+
+      /* ── MAIN CONTENT ── */
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow-y: auto;
+      }
+
+      /* ── HEADER ── */
+      .topbar {
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .topbar-left {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .page-subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .badge-live {
+        background: var(--success-bg);
+        color: var(--success-text);
+        font-size: 12px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+      }
+
+      .pulse-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--success);
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+
+      /* ── MOBILE HEADER ── */
+      .mobile-header {
+        display: none;
+        background: var(--sidebar-bg);
+        color: #fff;
+        padding: 12px 16px;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 101;
+        width: 100%;
+        border-bottom: 1px solid var(--sidebar-border);
+      }
+
+      .mobile-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .mobile-logo i {
+        font-size: 18px;
+        color: var(--gold);
+      }
+
+      .mobile-logo span {
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .menu-toggle {
+        background: transparent;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+      }
+
+      /* ── WORKSPACE GRID ── */
+      .workspace {
+        padding: 32px;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 32px;
+        align-items: start;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+      }
+
+      .workspace-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .pane {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .pane.active {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── CARDS & SECTIONS ── */
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--gold), var(--rose));
+        opacity: 0.15;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+
+      .card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: var(--gold-light);
+        color: var(--gold-dark);
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .card-sub {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        margin-left: 44px;
+      }
+
+      .card-content {
+        margin-left: 44px;
+      }
+
+      /* ── COLUMNS ── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      /* ── STATS ROW ── */
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+
+      .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--gold);
+      }
+
+      .stat-icon-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+      }
+
+      .stat-card:nth-child(1) .stat-icon-wrap {
+        background: #eff6ff;
+        color: #3b82f6;
+      }
+      .stat-card:nth-child(2) .stat-icon-wrap {
+        background: #fdf2f8;
+        color: #ec4899;
+      }
+      .stat-card:nth-child(3) .stat-icon-wrap {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .stat-card:nth-child(4) .stat-icon-wrap {
+        background: #ecfdf5;
+        color: #10b981;
+      }
+
+      .stat-icon-wrap i {
+        font-size: 22px;
+      }
+
+      .stat-data {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .stat-num {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.1;
+      }
+
+      .stat-lbl {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        font-weight: 500;
+      }
+
+      /* ── EVENTS LIST ── */
+      .event-list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .event-row {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        transition: var(--transition);
+      }
+
+      .event-row:hover {
+        border-color: var(--border-focus);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .event-status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--success);
+        margin-right: 16px;
+        position: relative;
+      }
+
+      .event-status-indicator::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid var(--success);
+        opacity: 0.4;
+        animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.5);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.3);
+          opacity: 0;
+        }
+      }
+
+      .event-status-indicator.draft {
+        background: var(--text-muted);
+      }
+
+      .event-status-indicator.draft::after {
+        display: none;
+      }
+
+      .event-info {
+        flex: 1;
+      }
+
+      .event-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .event-meta {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .event-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        background: var(--success-bg);
+        color: var(--success-text);
+      }
+
+      .event-badge.draft {
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+      }
+
+      .event-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      /* ── FORMS & INPUTS ── */
+      .field {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .field label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--bg-primary);
+        font-family: "Outfit", sans-serif;
+        font-size: 14px;
+        color: var(--text-primary);
+        outline: none;
+        transition: var(--transition);
+      }
+
+      .field textarea {
+        resize: vertical;
+        min-height: 90px;
+        line-height: 1.5;
+      }
+
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: var(--border-focus);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12);
+      }
+
+      .field input::placeholder,
+      .field textarea::placeholder {
+        color: var(--text-muted);
+      }
+
+      /* ── UPLOAD ZONE ── */
+      .upload-zone {
+        border: 2px dashed var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px 24px;
+        text-align: center;
+        cursor: pointer;
+        background: var(--bg-primary);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .upload-zone:hover {
+        border-color: var(--gold);
+        background: rgba(201, 169, 110, 0.02);
+      }
+
+      .upload-zone i {
+        font-size: 36px;
+        color: var(--gold);
+        background: #fff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 4px;
+        transition: var(--transition);
+      }
+
+      .upload-zone:hover i {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .upload-zone p {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .upload-zone small {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      /* ── HERO PREVIEW IN PANEL ── */
+      .hero-preview {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        height: 140px;
+        position: relative;
+        margin-bottom: 16px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .hero-sim {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #3d2b14, #8b5e3c);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .hero-sim-text {
+        color: #faf6f0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      }
+
+      .hero-sim-event {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        opacity: 0.8;
+        margin-bottom: 2px;
+      }
+
+      .hero-sim-couple {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 26px;
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      .hero-sim-date {
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 2px;
+      }
+
+      .hero-edit-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 6px 12px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+      }
+
+      .hero-edit-btn:hover {
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      /* ── COLOR PANEL ── */
+      .color-swatch-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+
+      .color-swatch {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 1px var(--border);
+        transition: var(--transition);
+        position: relative;
+      }
+
+      .color-swatch:hover {
+        transform: scale(1.1);
+      }
+
+      .color-swatch.selected {
+        box-shadow: 0 0 0 2px var(--gold-dark);
+        transform: scale(1.08);
+      }
+
+      .color-swatch.selected::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .custom-color-input-wrapper {
+        position: relative;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 1px var(--border);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .custom-color-input-wrapper:hover {
+        transform: scale(1.1);
+      }
+
+      .custom-color-input-wrapper input[type="color"] {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+
+      /* ── FRAMES GRID ── */
+      .frame-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .frame-item {
+        aspect-ratio: 3/4;
+        border-radius: var(--radius-md);
+        border: 2px solid var(--border);
+        cursor: pointer;
+        overflow: hidden;
+        background: var(--bg-primary);
+        position: relative;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .frame-item:hover {
+        border-color: var(--gold);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .frame-item.active {
+        border-color: var(--gold-dark);
+        box-shadow: 0 4px 12px rgba(201, 169, 110, 0.15);
+      }
+
+      .fcheck {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--gold-dark);
+        color: #fff;
+        font-size: 11px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .frame-item.active .fcheck {
+        display: flex;
+      }
+
+      .frame-svg-mini {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .frame-add {
+        aspect-ratio: 3/4;
+        border-radius: var(--radius-md);
+        border: 2px dashed var(--border);
+        cursor: pointer;
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: var(--transition);
+      }
+
+      .frame-add:hover {
+        background: var(--bg-secondary);
+        border-color: var(--gold);
+      }
+
+      .frame-add i {
+        font-size: 24px;
+        color: var(--text-secondary);
+      }
+
+      .frame-add span {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+
+      /* ── GUIDES ── */
+      .guide-box {
+        padding: 16px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .guide-success {
+        background: var(--success-bg);
+        color: var(--success-text);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+      }
+
+      .guide-danger {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+        border: 1px solid rgba(239, 68, 68, 0.15);
+      }
+
+      .guide-title {
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* ── BUTTONS ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 20px;
+        border-radius: var(--radius-md);
+        font-family: "Outfit", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--card-bg);
+        color: var(--text-primary);
+        transition: var(--transition);
+        user-select: none;
+      }
+
+      .btn:hover {
+        background: var(--bg-primary);
+        border-color: var(--text-secondary);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 12px rgba(201, 169, 110, 0.3);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #bca065, #a3722e);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(201, 169, 110, 0.4);
+      }
+
+      .btn-outline {
+        border: 1px solid var(--gold);
+        color: var(--gold-dark);
+        background: transparent;
+      }
+
+      .btn-outline:hover {
+        background: var(--gold-light);
+        border-color: var(--gold-dark);
+      }
+
+      .btn-danger {
+        color: var(--danger);
+        border-color: var(--danger);
+        background: transparent;
+      }
+
+      .btn-danger:hover {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+      }
+
+      /* ── QR CODE ZONE ── */
+      .qr-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 0;
+      }
+
+      .qr-card-wrap {
+        background: #fff;
+        padding: 20px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 20px;
+        transition: var(--transition);
+      }
+
+      .qr-card-wrap:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+
+      .qr-link-display {
+        font-size: 13px;
+        color: var(--text-secondary);
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        padding: 10px 16px;
+        border-radius: var(--radius-md);
+        font-family: monospace;
+        margin-bottom: 20px;
+        word-break: break-all;
+        text-align: center;
+        max-width: 360px;
+        font-weight: 500;
+      }
+
+      /* ── TOGGLES ── */
+      .toggle-list {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .toggle-row:last-child {
+        border-bottom: none;
+      }
+
+      .toggle-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .toggle-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .toggle-desc {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .toggle-switch {
+        width: 44px;
+        height: 24px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        transition: var(--transition);
+        background: #cbd5e1;
+        flex-shrink: 0;
+      }
+
+      .toggle-switch.on {
+        background: var(--success);
+      }
+
+      .toggle-switch::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        transition: var(--transition);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .toggle-switch.on::after {
+        left: 23px;
+      }
+
+      /* ── SAVE FLOATING BAR ── */
+      .save-bar {
+        position: fixed;
+        bottom: 24px;
+        left: 284px; /* offset sidebar */
+        right: 24px;
+        background: #0f172af2;
+        backdrop-filter: blur(12px);
+        border: 1px solid #1e293b;
+        border-radius: var(--radius-lg);
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #fff;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        z-index: 999;
+        transform: translateY(150%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .save-bar.visible {
+        transform: translateY(0);
+      }
+
+      .save-msg {
+        font-size: 14px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .save-msg i {
+        color: var(--gold);
+        font-size: 18px;
+      }
+
+      .save-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .saved-toast {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--success);
+        display: none;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* ── LIVE PREVIEW PHONE SIDEBAR ── */
+      .workspace-preview {
+        position: sticky;
+        top: 100px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .preview-header {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+      }
+
+      .phone-mockup {
+        position: relative;
+        width: 290px;
+        height: 580px;
+        background: #000;
+        border-radius: 40px;
+        border: 12px solid #1e293b;
+        box-shadow:
+          var(--shadow-premium),
+          0 30px 60px -15px rgba(0, 0, 0, 0.15);
+        margin: 0 auto;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .phone-speaker {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 4px;
+        background: #334155;
+        border-radius: 2px;
+        z-index: 10;
+      }
+
+      .phone-screen {
+        flex: 1;
+        background: #faf6f0;
+        overflow-y: auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .phone-screen::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* ── SIMULATED GUEST APP ── */
+      .phone-app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        position: relative;
+      }
+
+      .phone-pane {
+        display: none;
+        flex-direction: column;
+        flex: 1;
+        width: 100%;
+      }
+
+      .phone-pane.active {
+        display: flex;
+      }
+
+      /* Screen: Welcome */
+      .phone-hero {
+        height: 160px;
+        position: relative;
+        background: linear-gradient(135deg, #3d2b14, #8b5e3c);
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: flex-end;
+        padding: 12px 16px;
+        transition: var(--transition);
+      }
+
+      .phone-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.1),
+          rgba(0, 0, 0, 0.6)
+        );
+        z-index: 1;
+      }
+
+      .phone-hero-text {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+      }
+
+      .phone-hero-event {
+        font-size: 8px;
+        letter-spacing: 2px;
+        opacity: 0.8;
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .phone-hero-couple {
+        font-family: "Gyahegi", "Playfair Display", serif;
+        font-size: 20px;
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      .phone-hero-date {
+        font-size: 9px;
+        opacity: 0.7;
+        margin-top: 1px;
+      }
+
+      .phone-hero-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--text-primary);
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 10px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .phone-pulse {
+        width: 5px;
+        height: 5px;
+        background: var(--success);
+        border-radius: 50%;
+      }
+
+      .phone-body {
+        padding: 14px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .phone-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(44, 24, 16, 0.04);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid rgba(201, 169, 110, 0.1);
+      }
+
+      .phone-logo {
+        font-family: "Playfair Display", serif;
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
+      .phone-welcome-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+
+      .phone-welcome-text {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-align: center;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+
+      .phone-input-sim {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+
+      .phone-input-lbl {
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        display: block;
+        letter-spacing: 0.5px;
+      }
+
+      .phone-input-box {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--text-muted);
+        background: #faf6f0;
+      }
+
+      .phone-btn-primary {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: var(--gold);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(201, 169, 110, 0.2);
+      }
+
+      /* Screen: Frame Picker */
+      .phone-app-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        text-align: center;
+        margin-top: 6px;
+      }
+
+      .phone-app-sub {
+        font-size: 10px;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 12px;
+      }
+
+      .phone-frame-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .phone-frame-item {
+        aspect-ratio: 3/4;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: #fff;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.5;
+        transition: var(--transition);
+      }
+
+      .phone-frame-item.selected {
+        border-color: var(--gold-dark);
+        opacity: 1;
+        box-shadow: 0 2px 6px rgba(201, 169, 110, 0.1);
+      }
+
+      .phone-frame-item .check-icon {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--gold-dark);
+        color: #fff;
+        font-size: 8px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .phone-frame-item.selected .check-icon {
+        display: flex;
+      }
+
+      /* Screen: Camera / Voice */
+      .phone-cam-wrap {
+        width: 100%;
+        aspect-ratio: 3/4;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #1a0f08;
+        position: relative;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .phone-cam-sim {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 24px;
+      }
+
+      .phone-frame-overlay {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .phone-frame-overlay svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .phone-voice-rec {
+        margin-top: 10px;
+        background: #f5ede0;
+        border: 1px solid var(--rose-light);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+      }
+
+      .phone-voice-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--rose);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        margin: 0 auto 6px;
+        box-shadow: 0 2px 8px rgba(212, 132, 122, 0.3);
+      }
+
+      .phone-voice-lbl {
+        font-size: 10px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      /* iOS Home indicator */
+      .phone-home-indicator {
+        height: 20px;
+        width: 100%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 1px solid #f1f5f9;
+      }
+
+      .phone-bar {
+        width: 80px;
+        height: 4px;
+        background: #cbd5e1;
+        border-radius: 2px;
+      }
+
+      /* iOS Toast */
+      .toast-notification {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translate(-50%, -150%);
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px 24px;
+        border-radius: 30px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .toast-notification.show {
+        transform: translate(-50%, 0);
+      }
+
+      .toast-notification i {
+        font-size: 16px;
+      }
+
+      .toast-notification.success i {
+        color: var(--success);
+      }
+      .toast-notification.info i {
+        color: var(--gold);
+      }
+
+      /* ── RESPONSIVE MEDIA QUERIES ── */
+      @media (max-width: 1200px) {
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+        .workspace-preview {
+          display: none; /* hide smartphone preview on small screens to save space */
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .dashboard-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: fixed;
+          left: -260px;
+          top: 0;
+          bottom: 0;
+          width: 260px;
+          z-index: 102;
+          box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar.open {
+          left: 0;
+        }
+
+        .sidebar-overlay.open {
+          display: block;
+        }
+
+        .mobile-header {
+          display: flex;
+        }
+
+        .topbar {
+          padding: 12px 16px;
+        }
+
+        .workspace {
+          padding: 16px;
+        }
+
+        .save-bar {
+          left: 16px;
+          right: 16px;
+          bottom: 16px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .stats-container {
+          grid-template-columns: 1fr 1fr;
+        }
+        .frame-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <h2 class="sr-only">Admin panel untuk mengelola event photobooth, frame, tampilan, dan QR code</h2> -->
+
+    <div class="toast-notification success" id="toast">
+      <i class="ti ti-circle-check-filled"></i>
+      <span id="toast-text">Perubahan disimpan</span>
+    </div>
+
+    <div class="dashboard-layout">
+      <!-- BACKDROP OVERLAY FOR MOBILE SIDEBAR -->
+      <div
+        class="sidebar-overlay"
+        id="sidebar-overlay"
+        onclick="toggleSidebar()"
+      ></div>
+
+      <!-- MOBILE HEADER -->
+      <header class="mobile-header">
+        <div class="mobile-logo">
+          <i class="ti ti-camera"></i>
+          <span>Photobooth Admin</span>
+        </div>
+        <button
+          class="menu-toggle"
+          onclick="toggleSidebar()"
+          aria-label="Buka menu navigasi"
+        >
+          <i class="ti ti-menu-2"></i>
+        </button>
+      </header>
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <img
+            src="Logo Bingkiskaca.png"
+            alt="Logo Bingkiskaca"
+            class="sidebar-logo"
+          />
+          <div class="logo-text">
+            <div class="logo-title">Photobooth Admin</div>
+            <div class="logo-subtitle">BINGKIS KACA</div>
+          </div>
+        </div>
+
+        <div class="current-event-panel">
+          <div class="current-event-title">
+            <span>Event Saat Ini</span>
+            <span
+              style="
+                color: var(--success);
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                gap: 3px;
+              "
+            >
+              <span class="pulse-dot"></span> Live
+            </span>
+          </div>
+          <div class="current-event-name" id="sidebar-event-name">
+            Rizky &amp; Nabila
+          </div>
+          <div class="current-event-meta" id="sidebar-event-meta">
+            7 Juni 2026 · Bandung
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-item active" onclick="switchTab('event', this)">
+            <i class="ti ti-calendar-event" aria-hidden="true"></i> Event
+          </button>
+          <button class="nav-item" onclick="switchTab('appearance', this)">
+            <i class="ti ti-palette" aria-hidden="true"></i> Tampilan
+          </button>
+          <button class="nav-item" onclick="switchTab('frames', this)">
+            <i class="ti ti-photo" aria-hidden="true"></i> Bingkai Frame
+          </button>
+          <button class="nav-item" onclick="switchTab('qr', this)">
+            <i class="ti ti-qrcode" aria-hidden="true"></i> QR Code
+          </button>
+          <button class="nav-item" onclick="switchTab('settings', this)">
+            <i class="ti ti-settings" aria-hidden="true"></i> Setelan
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <p>© 2026 Bingkis Kaca</p>
+        </div>
+      </aside>
+
+      <!-- MAIN AREA -->
+      <div class="main-content">
+        <!-- TOPBAR HEADER -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <h2 class="page-title" id="page-title">Dasbor Utama</h2>
+            <p class="page-subtitle" id="page-subtitle">
+              Kelola status event, statistik, dan ringkasan aktivitas saat ini.
+            </p>
+          </div>
+          <div class="topbar-right">
+            <span class="badge-live"><span class="pulse-dot"></span> Live</span>
+            <button
+              class="btn btn-outline"
+              onclick="
+                window.open(
+                  'virtual_photobooth_app.html?event=rizky-nabila-2026',
+                  '_blank',
+                )
+              "
+            >
+              Preview App <i class="ti ti-external-link" aria-hidden="true"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- CONTENT WORKSPACE -->
+        <div class="workspace">
+          <!-- LEFT WORKSPACE COLUMN -->
+          <div class="workspace-main">
+            <!-- ══ TAB: EVENT ══ -->
+            <div class="pane active" id="pane-event">
+              <!-- Stat cards -->
+              <div class="stats-container">
+                <div class="stat-card">
+                  <div class="stat-icon-wrap">
+                    <i class="ti ti-users" aria-hidden="true"></i>
+                  </div>
+                  <div class="stat-data">
+                    <div class="stat-num">12</div>
+                    <div class="stat-lbl">Tamu Foto</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrap">
+                    <i class="ti ti-microphone" aria-hidden="true"></i>
+                  </div>
+                  <div class="stat-data">
+                    <div class="stat-num">9</div>
+                    <div class="stat-lbl">Voice Note</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrap">
+                    <i class="ti ti-sparkles" aria-hidden="true"></i>
+                  </div>
+                  <div class="stat-data">
+                    <div class="stat-num">3</div>
+                    <div class="stat-lbl">Foto Baru</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon-wrap">
+                    <i class="ti ti-circle-check" aria-hidden="true"></i>
+                  </div>
+                  <div class="stat-data">
+                    <div class="stat-num">2</div>
+                    <div class="stat-lbl">Event Aktif</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Event list card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-list" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Daftar Event</h3>
+                </div>
+                <p class="card-sub">
+                  Kelola semua event photobooth yang terdaftar
+                </p>
+                <div class="card-content event-list-container">
+                  <div class="event-row">
+                    <div class="event-status-indicator"></div>
+                    <div class="event-info">
+                      <div class="event-name">
+                        Pernikahan Rizky &amp; Nabila
+                      </div>
+                      <div class="event-meta">
+                        <span><i class="ti ti-calendar"></i> 7 Jun 2026</span>
+                        <span>·</span>
+                        <span><i class="ti ti-users"></i> 12 tamu</span>
+                        <span>·</span>
+                        <span><i class="ti ti-map-pin"></i> Bandung</span>
+                      </div>
+                    </div>
+                    <div class="event-actions">
+                      <span
+                        class="event-badge"
+                        style="align-self: center; margin-right: 12px"
+                        >Live</span
+                      >
+                      <button
+                        class="btn"
+                        style="padding: 6px 12px; font-size: 13px"
+                        onclick="
+                          switchTab(
+                            'appearance',
+                            document.querySelector(
+                              '.sidebar-nav button:nth-child(2)',
+                            ),
+                          )
+                        "
+                      >
+                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="event-row">
+                    <div class="event-status-indicator draft"></div>
+                    <div class="event-info">
+                      <div class="event-name">Ulang Tahun Budi ke-30</div>
+                      <div class="event-meta">
+                        <span><i class="ti ti-calendar"></i> 15 Jun 2026</span>
+                        <span>·</span>
+                        <span><i class="ti ti-users"></i> 0 tamu</span>
+                        <span>·</span>
+                        <span><i class="ti ti-map-pin"></i> Jakarta</span>
+                      </div>
+                    </div>
+                    <div class="event-actions">
+                      <span
+                        class="event-badge draft"
+                        style="align-self: center; margin-right: 12px"
+                        >Draft</span
+                      >
+                      <button
+                        class="btn"
+                        style="padding: 6px 12px; font-size: 13px"
+                      >
+                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Create event card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-plus" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Buat Event Baru</h3>
+                </div>
+                <p class="card-sub">
+                  Buat konfigurasi photobooth untuk acara baru
+                </p>
+                <div class="card-content">
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="event-title-input">Nama Event</label>
+                      <input
+                        type="text"
+                        id="event-title-input"
+                        placeholder="cth: Pernikahan Ana &amp; Budi"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="event-date-input">Tanggal Acara</label>
+                      <input type="date" id="event-date-input" />
+                    </div>
+                  </div>
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="event-host-input"
+                        >Nama Pengantin / Host</label
+                      >
+                      <input
+                        type="text"
+                        id="event-host-input"
+                        placeholder="cth: Ana &amp; Budi"
+                        oninput="syncEventCreation()"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="event-loc-input">Lokasi</label>
+                      <input
+                        type="text"
+                        id="event-loc-input"
+                        placeholder="cth: Jakarta Selatan"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: flex-end;
+                      margin-top: 4px;
+                    "
+                  >
+                    <button
+                      class="btn btn-primary"
+                      onclick="showSaved('Event baru berhasil dibuat!')"
+                    >
+                      <i class="ti ti-plus" aria-hidden="true"></i> Buat Event
+                      Baru
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ TAB: TAMPILAN ══ -->
+            <div class="pane" id="pane-appearance">
+              <!-- Background card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-user-heart" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Foto Pengantin (Background Hero)</h3>
+                </div>
+                <p class="card-sub">
+                  Foto ini akan tampil sebagai latar belakang utama di guest app
+                </p>
+                <div class="card-content">
+                  <div class="hero-preview" id="hero-prev">
+                    <div class="hero-sim" id="hero-sim">
+                      <div class="hero-sim-text">
+                        <div class="hero-sim-event">✦ PERNIKAHAN BAHAGIA ✦</div>
+                        <div class="hero-sim-couple" id="prev-couple">
+                          Rizky &amp; Nabila
+                        </div>
+                        <div class="hero-sim-date" id="prev-date">
+                          7 Juni 2026 · Bandung
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="hero-edit-btn"
+                      onclick="document.getElementById('photo-upload').click()"
+                    >
+                      <i class="ti ti-upload" aria-hidden="true"></i> Ganti
+                      Gambar
+                    </button>
+                    <input
+                      type="file"
+                      id="photo-upload"
+                      accept="image/*"
+                      style="display: none"
+                      onchange="previewHero(this)"
+                    />
+                  </div>
+                  <div
+                    class="upload-zone"
+                    onclick="document.getElementById('photo-upload').click()"
+                  >
+                    <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                    <p>Seret foto pengantin ke sini atau klik untuk memilih</p>
+                    <small
+                      >Format: JPG, PNG · Ukuran Rekomendasi: 1200×800px · Maks:
+                      5MB</small
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Guest app theme configuration card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-palette" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Warna &amp; Tema Aplikasi</h3>
+                </div>
+                <p class="card-sub">
+                  Kustomisasi palet warna, tipografi, dan gaya visual halaman
+                  tamu
+                </p>
+                <div class="card-content">
+                  <div class="field" style="margin-bottom: 24px">
+                    <label>Pilihan Warna Utama</label>
+                    <div class="color-swatch-container" id="color-row">
+                      <div
+                        class="color-swatch selected"
+                        style="background: #c9a96e"
+                        data-hex="#c9a96e"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="color-swatch"
+                        style="background: #d4847a"
+                        data-hex="#d4847a"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="color-swatch"
+                        style="background: #7a9e7e"
+                        data-hex="#7a9e7e"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="color-swatch"
+                        style="background: #7b9ed4"
+                        data-hex="#7b9ed4"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="color-swatch"
+                        style="background: #a87db8"
+                        data-hex="#a87db8"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="color-swatch"
+                        style="
+                          background: linear-gradient(135deg, #c9a96e, #d4847a);
+                        "
+                        data-hex="#d4847a"
+                        onclick="selectColor(this)"
+                      ></div>
+                      <div
+                        class="custom-color-input-wrapper"
+                        title="Warna Kustom"
+                      >
+                        <input
+                          type="color"
+                          value="#c9a96e"
+                          id="color-custom"
+                          onchange="customColor(this)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="welcome-text-input"
+                      >Teks Sambutan (Landing Page)</label
+                    >
+                    <textarea
+                      id="welcome-text-input"
+                      placeholder="Tulis teks pembuka..."
+                      oninput="updateMockupWelcomeText(this.value)"
+                    >
+Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textarea
+                    >
+                  </div>
+
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="title-font-select">Font Judul Utama</label>
+                      <select
+                        id="title-font-select"
+                        onchange="updateTitleFont(this.value)"
+                      >
+                        <option value="Playfair Display">
+                          Playfair Display (Klasik)
+                        </option>
+                        <option value="Cormorant Garamond">
+                          Cormorant Garamond (Elegans)
+                        </option>
+                        <option value="Great Vibes">
+                          Great Vibes (Romantis)
+                        </option>
+                        <option value="Libre Baskerville">
+                          Libre Baskerville (Formal)
+                        </option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="theme-style-select">Gaya Tema Presets</label>
+                      <select
+                        id="theme-style-select"
+                        onchange="updateThemePreset(this.value)"
+                      >
+                        <option value="elegan">
+                          Elegan (Gold &amp; Cream)
+                        </option>
+                        <option value="romantic">
+                          Romantic (Rose &amp; White)
+                        </option>
+                        <option value="garden">
+                          Garden (Green &amp; Ivory)
+                        </option>
+                        <option value="modern">Modern (Dark &amp; Gold)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      gap: 12px;
+                      justify-content: flex-end;
+                      margin-top: 8px;
+                    "
+                  >
+                    <button class="btn btn-primary" onclick="showSaved()">
+                      <i class="ti ti-check" aria-hidden="true"></i> Simpan
+                      Tampilan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ TAB: FRAME ══ -->
+            <div class="pane" id="pane-frames">
+              <!-- Polaroid Frames card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-layout-board" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Kelola Bingkai Polaroid</h3>
+                </div>
+                <p class="card-sub">
+                  Aktifkan atau unggah desain frame polaroid untuk kamera tamu
+                </p>
+                <div class="card-content">
+                  <div class="frame-grid" id="frame-grid">
+                    <div
+                      class="frame-item active"
+                      onclick="toggleFrame(this, 0)"
+                    >
+                      <svg viewBox="0 0 60 80" class="frame-svg-mini">
+                        <rect
+                          x="1"
+                          y="1"
+                          width="58"
+                          height="78"
+                          rx="2"
+                          fill="none"
+                          stroke="#c9a96e"
+                          stroke-width="3"
+                        />
+                        <rect
+                          x="4"
+                          y="4"
+                          width="52"
+                          height="52"
+                          fill="none"
+                          stroke="#e8d5b0"
+                          stroke-width="1"
+                          stroke-dasharray="3 2"
+                        />
+                        <rect
+                          x="1"
+                          y="60"
+                          width="58"
+                          height="18"
+                          fill="rgba(255,255,255,0.85)"
+                        />
+                        <text
+                          x="30"
+                          y="71"
+                          text-anchor="middle"
+                          font-size="5"
+                          fill="#9c7c5e"
+                          font-family="Georgia,serif"
+                          font-style="italic"
+                        >
+                          Garden Rose
+                        </text>
+                      </svg>
+                      <div class="fcheck">
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                      </div>
+                    </div>
+
+                    <div
+                      class="frame-item active"
+                      onclick="toggleFrame(this, 1)"
+                    >
+                      <svg viewBox="0 0 60 80" class="frame-svg-mini">
+                        <rect
+                          x="1"
+                          y="1"
+                          width="58"
+                          height="78"
+                          rx="1"
+                          fill="none"
+                          stroke="#c9a96e"
+                          stroke-width="3"
+                        />
+                        <path
+                          d="M1 9 L1 1 L9 1"
+                          fill="none"
+                          stroke="#b8843a"
+                          stroke-width="2"
+                        />
+                        <path
+                          d="M51 1 L59 1 L59 9"
+                          fill="none"
+                          stroke="#b8843a"
+                          stroke-width="2"
+                        />
+                        <path
+                          d="M1 71 L1 79 L9 79"
+                          fill="none"
+                          stroke="#b8843a"
+                          stroke-width="2"
+                        />
+                        <path
+                          d="M51 79 L59 79 L59 71"
+                          fill="none"
+                          stroke="#b8843a"
+                          stroke-width="2"
+                        />
+                        <rect
+                          x="1"
+                          y="60"
+                          width="58"
+                          height="18"
+                          fill="rgba(255,250,240,0.9)"
+                        />
+                        <text
+                          x="30"
+                          y="71"
+                          text-anchor="middle"
+                          font-size="5"
+                          fill="#6b4c2a"
+                          font-family="Georgia,serif"
+                        >
+                          Vintage Gold
+                        </text>
+                      </svg>
+                      <div class="fcheck">
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                      </div>
+                    </div>
+
+                    <div
+                      class="frame-item active"
+                      onclick="toggleFrame(this, 2)"
+                    >
+                      <svg viewBox="0 0 60 80" class="frame-svg-mini">
+                        <rect
+                          x="2"
+                          y="2"
+                          width="56"
+                          height="76"
+                          rx="4"
+                          fill="none"
+                          stroke="#f0c4be"
+                          stroke-width="5"
+                        />
+                        <rect
+                          x="6"
+                          y="6"
+                          width="48"
+                          height="52"
+                          fill="none"
+                          stroke="#d4847a"
+                          stroke-width="1"
+                        />
+                        <rect
+                          x="2"
+                          y="60"
+                          width="56"
+                          height="18"
+                          fill="rgba(255,255,255,0.9)"
+                        />
+                        <text
+                          x="30"
+                          y="71"
+                          text-anchor="middle"
+                          font-size="5"
+                          fill="#d4847a"
+                          font-family="Georgia,serif"
+                        >
+                          Floral White
+                        </text>
+                      </svg>
+                      <div class="fcheck">
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                      </div>
+                    </div>
+
+                    <div
+                      class="frame-item active"
+                      onclick="toggleFrame(this, 3)"
+                    >
+                      <svg viewBox="0 0 60 80" class="frame-svg-mini">
+                        <rect
+                          x="0"
+                          y="0"
+                          width="60"
+                          height="8"
+                          fill="rgba(44,24,16,0.8)"
+                        />
+                        <rect
+                          x="0"
+                          y="72"
+                          width="60"
+                          height="8"
+                          fill="rgba(44,24,16,0.8)"
+                        />
+                        <rect
+                          x="0"
+                          y="8"
+                          width="5"
+                          height="64"
+                          fill="rgba(44,24,16,0.5)"
+                        />
+                        <rect
+                          x="55"
+                          y="8"
+                          width="5"
+                          height="64"
+                          fill="rgba(44,24,16,0.5)"
+                        />
+                        <rect
+                          x="5"
+                          y="62"
+                          width="50"
+                          height="10"
+                          fill="rgba(250,246,240,0.9)"
+                        />
+                        <text
+                          x="30"
+                          y="69"
+                          text-anchor="middle"
+                          font-size="4.5"
+                          fill="#6b4c2a"
+                          font-family="Courier,monospace"
+                          letter-spacing="1.5"
+                        >
+                          CLASSIC FILM
+                        </text>
+                      </svg>
+                      <div class="fcheck">
+                        <i class="ti ti-check" aria-hidden="true"></i>
+                      </div>
+                    </div>
+
+                    <div
+                      class="frame-add"
+                      onclick="document.getElementById('frame-upload').click()"
+                    >
+                      <i class="ti ti-plus" aria-hidden="true"></i>
+                      <span>Tambah</span>
+                      <input
+                        type="file"
+                        id="frame-upload"
+                        accept="image/png"
+                        style="display: none"
+                        onchange="addFrame(this)"
+                      />
+                    </div>
+                  </div>
+
+                  <p
+                    style="
+                      font-size: 12px;
+                      color: var(--text-secondary);
+                      margin: 16px 0 20px;
+                    "
+                  >
+                    * Klik kartu bingkai untuk mengaktifkan/menonaktifkan.
+                    Bingkai yang tidak aktif tidak akan muncul sebagai opsi bagi
+                    tamu.
+                  </p>
+
+                  <div
+                    style="display: flex; gap: 12px; justify-content: flex-end"
+                  >
+                    <button class="btn btn-primary" onclick="showSaved()">
+                      <i class="ti ti-check" aria-hidden="true"></i> Simpan
+                      Frame Aktif
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Guide card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-info-circle" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Panduan Desain Frame Polaroid</h3>
+                </div>
+                <p class="card-sub">
+                  Aturan teknis pembuatan file frame kustom
+                </p>
+                <div class="card-content grid-2">
+                  <div class="guide-box guide-success">
+                    <div class="guide-title">
+                      <i
+                        class="ti ti-circle-check-filled"
+                        aria-hidden="true"
+                      ></i>
+                      Spesifikasi Rekomendasi
+                    </div>
+                    Format harus **PNG Transparan** · Rasio dimensi **3:4** ·
+                    Resolusi minimal **600 × 800 pixel** (Area tengah/atas
+                    dikosongkan agar foto terlihat).
+                  </div>
+
+                  <div class="guide-box guide-danger">
+                    <div class="guide-title">
+                      <i class="ti ti-circle-x-filled" aria-hidden="true"></i>
+                      Kesalahan Umum
+                    </div>
+                    Menyimpan format **JPG** (tidak mendukung transparansi) ·
+                    Background berwarna solid penuh · Ukuran file di atas
+                    **2MB** (memperlambat koneksi tamu).
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ TAB: QR CODE ══ -->
+            <div class="pane" id="pane-qr">
+              <!-- QR card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-qrcode" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">QR Code Masuk Event</h3>
+                </div>
+                <p class="card-sub">
+                  Cetak atau tampilkan QR Code ini di pintu masuk acara agar
+                  tamu dapat langsung scan
+                </p>
+                <div class="card-content qr-container">
+                  <div class="qr-card-wrap">
+                    <svg
+                      viewBox="0 0 120 120"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="160"
+                      height="160"
+                    >
+                      <rect width="120" height="120" fill="#ffffff" rx="10" />
+                      <g fill="#0f172a">
+                        <rect
+                          x="10"
+                          y="10"
+                          width="40"
+                          height="40"
+                          rx="4"
+                          fill="none"
+                          stroke="#0f172a"
+                          stroke-width="4"
+                        />
+                        <rect x="18" y="18" width="24" height="24" rx="2" />
+                        <rect
+                          x="70"
+                          y="10"
+                          width="40"
+                          height="40"
+                          rx="4"
+                          fill="none"
+                          stroke="#0f172a"
+                          stroke-width="4"
+                        />
+                        <rect x="78" y="18" width="24" height="24" rx="2" />
+                        <rect
+                          x="10"
+                          y="70"
+                          width="40"
+                          height="40"
+                          rx="4"
+                          fill="none"
+                          stroke="#0f172a"
+                          stroke-width="4"
+                        />
+                        <rect x="18" y="78" width="24" height="24" rx="2" />
+                        <rect x="70" y="70" width="6" height="6" />
+                        <rect x="80" y="70" width="6" height="6" />
+                        <rect x="90" y="70" width="6" height="6" />
+                        <rect x="100" y="70" width="6" height="6" />
+                        <rect x="70" y="80" width="6" height="6" />
+                        <rect x="86" y="80" width="6" height="6" />
+                        <rect x="100" y="80" width="6" height="6" />
+                        <rect x="70" y="90" width="6" height="6" />
+                        <rect x="80" y="90" width="16" height="6" />
+                        <rect x="100" y="90" width="6" height="6" />
+                        <rect x="70" y="100" width="6" height="6" />
+                        <rect x="80" y="100" width="6" height="6" />
+                        <rect x="90" y="100" width="6" height="6" />
+                        <rect x="100" y="100" width="6" height="6" />
+                        <rect x="70" y="110" width="36" height="6" />
+                      </g>
+                      <text
+                        x="60"
+                        y="65"
+                        text-anchor="middle"
+                        font-size="6.5"
+                        fill="#64748b"
+                        font-family="'Outfit', sans-serif"
+                        font-weight="700"
+                      >
+                        SCAN ME
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div class="qr-link-display">
+                    https://photobooth.app/event/rizky-nabila-2026
+                  </div>
+
+                  <div style="display: flex; gap: 12px">
+                    <button
+                      class="btn"
+                      onclick="showToast('Link disalin ke clipboard!', 'info')"
+                    >
+                      <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
+                      URL
+                    </button>
+                    <button
+                      class="btn btn-primary"
+                      onclick="
+                        showToast('QR Code berhasil diunduh!', 'success')
+                      "
+                    >
+                      <i class="ti ti-download" aria-hidden="true"></i> Unduh
+                      File QR
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Configuration Card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-settings-automation" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Konfigurasi Link &amp; Keamanan</h3>
+                </div>
+                <p class="card-sub">
+                  Sesuaikan parameter alamat web event photobooth ini
+                </p>
+                <div class="card-content">
+                  <div class="field">
+                    <label for="url-slug-input">Slug URL Unik</label>
+                    <input
+                      type="text"
+                      id="url-slug-input"
+                      value="rizky-nabila-2026"
+                      oninput="
+                        document.querySelector('.qr-link-display').textContent =
+                          'https://photobooth.app/event/' + this.value
+                      "
+                    />
+                  </div>
+
+                  <div class="grid-2">
+                    <div class="field">
+                      <label for="limit-guest-input"
+                        >Batas Kuota Tamu (Foto)</label
+                      >
+                      <input
+                        type="number"
+                        id="limit-guest-input"
+                        placeholder="Kosongkan jika tak terbatas"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="expiry-date-input"
+                        >Tanggal Kadaluarsa Link</label
+                      >
+                      <input type="date" id="expiry-date-input" />
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: flex-end;
+                      margin-top: 8px;
+                    "
+                  >
+                    <button
+                      class="btn btn-primary"
+                      onclick="showSaved('Konfigurasi link diperbarui!')"
+                    >
+                      <i class="ti ti-refresh" aria-hidden="true"></i>
+                      Regenerate QR &amp; Link
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ TAB: SETELAN ══ -->
+            <div class="pane" id="pane-settings">
+              <!-- Features Toggles card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-toggle-right" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Fitur &amp; Kemampuan Guest App</h3>
+                </div>
+                <p class="card-sub">
+                  Aktifkan atau nonaktifkan modul fitur pada halaman web tamu
+                </p>
+                <div class="card-content toggle-list">
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label">Voice note ucapan suara</span>
+                      <span class="toggle-desc"
+                        >Tamu dapat merekam suara setelah berfoto</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'voice')"
+                      aria-label="Toggle voice note"
+                    ></button>
+                  </div>
+
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label">Wajib Isi Nama Tamu</span>
+                      <span class="toggle-desc"
+                        >Tamu harus mengisi kolom nama sebelum membuka
+                        kamera</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'reqname')"
+                      aria-label="Toggle wajib nama"
+                    ></button>
+                  </div>
+
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label">Izinkan Pemilihan Frame</span>
+                      <span class="toggle-desc"
+                        >Tamu diperbolehkan memilih frame kustom polaroid</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'chooseframe')"
+                      aria-label="Toggle pilih frame"
+                    ></button>
+                  </div>
+
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label">Izinkan Retake Foto</span>
+                      <span class="toggle-desc"
+                        >Tamu bisa mengulang pengambilan foto jika dirasa kurang
+                        bagus</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'retake')"
+                      aria-label="Toggle retake"
+                    ></button>
+                  </div>
+
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label">Notifikasi Realtime</span>
+                      <span class="toggle-desc"
+                        >Halaman dashboard pengantin melakukan pemuatan instan
+                        saat ada foto baru</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'realtime')"
+                      aria-label="Toggle realtime"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Moderation card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-shield-lock" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Moderasi &amp; Sensor Konten</h3>
+                </div>
+                <p class="card-sub">
+                  Konfigurasi keamanan filter galeri publik
+                </p>
+                <div class="card-content toggle-list">
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label"
+                        >Persetujuan Foto Manual (Review Mode)</span
+                      >
+                      <span class="toggle-desc"
+                        >Foto tamu tidak akan tampil di dashboard publik sebelum
+                        di-approve admin</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch"
+                      onclick="toggleSwitchSetting(this, 'approval')"
+                      aria-label="Toggle review manual"
+                    ></button>
+                  </div>
+
+                  <div class="toggle-row">
+                    <div class="toggle-text">
+                      <span class="toggle-label"
+                        >Tombol Sembunyikan Instan</span
+                      >
+                      <span class="toggle-desc"
+                        >Menampilkan tombol cepat untuk menyembunyikan foto di
+                        dashboard pengantin</span
+                      >
+                    </div>
+                    <button
+                      class="toggle-switch on"
+                      onclick="toggleSwitchSetting(this, 'hidebtn')"
+                      aria-label="Toggle tombol hide"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data exports card -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon">
+                    <i class="ti ti-download" aria-hidden="true"></i>
+                  </div>
+                  <h3 class="card-title">Ekspor &amp; Manajemen Data</h3>
+                </div>
+                <p class="card-sub">
+                  Unduh file kenangan tamu atau lakukan pembersihan database
+                </p>
+                <div class="card-content">
+                  <div style="display: flex; gap: 12px; flex-wrap: wrap">
+                    <button
+                      class="btn"
+                      onclick="
+                        showToast('Unduhan zip foto disiapkan...', 'info')
+                      "
+                    >
+                      <i class="ti ti-photo" aria-hidden="true"></i> Unduh Semua
+                      File Foto (ZIP)
+                    </button>
+                    <button
+                      class="btn"
+                      onclick="showToast('Data tamu diekspor ke CSV', 'info')"
+                    >
+                      <i class="ti ti-table" aria-hidden="true"></i> Ekspor CSV
+                      Data Tamu
+                    </button>
+                    <button
+                      class="btn btn-danger"
+                      onclick="
+                        if (
+                          confirm(
+                            'Apakah Anda yakin ingin menghapus semua data? Tindakan ini permanen.',
+                          )
+                        )
+                          showToast(
+                            'Seluruh data berhasil dihapus!',
+                            'success',
+                          );
+                      "
+                    >
+                      <i class="ti ti-trash" aria-hidden="true"></i> Hapus Semua
+                      Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT WORKSPACE COLUMN: SMARTPHONE LIVE PREVIEW -->
+          <aside class="workspace-preview">
+            <div class="preview-header">
+              <i class="ti ti-device-mobile" aria-hidden="true"></i> Live App
+              Preview
+            </div>
+
+            <div class="phone-mockup">
+              <div class="phone-speaker"></div>
+
+              <div class="phone-screen">
+                <div class="phone-app">
+                  <!-- Phone Screen 1: Welcome (Default / Tab: Event, Tampilan, QR) -->
+                  <div class="phone-pane active" id="phone-pane-welcome">
+                    <div class="phone-hero" id="phone-hero-bg">
+                      <div class="phone-hero-overlay"></div>
+                      <div class="phone-hero-text">
+                        <span class="phone-hero-event"
+                          >✦ PERNIKAHAN BAHAGIA ✦</span
+                        >
+                        <h4 class="phone-hero-couple" id="phone-mock-couple">
+                          Rizky &amp; Nabila
+                        </h4>
+                        <p class="phone-hero-date" id="phone-mock-date">
+                          7 Juni 2026 · Bandung
+                        </p>
+                      </div>
+                      <span class="phone-hero-badge">
+                        <span class="phone-pulse"></span> Live
+                      </span>
+                    </div>
+                    <div class="phone-body">
+                      <div class="phone-card">
+                        <div class="phone-logo">✦ PHOTOBOOTH EVENT ✦</div>
+                        <div class="phone-welcome-title">Selamat Datang</div>
+                        <div class="phone-welcome-text" id="phone-mock-welcome">
+                          Abadikan momen spesial bersama &amp; kirim ucapan
+                          hangat untuk pasangan
+                        </div>
+
+                        <div class="phone-input-sim">
+                          <span class="phone-input-lbl">NAMA KAMU</span>
+                          <div class="phone-input-box">
+                            Tulis nama lengkap...
+                          </div>
+                        </div>
+
+                        <button
+                          class="phone-btn-primary"
+                          id="phone-welcome-btn"
+                          onclick="simulateNextPhoneScreen()"
+                        >
+                          Lanjutkan →
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Phone Screen 2: Choose Frame (Tab: Frames) -->
+                  <div class="phone-pane" id="phone-pane-frames">
+                    <div
+                      style="
+                        padding: 14px 14px 4px;
+                        border-bottom: 1px solid var(--border);
+                        background: #fff;
+                      "
+                    >
+                      <div class="phone-logo" style="text-align: center">
+                        ✦ PHOTOBOOTH ✦
+                      </div>
+                      <div class="phone-app-title">Pilih Bingkai</div>
+                      <div class="phone-app-sub">
+                        Pilih bingkai polaroid favoritmu
+                      </div>
+                    </div>
+                    <div class="phone-body" style="overflow-y: auto">
+                      <div class="phone-frame-grid" id="phone-mock-frame-grid">
+                        <!-- Dynamic frame items loaded in JS -->
+                      </div>
+                      <button
+                        class="phone-btn-primary"
+                        id="phone-frame-btn"
+                        style="margin-top: 8px"
+                      >
+                        Buka Kamera →
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Phone Screen 3: Camera / Settings (Tab: Settings) -->
+                  <div class="phone-pane" id="phone-pane-settings">
+                    <div
+                      style="
+                        padding: 14px 14px 4px;
+                        border-bottom: 1px solid var(--border);
+                        background: #fff;
+                      "
+                    >
+                      <div class="phone-logo" style="text-align: center">
+                        ✦ PHOTOBOOTH ✦
+                      </div>
+                      <div class="phone-app-title">Kamera Tamu</div>
+                      <div class="phone-app-sub" id="phone-mock-cam-sub">
+                        Senyum ya! 😊
+                      </div>
+                    </div>
+                    <div class="phone-body">
+                      <div class="phone-cam-wrap">
+                        <div class="phone-cam-sim">
+                          <i class="ti ti-camera" aria-hidden="true"></i>
+                        </div>
+                        <div
+                          class="phone-frame-overlay"
+                          id="phone-mock-frame-overlay"
+                        ></div>
+                      </div>
+
+                      <div class="phone-voice-rec" id="phone-mock-voice-rec">
+                        <div class="phone-voice-btn">
+                          <i class="ti ti-microphone" aria-hidden="true"></i>
+                        </div>
+                        <div class="phone-voice-lbl">Voice Note Aktif</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="phone-home-indicator">
+                <div class="phone-bar"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- FLOATING SAVE BAR -->
+      <div class="save-bar" id="save-bar">
+        <div class="save-msg">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>
+          <span id="save-msg-text">Perubahan belum disimpan</span>
+        </div>
+        <div class="save-actions">
+          <div class="saved-toast" id="saved-ok">
+            <i class="ti ti-circle-check" aria-hidden="true"></i> Tersimpan
+          </div>
+          <button
+            class="btn btn-primary"
+            style="padding: 8px 16px; font-size: 13px"
+            onclick="showSaved()"
+          >
+            <i class="ti ti-device-floppy" aria-hidden="true"></i> Simpan Semua
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CORE SCRIPTS -->
+    <script>
+      const SUPABASE_URL = "https://hzrfiyqvyilnojrwwdyu.supabase.co/"; // ← GANTI
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6cmZpeXF2eWlsbm9qcnd3ZHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4OTY2NDMsImV4cCI6MjA5NjQ3MjY0M30.AD0cAPOE1RnyrtxfgkvNLiVxjLs2D8AqwyXEHQpGBzA"; // ← GANTI
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      // ── PRESET STYLES ──
+      const THEME_PRESETS = {
+        elegan: { hex: "#c9a96e", font: "Playfair Display" },
+        romantic: { hex: "#d4847a", font: "Great Vibes" },
+        garden: { hex: "#7a9e7e", font: "Cormorant Garamond" },
+        modern: { hex: "#0f172a", font: "Outfit" },
+      };
+
+      // ── FRAME INLINE SVGS FOR MOCKUP SINK ──
+      const FRAME_SVGS = [
+        `<svg viewBox="0 0 60 80"><rect x="1" y="1" width="58" height="78" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><rect x="4" y="4" width="52" height="52" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 1"/><rect x="1" y="60" width="58" height="18" fill="rgba(255,255,255,0.85)"/><text x="30" y="71" text-anchor="middle" font-size="4.5" fill="currentColor" font-family="Georgia,serif" font-style="italic">Garden Rose</text></svg>`,
+        `<svg viewBox="0 0 60 80"><rect x="1" y="1" width="58" height="78" rx="1" fill="none" stroke="currentColor" stroke-width="3"/><path d="M1 9 L1 1 L9 1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M51 1 L59 1 L59 9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M1 71 L1 79 L9 79" fill="none" stroke="currentColor" stroke-width="2"/><path d="M51 79 L59 79 L59 71" fill="none" stroke="currentColor" stroke-width="2"/><rect x="1" y="60" width="58" height="18" fill="rgba(255,250,240,0.9)"/><text x="30" y="71" text-anchor="middle" font-size="4.5" fill="currentColor" font-family="Georgia,serif">Vintage Gold</text></svg>`,
+        `<svg viewBox="0 0 60 80"><rect x="2" y="2" width="56" height="76" rx="4" fill="none" stroke="currentColor" stroke-width="4"/><rect x="6" y="6" width="48" height="52" fill="none" stroke="currentColor" stroke-width="0.5"/><rect x="2" y="60" width="56" height="18" fill="rgba(255,255,255,0.9)"/><text x="30" y="71" text-anchor="middle" font-size="4.5" fill="currentColor" font-family="Georgia,serif">Floral White</text></svg>`,
+        `<svg viewBox="0 0 60 80"><rect x="0" y="0" width="60" height="8" fill="currentColor" opacity="0.8"/><rect x="0" y="72" width="60" height="8" fill="currentColor" opacity="0.8"/><rect x="0" y="8" width="5" height="64" fill="currentColor" opacity="0.5"/><rect x="55" y="8" width="5" height="64" fill="currentColor" opacity="0.5"/><rect x="5" y="62" width="50" height="10" fill="rgba(250,246,240,0.9)"/><text x="30" y="69" text-anchor="middle" font-size="4" fill="currentColor" font-family="Courier,monospace" letter-spacing="1">CLASSIC FILM</text></svg>`,
+      ];
+
+      const FRAME_NAMES = [
+        "Garden Rose",
+        "Vintage Gold",
+        "Floral White",
+        "Classic Film",
+      ];
+
+      // ── SWITCH TAB LOGIC ──
+      function switchTab(id, el) {
+        // Nav bar states
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((btn) => btn.classList.remove("active"));
+        el.classList.add("active");
+
+        // Panes states
+        document
+          .querySelectorAll(".pane")
+          .forEach((p) => p.classList.remove("active"));
+        document.getElementById("pane-" + id).classList.add("active");
+
+        // Close mobile sidebar if open
+        toggleSidebar(false);
+
+        // Update Header titles dynamically
+        const headerTitle = document.getElementById("page-title");
+        const headerSub = document.getElementById("page-subtitle");
+
+        // Switch mockup phone screen context based on setting tab
+        const welcomePane = document.getElementById("phone-pane-welcome");
+        const framesPane = document.getElementById("phone-pane-frames");
+        const settingsPane = document.getElementById("phone-pane-settings");
+
+        welcomePane.classList.remove("active");
+        framesPane.classList.remove("active");
+        settingsPane.classList.remove("active");
+
+        switch (id) {
+          case "event":
+            headerTitle.textContent = "Kelola Event";
+            headerSub.textContent =
+              "Kelola daftar event, buat event baru, dan lihat statistik realtime.";
+            welcomePane.classList.add("active");
+            break;
+          case "appearance":
+            headerTitle.textContent = "Tampilan Aplikasi";
+            headerSub.textContent =
+              "Desain antarmuka halaman tamu, banner hero, warna, dan font tema.";
+            welcomePane.classList.add("active");
+            break;
+          case "frames":
+            headerTitle.textContent = "Desain Bingkai Frame";
+            headerSub.textContent =
+              "Kelola koleksi bingkai polaroid (PNG) dan aktifkan pilihan bingkai untuk tamu.";
+            framesPane.classList.add("active");
+            renderMockPhoneFrames();
+            break;
+          case "qr":
+            headerTitle.textContent = "Link & QR Code Event";
+            headerSub.textContent =
+              "Unduh QR Code masuk pintu acara dan konfigurasikan slug URL unik.";
+            welcomePane.classList.add("active");
+            break;
+          case "settings":
+            headerTitle.textContent = "Setelan Fitur";
+            headerSub.textContent =
+              "Aktifkan modul perekam suara, wajib nama, retake, dan moderasi sensor.";
+            settingsPane.classList.add("active");
+            break;
+        }
+      }
+
+      // ── TOGGLE SIDEBAR FOR MOBILE VIEW ──
+      function toggleSidebar(forcedState) {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+
+        let shouldOpen = !sidebar.classList.contains("open");
+        if (forcedState !== undefined) shouldOpen = forcedState;
+
+        if (shouldOpen) {
+          sidebar.classList.add("open");
+          overlay.classList.add("open");
+        } else {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("open");
+        }
+      }
+
+      // ── COLOR THEME SELECTION ──
+      function selectColor(el) {
+        document
+          .querySelectorAll(".color-swatch")
+          .forEach((s) => s.classList.remove("selected"));
+        el.classList.add("selected");
+        const hex = el.getAttribute("data-hex") || "#c9a96e";
+        updateThemeColor(hex);
+        markUnsaved();
+      }
+
+      function customColor(el) {
+        document
+          .querySelectorAll(".color-swatch")
+          .forEach((s) => s.classList.remove("selected"));
+        const hex = el.value;
+        updateThemeColor(hex);
+        markUnsaved();
+      }
+
+      function updateThemeColor(hex) {
+        // Apply primary color to mock phone elements
+        const phoneBtn = document.getElementById("phone-welcome-btn");
+        const phoneFrameBtn = document.getElementById("phone-frame-btn");
+
+        if (phoneBtn) {
+          phoneBtn.style.background = hex;
+          phoneBtn.style.boxShadow = `0 4px 10px ${hex}40`;
+        }
+        if (phoneFrameBtn) {
+          phoneFrameBtn.style.background = hex;
+          phoneFrameBtn.style.boxShadow = `0 4px 10px ${hex}40`;
+        }
+
+        // Apply theme color borders to active swatches in mockup frames
+        document
+          .querySelectorAll(".phone-frame-item.selected")
+          .forEach((item) => {
+            item.style.borderColor = hex;
+          });
+
+        const activeFrameCheck = document.getElementById(
+          "phone-mock-frame-overlay",
+        );
+        if (activeFrameCheck) {
+          activeFrameCheck.style.color = hex;
+        }
+      }
+
+      // ── TEXT FIELDS / TEXTAREAS SYNC ──
+      function updateMockupWelcomeText(val) {
+        const el = document.getElementById("phone-mock-welcome");
+        if (el) el.textContent = val;
+        markUnsaved();
+      }
+
+      function updateTitleFont(val) {
+        const coupleText = document.getElementById("prev-couple");
+        const mockCoupleText = document.getElementById("phone-mock-couple");
+
+        if (coupleText) coupleText.style.fontFamily = `"${val}", serif`;
+        if (mockCoupleText) mockCoupleText.style.fontFamily = `"${val}", serif`;
+        markUnsaved();
+      }
+
+      function updateThemePreset(val) {
+        const config = THEME_PRESETS[val];
+        if (!config) return;
+
+        // Set Font Judul Select value
+        const selectFont = document.getElementById("title-font-select");
+        if (selectFont) {
+          selectFont.value = config.font;
+          updateTitleFont(config.font);
+        }
+
+        // Select color from row matching preset hex or custom input
+        let swatchFound = false;
+        document.querySelectorAll(".color-swatch").forEach((swatch) => {
+          if (swatch.getAttribute("data-hex") === config.hex) {
+            selectColor(swatch);
+            swatchFound = true;
+          }
+        });
+
+        if (!swatchFound) {
+          const customInput = document.getElementById("color-custom");
+          if (customInput) {
+            customInput.value = config.hex;
+            updateThemeColor(config.hex);
+          }
+        }
+        markUnsaved();
+      }
+
+      // ── FRAME TOGGLING ──
+      function toggleFrame(el, index) {
+        el.classList.toggle("active");
+
+        // Update live mockup phone frame view
+        renderMockPhoneFrames();
+
+        const activeCount =
+          document.querySelectorAll(".frame-item.active").length;
+        document.getElementById("save-msg-text").textContent =
+          activeCount + " frame aktif — belum disimpan";
+        markUnsaved();
+      }
+
+      // ── RENDER MOCK PHONE FRAMES GRID ──
+      function renderMockPhoneFrames() {
+        const mockGrid = document.getElementById("phone-mock-frame-grid");
+        if (!mockGrid) return;
+        mockGrid.innerHTML = "";
+
+        // Collect all active frames in the main workspace
+        const items = document.querySelectorAll(".frame-item");
+        let hasActive = false;
+
+        items.forEach((item, idx) => {
+          const isActive = item.classList.contains("active");
+          if (isActive) {
+            const frameDiv = document.createElement("div");
+            frameDiv.className =
+              "phone-frame-item" + (!hasActive ? " selected" : "");
+            frameDiv.setAttribute("data-index", idx);
+
+            // Color theme mapping
+            const selectedSwatch = document.querySelector(
+              ".color-swatch.selected",
+            );
+            const customHex = document.getElementById("color-custom").value;
+            const hex = selectedSwatch
+              ? selectedSwatch.getAttribute("data-hex")
+              : customHex;
+
+            if (!hasActive) {
+              frameDiv.style.borderColor = hex;
+              updateActiveOverlay(idx);
+              hasActive = true;
+            }
+
+            frameDiv.onclick = function () {
+              document.querySelectorAll(".phone-frame-item").forEach((i) => {
+                i.classList.remove("selected");
+                i.style.borderColor = "";
+              });
+              frameDiv.classList.add("selected");
+              frameDiv.style.borderColor = hex;
+              updateActiveOverlay(idx);
+            };
+
+            // Inject mini SVG representation
+            frameDiv.innerHTML = `
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#f5ede0,#faf6f0);opacity:0.25;"></div>
+          ${FRAME_SVGS[idx]}
+          <div class="check-icon"><i class="ti ti-check" aria-hidden="true"></i></div>
+        `;
+            mockGrid.appendChild(frameDiv);
+          }
+        });
+
+        // If no frames active, show a helper placeholder
+        if (mockGrid.children.length === 0) {
+          mockGrid.innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;font-size:11px;color:var(--text-secondary);padding:20px;">Aktifkan minimal 1 frame di panel admin.</div>';
+          updateActiveOverlay(-1);
+        }
+      }
+
+      // UPDATE CAMERA OVERLAY IN PHONE MOCKUP
+      function updateActiveOverlay(idx) {
+        const overlay = document.getElementById("phone-mock-frame-overlay");
+        if (!overlay) return;
+
+        if (idx === -1) {
+          overlay.innerHTML = "";
+          return;
+        }
+
+        const selectedSwatch = document.querySelector(".color-swatch.selected");
+        const customHex = document.getElementById("color-custom").value;
+        const hex = selectedSwatch
+          ? selectedSwatch.getAttribute("data-hex")
+          : customHex;
+
+        overlay.style.color = hex;
+        overlay.innerHTML = FRAME_SVGS[idx];
+      }
+
+      // ── ADD NEW FRAME (SIMULATOR) ──
+      function addFrame(input) {
+        if (!input.files[0]) return;
+        const grid = document.getElementById("frame-grid");
+        const addBtn = grid.querySelector(".frame-add");
+        const item = document.createElement("div");
+        item.className = "frame-item active";
+
+        const url = URL.createObjectURL(input.files[0]);
+        const nextIdx = FRAME_SVGS.length;
+
+        // Add to simulated lists
+        FRAME_NAMES.push(input.files[0].name.split(".")[0] || "Custom Frame");
+        FRAME_SVGS.push(
+          `<svg viewBox="0 0 60 80"><rect x="1" y="1" width="58" height="78" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><image href="${url}" x="0" y="0" height="80" width="60" preserveAspectRatio="none"/><rect x="1" y="60" width="58" height="18" fill="rgba(255,255,255,0.85)"/><text x="30" y="71" text-anchor="middle" font-size="4.5" fill="currentColor">${FRAME_NAMES[nextIdx]}</text></svg>`,
+        );
+
+        item.onclick = function () {
+          toggleFrame(this, nextIdx);
+        };
+
+        item.innerHTML = `
+      <img src="${url}" style="width:100%;height:100%;object-fit:contain;" alt="Kustom Frame Preview"/>
+      <div class="fcheck"><i class="ti ti-check" aria-hidden="true"></i></div>
+    `;
+
+        grid.insertBefore(item, addBtn);
+        renderMockPhoneFrames();
+
+        document.getElementById("save-msg-text").textContent =
+          "Frame baru ditambahkan — belum disimpan";
+        markUnsaved();
+        showToast("Frame baru ditambahkan!", "success");
+      }
+
+      // ── PREVIEW HERO HERO BACKGROUND ──
+      function previewHero(input) {
+        if (!input.files[0]) return;
+        const url = URL.createObjectURL(input.files[0]);
+        const sim = document.getElementById("hero-sim");
+
+        sim.style.backgroundImage = `url(${url})`;
+
+        // Sync with mockup smartphone hero
+        const phoneHero = document.getElementById("phone-hero-bg");
+        if (phoneHero) {
+          phoneHero.style.backgroundImage = `url(${url})`;
+        }
+
+        document.getElementById("save-msg-text").textContent =
+          "Foto latar belakang diubah — belum disimpan";
+        markUnsaved();
+        showToast("Latar belakang diunggah!", "success");
+      }
+
+      // ── SETTINGS SWITCH TOGGLES ──
+      function toggleSwitchSetting(el, key) {
+        el.classList.toggle("on");
+
+        // Sync switch in mockup
+        if (key === "voice") {
+          const voiceBlock = document.getElementById("phone-mock-voice-rec");
+          if (voiceBlock) {
+            voiceBlock.style.display = el.classList.contains("on")
+              ? "block"
+              : "none";
+          }
+        }
+
+        document.getElementById("save-msg-text").textContent =
+          "Fitur diperbarui — belum disimpan";
+        markUnsaved();
+      }
+
+      // ── SYNC EVENT CREATION FOR MOCKUP PHONE ──
+      function syncEventCreation() {
+        const coupleName = document
+          .getElementById("event-host-input")
+          .value.trim();
+        const eventDate = document.getElementById("event-date-input").value;
+
+        if (coupleName) {
+          document.getElementById("phone-mock-couple").textContent = coupleName;
+          document.getElementById("prev-couple").textContent = coupleName;
+        }
+        if (eventDate) {
+          const dateObj = new Date(eventDate);
+          const options = { day: "numeric", month: "long", year: "numeric" };
+          const formattedDate = dateObj.toLocaleDateString("id-ID", options);
+
+          document.getElementById("phone-mock-date").textContent =
+            formattedDate;
+          document.getElementById("prev-date").textContent = formattedDate;
+        }
+        markUnsaved();
+      }
+
+      // ── PHONE SIMULATION AUTOMATIC TRANSITIONS ──
+      function simulateNextPhoneScreen() {
+        const welcomePane = document.getElementById("phone-pane-welcome");
+        const framesPane = document.getElementById("phone-pane-frames");
+        welcomePane.classList.remove("active");
+        framesPane.classList.add("active");
+        renderMockPhoneFrames();
+      }
+
+      // ── SAVE BAR SYSTEM ──
+      function markUnsaved() {
+        document.getElementById("save-bar").classList.add("visible");
+      }
+
+      let saveTimer = null;
+      function showSaved(customMsg) {
+        clearTimeout(saveTimer);
+
+        const saveBarText = document.getElementById("save-msg-text");
+        const ok = document.getElementById("saved-ok");
+
+        // Visual states
+        ok.style.display = "flex";
+        if (customMsg) {
+          showToast(customMsg, "success");
+        } else {
+          showToast("Semua perubahan disimpan ke database!", "success");
+        }
+
+        // Update sidebar info if event creation was filled
+        const coupleInput = document
+          .getElementById("event-host-input")
+          .value.trim();
+        const dateInput = document.getElementById("event-date-input").value;
+        const locInput = document
+          .getElementById("event-loc-input")
+          .value.trim();
+
+        if (coupleInput) {
+          document.getElementById("sidebar-event-name").textContent =
+            coupleInput;
+          const topbarSub = document.querySelector(".topbar-sub");
+          if (topbarSub) topbarSub.textContent = "Event: " + coupleInput;
+
+          let meta = "";
+          if (dateInput) {
+            const d = new Date(dateInput);
+            meta += d.toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+          }
+          if (locInput) {
+            meta += (meta ? " · " : "") + locInput;
+          }
+          if (meta) {
+            document.getElementById("sidebar-event-meta").textContent = meta;
+          }
+        }
+
+        saveTimer = setTimeout(() => {
+          document.getElementById("save-bar").classList.remove("visible");
+          setTimeout(() => {
+            ok.style.display = "none";
+            saveBarText.textContent = "Perubahan belum disimpan";
+          }, 500);
+        }, 2000);
+      }
+
+      // ── TOAST MESSAGES SYSTEM ──
+      let toastTimer = null;
+      function showToast(text, type) {
+        clearTimeout(toastTimer);
+        const toast = document.getElementById("toast");
+        const toastText = document.getElementById("toast-text");
+
+        toast.className = "toast-notification " + type;
+        toastText.textContent = text;
+
+        const icon = toast.querySelector("i");
+        if (type === "success") {
+          icon.className = "ti ti-circle-check-filled";
+        } else if (type === "info") {
+          icon.className = "ti ti-info-circle-filled";
+        } else {
+          icon.className = "ti ti-alert-triangle-filled";
+        }
+
+        toast.classList.add("show");
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2800);
+      }
+
+      // ── ATTACH DETECTOR TO ALL INPUTS ──
+      document.querySelectorAll("input, select, textarea").forEach((el) => {
+        el.addEventListener("input", () => {
+          document.getElementById("save-msg-text").textContent =
+            "Ada perubahan baru — belum disimpan";
+          markUnsaved();
+        });
+      });
+    </script>
+  </body>
+</html>

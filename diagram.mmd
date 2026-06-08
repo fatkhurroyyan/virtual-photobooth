@@ -1,0 +1,52 @@
+graph TD
+    %% Penentuan Warna & Gaya Hubungan
+    classDef client fill:#EBF5FB,stroke:#2E86C1,stroke-width:2px;
+    classDef network fill:#FEF9E7,stroke:#D4AC0D,stroke-width:2px;
+    classDef ai fill:#EAFAF1,stroke:#27AE60,stroke-width:2px;
+    classDef output fill:#FBEEE6,stroke:#DC7633,stroke-width:2px;
+
+    %% Subgraph 1: Input & Perangkat (Client Side)
+    subgraph Client_Layer ["1. Lapisan Input & Perangkat (PWA & IoT Grip)"]
+        A[Guru: Buka PWA DyLeks <br> Caching via Service Worker] --> B(Input Profil Dasar Anak)
+        B --> C[Anak Jalankan Tes Audio-Visual <br> Font: OpenDyslexic]
+        B --> D[Anak Menulis di Kertas Fisik <br> Menggunakan Smart Writing Grip]
+        B --> E[Guru Ambil Foto Hasil Tulisan <br> Lewat Kamera Smartphone]
+    end
+    class A,B,C,D,E client;
+
+    %% Subgraph 2: Jaringan & Transmisi Data (Local Mesh)
+    subgraph Network_Layer ["2. Infrastruktur Jaringan Lokal (Offline Mesh)"]
+        D -->|Data Pergerakan <br> Wi-Fi ESP32| F[Router Lokal Sekolah <br> Zero-Config / Tanpa Internet]
+        E -->|Kirim Gambar <br> HTTPS Lokal Terenkripsi| F
+        C -->|Data Respon & Latensi| F
+        F -->|Protokol MQTT <br> Latensi Rendah| G[Eclipse Mosquitto Broker]
+        F -->|REST API Request| H[FastAPI Backend Server <br> di Laptop Guru]
+    end
+    class F,G,H network;
+
+    %% Subgraph 3: Pemrosesan Data & Kecerdasan Buatan (Edge AI)
+    subgraph AI_Engine_Layer ["3. Pemrosesan Komputasi & Edge AI Lokal"]
+        G -->|Stream Data Sensor IMU MPU6050| I[Kinetik Analyser: <br> Deteksi Getaran/Tremor & Jeda]
+        H -->|Terima Foto Tulisan Tangan| J[Local AI OCR Engine: <br> TrOCR Terkompresi ONNX]
+        
+        J -->|Ekstraksi Karakter Tegak/Sambung| K[Error Pattern Recognition: <br> RapidFuzz / Levenshtein Distance]
+        K -->|Identifikasi Pola: <br> Reversal, Omission, Substitution| L[Multivariate Risk Assessment Engine]
+        I -->|Kirim Metrik Motorik Halus| L
+        
+        L -->|Kalkulasi Bobot Matematis| M{Klasifikasi Risiko <br> Disleksia}
+        M -->|Rendah / Sedang / Tinggi| N[(Penyimpanan Lokal: <br> IndexedDB & SQLite)]
+    end
+    class I,J,K,L,M,N ai;
+
+    %% Subgraph 4: Output & Tindakan Pedagogis
+    subgraph Output_Layer ["4. Dasbor Hasil & Intervensi Multisensori"]
+        N --> O[Local Mesh Dashboard: <br> Grafik Tumbuh Kembang Siswa]
+        N --> P[Teacher's Offline AI Copilot: <br> SLM Phi-3/Qwen via Ollama]
+        P -->|Analisis Pola Kesalahan Spesifik| Q[Rekomendasi Strategi <br> Metode Orton-Gillingham]
+        Q --> R[Cetak Otomatis Lembar Panduan <br> Latihan Fisik Luring untuk Orang Tua]
+        O --> R
+    end
+    class O,P,Q,R output;
+
+    %% Alur Antar Lapisan
+    C -.->|Evaluasi Kognitif| L
