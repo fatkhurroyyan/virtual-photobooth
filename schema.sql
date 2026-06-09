@@ -81,36 +81,44 @@ ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
 
 -- ── EVENTS ──
 -- Siapa pun bisa baca (untuk validasi slug di guest app)
+DROP POLICY IF EXISTS "events_select_public" ON public.events;
 CREATE POLICY "events_select_public" ON public.events
   FOR SELECT USING (true);
 
 -- Diubah agar public/anon bisa modifikasi (karena admin panel berjalan client-side tanpa login)
+DROP POLICY IF EXISTS "events_modify_public" ON public.events;
 CREATE POLICY "events_modify_public" ON public.events
   FOR ALL USING (true)
   WITH CHECK (true);
 
 -- ── FRAMES ──
+DROP POLICY IF EXISTS "frames_select_public" ON public.frames;
 CREATE POLICY "frames_select_public" ON public.frames
   FOR SELECT USING (true);
 
 -- Diubah agar public/anon bisa modifikasi (tambah/hapus frame dari admin panel)
+DROP POLICY IF EXISTS "frames_modify_public" ON public.frames;
 CREATE POLICY "frames_modify_public" ON public.frames
   FOR ALL USING (true)
   WITH CHECK (true);
 
 -- ── SUBMISSIONS ──
 -- Tamu (tidak login) bisa INSERT kiriman mereka
+DROP POLICY IF EXISTS "submissions_insert_public" ON public.submissions;
 CREATE POLICY "submissions_insert_public" ON public.submissions
   FOR INSERT WITH CHECK (true);
 
 -- Dashboard pengantin dan admin bisa baca semua kiriman
+DROP POLICY IF EXISTS "submissions_select_public" ON public.submissions;
 CREATE POLICY "submissions_select_public" ON public.submissions
   FOR SELECT USING (true);
 
 -- Hanya admin yang bisa hapus/edit
+DROP POLICY IF EXISTS "submissions_modify_admin" ON public.submissions;
 CREATE POLICY "submissions_modify_admin" ON public.submissions
   FOR UPDATE USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "submissions_delete_admin" ON public.submissions;
 CREATE POLICY "submissions_delete_admin" ON public.submissions
   FOR DELETE USING (auth.role() = 'authenticated');
 
@@ -120,26 +128,32 @@ CREATE POLICY "submissions_delete_admin" ON public.submissions
 -- ================================================================
 
 -- PHOTOS: tamu (anonymous) bisa upload foto, semua bisa lihat
+DROP POLICY IF EXISTS "photos_public_upload" ON storage.objects;
 CREATE POLICY "photos_public_upload" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'photos');
 
+DROP POLICY IF EXISTS "photos_public_read" ON storage.objects;
 CREATE POLICY "photos_public_read" ON storage.objects
   FOR SELECT USING (bucket_id = 'photos');
 
 -- VOICES: tamu (anonymous) bisa upload suara, semua bisa putar
+DROP POLICY IF EXISTS "voices_public_upload" ON storage.objects;
 CREATE POLICY "voices_public_upload" ON storage.objects
   FOR INSERT WITH CHECK (bucket_id = 'voices');
 
+DROP POLICY IF EXISTS "voices_public_read" ON storage.objects;
 CREATE POLICY "voices_public_read" ON storage.objects
   FOR SELECT USING (bucket_id = 'voices');
 
 -- COUPLE-PHOTOS: hanya admin yang bisa upload foto pengantin
+DROP POLICY IF EXISTS "couple_photos_admin_upload" ON storage.objects;
 CREATE POLICY "couple_photos_admin_upload" ON storage.objects
   FOR INSERT WITH CHECK (
     bucket_id = 'couple-photos'
     AND auth.role() = 'authenticated'
   );
 
+DROP POLICY IF EXISTS "couple_photos_public_read" ON storage.objects;
 CREATE POLICY "couple_photos_public_read" ON storage.objects
   FOR SELECT USING (bucket_id = 'couple-photos');
 
