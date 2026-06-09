@@ -123,10 +123,11 @@
       }
 
       .sidebar-header {
-        padding: 24px;
+        padding: 20px 24px;
         display: flex;
-        align-items: center;
-        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
         border-bottom: 1px solid var(--sidebar-border);
       }
 
@@ -142,8 +143,9 @@
       }
 
       .sidebar-logo {
-        height: 38px;
-        max-width: 120px;
+        height: auto;
+        max-height: 28px;
+        max-width: 100%;
         object-fit: contain;
       }
 
@@ -164,6 +166,7 @@
         letter-spacing: 0.5px;
         background: linear-gradient(90deg, #faf6f0, var(--gold));
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
       }
 
@@ -3726,14 +3729,26 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
         const EVENT_SLUG = urlParams.get("event") || "demo";
 
         try {
+          // 1. Try to fetch the requested event
           const { data: eventData, error } = await db
             .from("events")
             .select("*")
             .eq("slug", EVENT_SLUG)
             .single();
 
-          if (error || !eventData)
+          if (error || !eventData) {
+            // If the slug (like the default 'demo') is not found, try to find any event in the DB and redirect to it
+            const { data: allEvents, error: allEventsError } = await db
+              .from("events")
+              .select("*")
+              .order("created_at", { ascending: false });
+
+            if (!allEventsError && allEvents && allEvents.length > 0) {
+              window.location.search = `?event=${allEvents[0].slug}`;
+              return;
+            }
             throw error || new Error("Event tidak ditemukan");
+          }
 
           currentEventId = eventData.id;
           coupleName = eventData.couple_name;
@@ -3813,7 +3828,7 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
           await loadFrames();
         } catch (e) {
           console.warn(
-            "Supabase tidak terhubung, jalankan mode demo:",
+            "Gagal memuat event:",
             e.message,
           );
           // Set values default
@@ -3829,6 +3844,13 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
             sort_order: i,
           }));
           renderFramesGrid();
+
+          // Try to load list of events even if current event failed (e.g. database has 0 events)
+          try {
+            await loadEventsList();
+          } catch(err) {
+            console.error("Gagal memuat list event di catch block:", err);
+          }
         }
       }
 
