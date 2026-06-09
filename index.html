@@ -847,7 +847,7 @@
           const { data, error } = await db
             .from("events")
             .select(
-              "id, couple_name, allow_voice, require_name, allow_retake, is_active",
+              "id, couple_name, allow_voice, require_name, allow_retake, is_active, couple_photo_url, theme_color",
             )
             .eq("slug", EVENT_SLUG)
             .single();
@@ -860,6 +860,33 @@
             return;
           }
           currentEventId = data.id;
+          
+          // Apply theme color
+          if (data.theme_color) {
+            document.documentElement.style.setProperty("--gold", data.theme_color);
+          }
+
+          // Apply couple photo as background hero
+          if (data.couple_photo_url) {
+            document.body.style.backgroundImage = `url('${data.couple_photo_url}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundAttachment = "fixed";
+            
+            // Add background overlay for readability
+            let overlay = document.getElementById("body-overlay");
+            if (!overlay) {
+              overlay = document.createElement("div");
+              overlay.id = "body-overlay";
+              overlay.style.position = "fixed";
+              overlay.style.inset = "0";
+              overlay.style.background = "rgba(44, 24, 16, 0.45)"; // soft dark warm overlay
+              overlay.style.backdropFilter = "blur(2px)";
+              overlay.style.zIndex = "0";
+              document.body.insertBefore(overlay, document.body.firstChild);
+            }
+          }
+
           if (data.couple_name) {
             coupleName = data.couple_name;
             await loadFramesFromDb();

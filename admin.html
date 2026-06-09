@@ -2815,6 +2815,7 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
 
       let activeFrames = []; // will be loaded dynamically from DB
       let coupleName = "Rizky & Nabila"; // dynamic couple name
+      let heroFileToUpload = null; // couple background photo to upload
 
       // ── SWITCH TAB LOGIC ──
       function switchTab(id, el) {
@@ -3284,7 +3285,9 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
       // ── PREVIEW HERO HERO BACKGROUND ──
       function previewHero(input) {
         if (!input.files[0]) return;
-        const url = URL.createObjectURL(input.files[0]);
+        const file = input.files[0];
+        heroFileToUpload = file;
+        const url = URL.createObjectURL(file);
         const sim = document.getElementById("hero-sim");
 
         sim.style.backgroundImage = `url(${url})`;
@@ -3298,7 +3301,7 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
         document.getElementById("save-msg-text").textContent =
           "Foto latar belakang diubah — belum disimpan";
         markUnsaved();
-        showToast("Latar belakang diunggah!", "success");
+        showToast("Latar belakang dipilih!", "success");
       }
 
       // ── SETTINGS SWITCH TOGGLES ──
@@ -3685,19 +3688,52 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
           .querySelector(`[onclick="toggleSwitchSetting(this, 'retake')"]`)
           .classList.contains("on");
 
+        let uploadedUrl = null;
+        if (heroFileToUpload) {
+          try {
+            showToast("Mengunggah foto pengantin...", "info");
+            const ts = Date.now();
+            const cleanName = heroFileToUpload.name.replace(/[^a-zA-Z0-9.]/g, "_");
+            const path = `backgrounds/${currentEventId}/${ts}_${cleanName}`;
+            
+            const { error: uploadError } = await db.storage
+              .from("couple-photos")
+              .upload(path, heroFileToUpload);
+              
+            if (uploadError) throw uploadError;
+            
+            const { data: urlData } = db.storage
+              .from("couple-photos")
+              .getPublicUrl(path);
+              
+            uploadedUrl = urlData.publicUrl;
+            heroFileToUpload = null; // Reset once uploaded successfully
+          } catch (storageErr) {
+            console.error("Gagal mengunggah foto pengantin:", storageErr);
+            showToast("Gagal mengunggah foto pengantin: " + storageErr.message, "danger");
+            return;
+          }
+        }
+
         try {
+          const updateData = {
+            couple_name: couple,
+            event_date: date || null,
+            event_location: loc || null,
+            theme_color: hex,
+            allow_voice: isVoiceOn,
+            require_name: isReqNameOn,
+            allow_retake: isRetakeOn,
+          };
+
+          if (uploadedUrl) {
+            updateData.couple_photo_url = uploadedUrl;
+          }
+
           // Update event details
           const { error: eventError } = await db
             .from("events")
-            .update({
-              couple_name: couple,
-              event_date: date || null,
-              event_location: loc || null,
-              theme_color: hex,
-              allow_voice: isVoiceOn,
-              require_name: isReqNameOn,
-              allow_retake: isRetakeOn,
-            })
+            .update(updateData)
             .eq("id", currentEventId);
 
           if (eventError) throw eventError;
@@ -3759,6 +3795,19 @@ Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan</textare
             document.getElementById("edit-event-date").value = eventData.event_date;
           }
           document.getElementById("edit-event-loc").value = eventData.event_location || "";
+
+          // Set hero background preview
+          if (eventData.couple_photo_url) {
+            const sim = document.getElementById("hero-sim");
+            if (sim) sim.style.backgroundImage = `url(${eventData.couple_photo_url})`;
+            const phoneHero = document.getElementById("phone-hero-bg");
+            if (phoneHero) phoneHero.style.backgroundImage = `url(${eventData.couple_photo_url})`;
+          } else {
+            const sim = document.getElementById("hero-sim");
+            if (sim) sim.style.backgroundImage = "";
+            const phoneHero = document.getElementById("phone-hero-bg");
+            if (phoneHero) phoneHero.style.backgroundImage = "";
+          }
 
           // Clean URL display
           const vercelDomain = window.location.origin;

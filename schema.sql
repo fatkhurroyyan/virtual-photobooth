@@ -145,13 +145,10 @@ DROP POLICY IF EXISTS "voices_public_read" ON storage.objects;
 CREATE POLICY "voices_public_read" ON storage.objects
   FOR SELECT USING (bucket_id = 'voices');
 
--- COUPLE-PHOTOS: hanya admin yang bisa upload foto pengantin
+-- COUPLE-PHOTOS: tamu/admin bisa upload foto pengantin (karena admin panel client-side)
 DROP POLICY IF EXISTS "couple_photos_admin_upload" ON storage.objects;
 CREATE POLICY "couple_photos_admin_upload" ON storage.objects
-  FOR INSERT WITH CHECK (
-    bucket_id = 'couple-photos'
-    AND auth.role() = 'authenticated'
-  );
+  FOR INSERT WITH CHECK (bucket_id = 'couple-photos');
 
 DROP POLICY IF EXISTS "couple_photos_public_read" ON storage.objects;
 CREATE POLICY "couple_photos_public_read" ON storage.objects
