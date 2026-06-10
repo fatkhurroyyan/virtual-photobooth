@@ -1690,7 +1690,7 @@
   color: var(--danger);
 }
 
-/* Responsive grid layout */
+/* ── RESPONSIVE: TABLET (≤1024px) ── */
 @media (max-width: 1024px) {
   .admin-layout-body .workspace {
     grid-template-columns: 1fr;
@@ -1700,9 +1700,14 @@
     top: 0;
     margin-top: 32px;
   }
+  .admin-layout-body .phone-mockup {
+    margin: 0 auto;
+  }
 }
 
+/* ── RESPONSIVE: MOBILE (≤768px) ── */
 @media (max-width: 768px) {
+  /* Layout: single column, hide sidebar */
   .admin-layout-body .dashboard-layout {
     grid-template-columns: 1fr;
   }
@@ -1713,6 +1718,7 @@
     left: 0;
     width: 260px;
     transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .admin-layout-body .sidebar.open {
     transform: translateX(0);
@@ -1723,15 +1729,17 @@
   .admin-layout-body .sidebar-overlay.open {
     display: block;
   }
-  .admin-layout-body .save-bar {
-    left: 24px;
-  }
   .admin-layout-body .topbar {
     display: none;
   }
+
+  /* Workspace */
   .admin-layout-body .workspace {
     padding: 16px;
+    gap: 20px;
   }
+
+  /* Grids */
   .admin-layout-body .grid-2 {
     grid-template-columns: 1fr;
   }
@@ -1740,8 +1748,245 @@
   }
   .admin-layout-body .stats-container {
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
   .admin-layout-body .frame-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Card inner spacing */
+  .admin-layout-body .card {
+    padding: 18px 16px;
+  }
+  .admin-layout-body .card-sub {
+    margin-left: 0;
+    font-size: 12px;
+  }
+  .admin-layout-body .card-content {
+    margin-left: 0;
+  }
+
+  /* Toggle rows */
+  .admin-layout-body .toggle-row {
+    gap: 12px;
+  }
+  .admin-layout-body .toggle-desc {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  /* Save bar */
+  .admin-layout-body .save-bar {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  .admin-layout-body .save-msg {
+    font-size: 13px;
+  }
+
+  /* Phone mockup: smaller on mobile */
+  .admin-layout-body .workspace-preview {
+    position: relative;
+    top: 0;
+    margin-top: 24px;
+  }
+  .admin-layout-body .phone-mockup {
+    width: 260px;
+    height: 520px;
+    border-width: 10px;
+    border-radius: 34px;
+  }
+
+  /* Event rows */
+  .admin-layout-body .event-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+  }
+  .admin-layout-body .event-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* QR section */
+  .admin-layout-body .qr-link-display {
+    font-size: 11px;
+    max-width: 100%;
+    word-break: break-all;
+  }
+
+  /* Stat cards */
+  .admin-layout-body .stat-card {
+    padding: 14px;
+    gap: 12px;
+  }
+  .admin-layout-body .stat-num {
+    font-size: 20px;
+  }
+  .admin-layout-body .stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+  }
+  .admin-layout-body .stat-icon-wrap i {
+    font-size: 18px;
+  }
+
+  /* Hero preview */
+  .admin-layout-body .hero-preview {
+    height: 120px;
+  }
+  .admin-layout-body .hero-sim-couple {
+    font-size: 20px;
+  }
+
+  /* Upload zone */
+  .admin-layout-body .upload-zone {
+    padding: 24px 16px;
+  }
+  .admin-layout-body .upload-zone i {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+  }
+
+  /* Buttons */
+  .admin-layout-body .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  /* Toast */
+  .admin-layout-body .toast-notification {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    font-size: 13px;
+  }
+}
+
+/* ── RESPONSIVE: SMALL PHONE (≤480px) ── */
+@media (max-width: 480px) {
+  .admin-layout-body .workspace {
+    padding: 12px;
+    gap: 16px;
+  }
+
+  /* Stats: stack on very small screens */
+  .admin-layout-body .stats-container {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .admin-layout-body .stat-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  .admin-layout-body .stat-num {
+    font-size: 18px;
+  }
+  .admin-layout-body .stat-lbl {
+    font-size: 11px;
+  }
+
+  /* Card titles */
+  .admin-layout-body .card-title {
+    font-size: 14px;
+  }
+  .admin-layout-body .card-header {
+    gap: 8px;
+  }
+  .admin-layout-body .card-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Toggle row: stack label and switch */
+  .admin-layout-body .toggle-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 0;
+  }
+  .admin-layout-body .toggle-switch {
+    align-self: flex-end;
+  }
+
+  /* Phone mockup even smaller */
+  .admin-layout-body .phone-mockup {
+    width: 230px;
+    height: 460px;
+    border-width: 8px;
+    border-radius: 30px;
+  }
+
+  /* Event name truncation */
+  .admin-layout-body .event-name {
+    font-size: 14px;
+  }
+  .admin-layout-body .event-meta {
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+
+  /* Save bar stacked */
+  .admin-layout-body .save-bar {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+  }
+
+  /* Mobile header */
+  .admin-layout-body .mobile-header {
+    padding: 10px 12px;
+  }
+  .admin-layout-body .mobile-logo span {
+    font-size: 13px;
+  }
+
+  /* Inputs */
+  .admin-layout-body .field input,
+  .admin-layout-body .field select,
+  .admin-layout-body .field textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  /* Color swatches smaller */
+  .admin-layout-body .color-swatch {
+    width: 32px;
+    height: 32px;
+  }
+  .admin-layout-body .custom-color-input-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Frames 2 columns */
+  .admin-layout-body .frame-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* Guide box */
+  .admin-layout-body .guide-box {
+    font-size: 12px;
+    padding: 12px;
+  }
+
+  /* Hero preview */
+  .admin-layout-body .hero-preview {
+    height: 100px;
+  }
+  .admin-layout-body .hero-sim-couple {
+    font-size: 18px;
+  }
+  .admin-layout-body .hero-sim-event {
+    font-size: 8px;
   }
 }
