@@ -26,7 +26,14 @@ interface Frame {
   sort_order: number;
 }
 
-type ScreenName = "welcome" | "frame" | "camera" | "preview" | "voice" | "upload" | "success";
+type ScreenName =
+  | "welcome"
+  | "frame"
+  | "camera"
+  | "preview"
+  | "voice"
+  | "upload"
+  | "success";
 
 const defaultFramesData = [
   {
@@ -34,29 +41,29 @@ const defaultFramesData = [
     svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="292" height="392" rx="4" fill="none" stroke="#c9a96e" stroke-width="8"/><rect x="14" y="14" width="272" height="372" rx="2" fill="none" stroke="#e8d5b0" stroke-width="2"/><rect x="18" y="18" width="264" height="310" rx="2" fill="none" stroke="#c9a96e" stroke-width="1" stroke-dasharray="4 4"/><rect x="4" y="336" width="292" height="60" rx="0" fill="rgba(255,255,255,0.95)"/><circle cx="4" cy="4" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="296" cy="4" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="4" cy="396" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="296" cy="396" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><text x="150" y="362" text-anchor="middle" font-family="'Gyahegi', 'Georgia', 'Times New Roman', serif" font-style="italic" font-size="14" fill="#9c7c5e">{{COUPLE_NAME}}</text><text x="150" y="380" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#c9a96e" letter-spacing="1.5">HAPPY WEDDING</text></svg>`,
     png_url: null,
     is_active: true,
-    sort_order: 0
+    sort_order: 0,
   },
   {
     name: "Vintage Gold",
     svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="296" height="396" rx="2" fill="none" stroke="#c9a96e" stroke-width="4"/><rect x="10" y="10" width="280" height="380" rx="2" fill="none" stroke="#e8d5b0" stroke-width="1"/><path d="M2 40 L2 2 L40 2" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M260 2 L298 2 L298 40" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M2 360 L2 398 L40 398" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M260 398 L298 398 L298 360" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M120 2 Q150 16 180 2" fill="none" stroke="#c9a96e" stroke-width="2"/><circle cx="150" cy="8" r="4" fill="#c9a96e"/><rect x="2" y="330" width="296" height="68" rx="0" fill="rgba(255,255,255,0.97)"/><line x1="20" y1="340" x2="280" y2="340" stroke="#e8d5b0" stroke-width="1"/><text x="150" y="360" text-anchor="middle" font-family="'Gyahegi', 'Georgia', 'Times New Roman', serif" font-style="italic" font-size="15" fill="#6b4c2a">{{COUPLE_NAME}}</text><text x="150" y="378" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#9c7c5e" letter-spacing="1.5">FOREVER & ALWAYS</text></svg>`,
     png_url: null,
     is_active: true,
-    sort_order: 1
+    sort_order: 1,
   },
   {
     name: "Floral White",
     svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="284" height="384" rx="12" fill="none" stroke="#f0c4be" stroke-width="10"/><rect x="16" y="16" width="268" height="368" rx="8" fill="none" stroke="#d4847a" stroke-width="2"/><circle cx="40" cy="30" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="40" cy="30" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="260" cy="30" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="260" cy="30" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="40" cy="370" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="40" cy="370" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="260" cy="370" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="260" cy="370" r="6" fill="rgba(212,132,122,0.5)"/><rect x="8" y="330" width="284" height="62" rx="0" fill="rgba(255,255,255,0.96)"/><text x="150" y="358" text-anchor="middle" font-family="'Gyahegi', 'Georgia', 'Times New Roman', serif" font-style="italic" font-size="14" fill="#d4847a">{{COUPLE_NAME}}</text><text x="150" y="378" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#c06b60" letter-spacing="1.5">LOVE CELEBRATION</text></svg>`,
     png_url: null,
     is_active: true,
-    sort_order: 2
+    sort_order: 2,
   },
   {
     name: "Classic Film",
     svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="300" height="400" rx="0" fill="rgba(30,20,10,0.06)"/><rect x="0" y="0" width="300" height="28" fill="rgba(44,24,16,0.7)"/><rect x="0" y="372" width="300" height="28" fill="rgba(44,24,16,0.7)"/><rect x="4" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="38" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="72" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="106" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="140" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="174" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="208" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="242" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="276" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="4" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="38" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="72" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="106" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="140" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="174" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="208" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="242" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="276" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="0" y="28" width="16" height="344" fill="rgba(44,24,16,0.5)"/><rect x="284" y="28" width="16" height="344" fill="rgba(44,24,16,0.5)"/><rect x="16" y="330" width="268" height="42" fill="rgba(250,246,240,0.95)"/><text x="150" y="350" text-anchor="middle" font-family="'SF Pro', sans-serif" font-weight="bold" font-size="10" fill="#6b4c2a" letter-spacing="3">{{COUPLE_NAME}}</text><text x="150" y="364" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#9c7c5e">⬛ SWEET MOMENTS ⬛</text></svg>`,
     png_url: null,
     is_active: true,
-    sort_order: 3
-  }
+    sort_order: 3,
+  },
 ];
 
 export default function GuestApp() {
@@ -92,7 +99,9 @@ export default function GuestApp() {
   const audioStreamRef = useRef<MediaStream | null>(null);
 
   // Wave heights state
-  const [waveHeights, setWaveHeights] = useState<number[]>(new Array(12).fill(8));
+  const [waveHeights, setWaveHeights] = useState<number[]>(
+    new Array(12).fill(8),
+  );
 
   // Load Event Config & Frames
   useEffect(() => {
@@ -101,7 +110,9 @@ export default function GuestApp() {
       try {
         const { data, error } = await db
           .from("events")
-          .select("id, couple_name, event_date, event_location, allow_voice, allow_chat, require_name, allow_retake, is_active, couple_photo_url, theme_color")
+          .select(
+            "id, couple_name, event_date, event_location, allow_voice, allow_chat, require_name, allow_retake, is_active, couple_photo_url, theme_color",
+          )
           .eq("slug", activeSlug)
           .single();
 
@@ -133,7 +144,7 @@ export default function GuestApp() {
             svg_code: f.svg_code,
             png_url: f.png_url,
             is_active: f.is_active,
-            sort_order: f.sort_order
+            sort_order: f.sort_order,
           }));
           setFrames(localFrames);
         }
@@ -151,7 +162,7 @@ export default function GuestApp() {
           allow_retake: true,
           is_active: true,
           couple_photo_url: null,
-          theme_color: "#c9a96e"
+          theme_color: "#c9a96e",
         });
         const localFrames = defaultFramesData.map((f, i) => ({
           id: `local-${i}`,
@@ -159,7 +170,7 @@ export default function GuestApp() {
           svg_code: f.svg_code,
           png_url: f.png_url,
           is_active: f.is_active,
-          sort_order: f.sort_order
+          sort_order: f.sort_order,
         }));
         setFrames(localFrames);
       } finally {
@@ -182,7 +193,10 @@ export default function GuestApp() {
     }
 
     if (eventConfig?.theme_color) {
-      document.documentElement.style.setProperty("--gold", eventConfig.theme_color);
+      document.documentElement.style.setProperty(
+        "--gold",
+        eventConfig.theme_color,
+      );
     } else {
       document.documentElement.style.removeProperty("--gold");
     }
@@ -211,7 +225,8 @@ export default function GuestApp() {
   // Clean up timers on unmount
   useEffect(() => {
     return () => {
-      if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+      if (recordingIntervalRef.current)
+        clearInterval(recordingIntervalRef.current);
       if (waveIntervalRef.current) clearInterval(waveIntervalRef.current);
     };
   }, []);
@@ -272,7 +287,8 @@ export default function GuestApp() {
 
     // Flash animation effect
     const flash = document.createElement("div");
-    flash.style.cssText = "position:absolute;inset:0;background:#fff;z-index:99;border-radius:16px;";
+    flash.style.cssText =
+      "position:absolute;inset:0;background:#fff;z-index:99;border-radius:16px;";
     video.parentElement?.appendChild(flash);
     setTimeout(() => flash.remove(), 200);
 
@@ -283,7 +299,9 @@ export default function GuestApp() {
   // Audio recording helpers
   const startRecording = async () => {
     try {
-      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
       audioStreamRef.current = audioStream;
       const chunks: BlobPart[] = [];
       const mediaRecorder = new MediaRecorder(audioStream);
@@ -327,7 +345,10 @@ export default function GuestApp() {
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
       mediaRecorderRef.current.stop();
     }
     if (recordingIntervalRef.current) {
@@ -360,7 +381,9 @@ export default function GuestApp() {
   };
 
   // Image and Frame merging
-  const mergePhotoAndFrame = async (photoCanvas: HTMLCanvasElement): Promise<HTMLCanvasElement> => {
+  const mergePhotoAndFrame = async (
+    photoCanvas: HTMLCanvasElement,
+  ): Promise<HTMLCanvasElement> => {
     const out = document.createElement("canvas");
     out.width = photoCanvas.width;
     out.height = photoCanvas.height;
@@ -404,7 +427,10 @@ export default function GuestApp() {
         }
       }
     } catch (e) {
-      console.warn("Merging frame overlay failed, uploading original photo:", e);
+      console.warn(
+        "Merging frame overlay failed, uploading original photo:",
+        e,
+      );
     }
     return out;
   };
@@ -438,7 +464,7 @@ export default function GuestApp() {
 
       const finalCanvas = await mergePhotoAndFrame(canvas);
       const photoBlob = await new Promise<Blob | null>((resolve) =>
-        finalCanvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9)
+        finalCanvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9),
       );
       if (!photoBlob) throw new Error("Gagal mengolah file foto");
 
@@ -458,7 +484,9 @@ export default function GuestApp() {
 
       if (photoErr) throw new Error("Gagal upload foto: " + photoErr.message);
 
-      const { data: { publicUrl: photoUrl } } = db.storage.from("photos").getPublicUrl(photoPath);
+      const {
+        data: { publicUrl: photoUrl },
+      } = db.storage.from("photos").getPublicUrl(photoPath);
 
       let voiceUrl: string | null = null;
       if (audioBlob && audioBlob.size > 0) {
@@ -474,7 +502,9 @@ export default function GuestApp() {
           });
 
         if (!voiceErr) {
-          const { data: { publicUrl } } = db.storage.from("voices").getPublicUrl(voicePath);
+          const {
+            data: { publicUrl },
+          } = db.storage.from("voices").getPublicUrl(voicePath);
           voiceUrl = publicUrl;
         }
       }
@@ -501,7 +531,6 @@ export default function GuestApp() {
       setTimeout(() => {
         setScreen("success");
       }, 500);
-
     } catch (err: any) {
       console.error("Upload error details:", err);
       setUploadError(true);
@@ -528,9 +557,26 @@ export default function GuestApp() {
   // Rendering screens
   if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "sans-serif",
+        }}
+      >
         <div>
-          <div style={{ fontSize: "24px", color: "#6b4c2a", fontStyle: "italic", textAlign: "center" }}>Memuat Event...</div>
+          <div
+            style={{
+              fontSize: "24px",
+              color: "#6b4c2a",
+              fontStyle: "italic",
+              textAlign: "center",
+            }}
+          >
+            Memuat Event...
+          </div>
         </div>
       </div>
     );
@@ -538,11 +584,25 @@ export default function GuestApp() {
 
   if (isEventNotFound) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif", textAlign: "center", padding: "40px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "sans-serif",
+          textAlign: "center",
+          padding: "40px",
+        }}
+      >
         <div>
           <div style={{ fontSize: "48px" }}>🔒</div>
-          <h2 style={{ margin: "16px 0 8px", color: "#3d2b14" }}>Event Tidak Tersedia</h2>
-          <p style={{ color: "#9c7c5e" }}>Link ini sudah tidak aktif. Hubungi panitia untuk info lebih lanjut.</p>
+          <h2 style={{ margin: "16px 0 8px", color: "#3d2b14" }}>
+            Event Tidak Tersedia
+          </h2>
+          <p style={{ color: "#9c7c5e" }}>
+            Link ini sudah tidak aktif. Hubungi panitia untuk info lebih lanjut.
+          </p>
         </div>
       </div>
     );
@@ -555,7 +615,9 @@ export default function GuestApp() {
         year: "numeric",
       })
     : "";
-  const heroMeta = [heroDateStr, eventConfig?.event_location].filter(Boolean).join(" · ");
+  const heroMeta = [heroDateStr, eventConfig?.event_location]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="guest-app-body">
@@ -568,17 +630,16 @@ export default function GuestApp() {
             background: "rgba(44, 24, 16, 0.45)",
             backdropFilter: "blur(2px)",
             zIndex: 0,
-            pointerEvents: "none"
+            pointerEvents: "none",
           }}
         />
       )}
 
-      <header className="app-header">
-        <img src="/Logo Bingkiskaca.png" alt="Logo Bingkis Kaca" className="app-logo-header" />
-      </header>
-
       {/* Welcome Screen */}
-      <div className={`screen ${screen === "welcome" ? "active" : ""}`} id="s-welcome">
+      <div
+        className={`screen ${screen === "welcome" ? "active" : ""}`}
+        id="s-welcome"
+      >
         {/* Hero Section — matches admin live mockup */}
         <div
           className="guest-hero"
@@ -603,7 +664,8 @@ export default function GuestApp() {
           <div className="logo">✦ PHOTOBOOTH EVENT ✦</div>
           <div className="title">Selamat Datang</div>
           <p className="subtitle">
-            Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan
+            Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk
+            pasangan
           </p>
           <div className="steps">
             <div className="step-dot active"></div>
@@ -634,10 +696,20 @@ export default function GuestApp() {
             Lanjutkan →
           </button>
         </div>
+        <header className="app-header">
+          <img
+            src="/src/assets/logo-bk.svg"
+            alt="Logo Bingkis Kaca"
+            className="app-logo-header"
+          />
+        </header>
       </div>
 
       {/* Frame Picker Screen */}
-      <div className={`screen ${screen === "frame" ? "active" : ""}`} id="s-frame">
+      <div
+        className={`screen ${screen === "frame" ? "active" : ""}`}
+        id="s-frame"
+      >
         <div className="card">
           <div className="title">Pilih Bingkai</div>
           <p className="subtitle">Pilih bingkai polaroid favoritmu</p>
@@ -655,8 +727,18 @@ export default function GuestApp() {
                   onClick={() => setSelectedFrameIndex(index)}
                 >
                   <div className="frame-preview">
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#f5ede0,#faf6f0)", opacity: 0.25 }}></div>
-                    <div className="frame-svg" dangerouslySetInnerHTML={{ __html: getFrameHtml(frame) }} />
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "linear-gradient(135deg,#f5ede0,#faf6f0)",
+                        opacity: 0.25,
+                      }}
+                    ></div>
+                    <div
+                      className="frame-svg"
+                      dangerouslySetInnerHTML={{ __html: getFrameHtml(frame) }}
+                    />
                   </div>
                   <div className="check">✓</div>
                 </div>
@@ -664,17 +746,26 @@ export default function GuestApp() {
               </div>
             ))}
           </div>
-          <button className="btn btn-primary" onClick={() => setScreen("camera")}>
+          <button
+            className="btn btn-primary"
+            onClick={() => setScreen("camera")}
+          >
             Buka Kamera →
           </button>
-          <button className="btn btn-secondary" onClick={() => setScreen("welcome")}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setScreen("welcome")}
+          >
             ← Kembali
           </button>
         </div>
       </div>
 
       {/* Camera Screen */}
-      <div className={`screen ${screen === "camera" ? "active" : ""}`} id="s-camera">
+      <div
+        className={`screen ${screen === "camera" ? "active" : ""}`}
+        id="s-camera"
+      >
         <div className="card">
           <div className="title">Ambil Foto</div>
           <p className="subtitle">Senyum ya! 😊</p>
@@ -689,8 +780,10 @@ export default function GuestApp() {
               <div className="cam-error">
                 <div className="cam-error-icon">📷</div>
                 <div>
-                  Kamera tidak dapat diakses.<br />
-                  Pastikan izin kamera sudah diberikan.<br />
+                  Kamera tidak dapat diakses.
+                  <br />
+                  Pastikan izin kamera sudah diberikan.
+                  <br />
                   <small style={{ marginTop: "8px", display: "block" }}>
                     Klik ikon gembok 🔒 di address bar → Izinkan Kamera
                   </small>
@@ -698,11 +791,21 @@ export default function GuestApp() {
               </div>
             ) : (
               <>
-                <video ref={videoRef} id="video" autoPlay playsInline muted></video>
+                <video
+                  ref={videoRef}
+                  id="video"
+                  autoPlay
+                  playsInline
+                  muted
+                ></video>
                 <canvas ref={canvasRef} id="canvas"></canvas>
                 <div
                   className="frame-overlay"
-                  dangerouslySetInnerHTML={{ __html: frames[selectedFrameIndex] ? getFrameHtml(frames[selectedFrameIndex]) : "" }}
+                  dangerouslySetInnerHTML={{
+                    __html: frames[selectedFrameIndex]
+                      ? getFrameHtml(frames[selectedFrameIndex])
+                      : "",
+                  }}
                 ></div>
                 <div className="camera-hint">Posisikan wajah di tengah</div>
               </>
@@ -726,7 +829,10 @@ export default function GuestApp() {
       </div>
 
       {/* Preview Screen */}
-      <div className={`screen ${screen === "preview" ? "active" : ""}`} id="s-preview">
+      <div
+        className={`screen ${screen === "preview" ? "active" : ""}`}
+        id="s-preview"
+      >
         <div className="card">
           <div className="title">Preview Foto</div>
           <p className="subtitle">Bagus? Lanjutkan atau ambil ulang</p>
@@ -734,7 +840,11 @@ export default function GuestApp() {
             <img id="preview-img" src={photoDataUrl} alt="preview" />
             <div
               className="preview-frame-overlay"
-              dangerouslySetInnerHTML={{ __html: frames[selectedFrameIndex] ? getFrameHtml(frames[selectedFrameIndex]) : "" }}
+              dangerouslySetInnerHTML={{
+                __html: frames[selectedFrameIndex]
+                  ? getFrameHtml(frames[selectedFrameIndex])
+                  : "",
+              }}
             ></div>
           </div>
           <button
@@ -747,7 +857,9 @@ export default function GuestApp() {
               }
             }}
           >
-            {(eventConfig?.allow_voice || eventConfig?.allow_chat) ? "Lanjut ke Ucapan →" : "Kirim Foto ✨"}
+            {eventConfig?.allow_voice || eventConfig?.allow_chat
+              ? "Lanjut ke Ucapan →"
+              : "Kirim Foto ✨"}
           </button>
           {eventConfig?.allow_retake && (
             <button
@@ -764,7 +876,10 @@ export default function GuestApp() {
       </div>
 
       {/* Voice & Chat Note Screen */}
-      <div className={`screen ${screen === "voice" ? "active" : ""}`} id="s-voice">
+      <div
+        className={`screen ${screen === "voice" ? "active" : ""}`}
+        id="s-voice"
+      >
         <div className="card">
           <div className="title">Ucapan Spesial</div>
           <p className="subtitle">Kirim ucapan &amp; doa untuk pengantin 💌</p>
@@ -786,17 +901,27 @@ export default function GuestApp() {
                 {isRecording ? "⏹" : "🎙️"}
               </div>
               <div className="voice-status">
-                {isRecording ? "Merekam... (tap untuk berhenti)" : audioUrl ? "Rekaman selesai ✓" : "Tap untuk mulai rekam"}
+                {isRecording
+                  ? "Merekam... (tap untuk berhenti)"
+                  : audioUrl
+                    ? "Rekaman selesai ✓"
+                    : "Tap untuk mulai rekam"}
               </div>
               <div className="voice-timer">
                 0:{recordingSeconds.toString().padStart(2, "0")}
               </div>
               <div className={`waveform ${isRecording ? "active" : ""}`}>
                 {waveHeights.map((h, i) => (
-                  <div className="bar" key={i} style={{ height: `${h}px` }}></div>
+                  <div
+                    className="bar"
+                    key={i}
+                    style={{ height: `${h}px` }}
+                  ></div>
                 ))}
               </div>
-              {audioUrl && <audio id="audio-playback" src={audioUrl} controls></audio>}
+              {audioUrl && (
+                <audio id="audio-playback" src={audioUrl} controls></audio>
+              )}
             </div>
           )}
 
@@ -826,7 +951,9 @@ export default function GuestApp() {
           <button
             className="btn btn-primary"
             onClick={confirmSend}
-            style={{ display: (audioUrl || messageText.trim()) ? "block" : "none" }}
+            style={{
+              display: audioUrl || messageText.trim() ? "block" : "none",
+            }}
           >
             Kirim Ucapan ✨
           </button>
@@ -854,30 +981,65 @@ export default function GuestApp() {
       </div>
 
       {/* Uploading Screen */}
-      <div className={`screen ${screen === "upload" ? "active" : ""}`} id="s-upload">
+      <div
+        className={`screen ${screen === "upload" ? "active" : ""}`}
+        id="s-upload"
+      >
         <div className="card" style={{ textAlign: "center" }}>
           <div style={{ fontSize: "48px", marginBottom: "16px" }}>📡</div>
           <div className="title">Mengirim...</div>
-          <p className="subtitle">Foto &amp; ucapanmu sedang dikirim ke pengantin</p>
+          <p className="subtitle">
+            Foto &amp; ucapanmu sedang dikirim ke pengantin
+          </p>
           <div className="upload-bar">
-            <div className="upload-fill" style={{ width: `${uploadProgress}%`, background: uploadError ? "linear-gradient(90deg, #e53e3e, #c53030)" : "" }}></div>
+            <div
+              className="upload-fill"
+              style={{
+                width: `${uploadProgress}%`,
+                background: uploadError
+                  ? "linear-gradient(90deg, #e53e3e, #c53030)"
+                  : "",
+              }}
+            ></div>
           </div>
-          <p style={{ fontSize: "13px", color: "var(--text-muted)" }}>{uploadLabel}</p>
+          <p style={{ fontSize: "13px", color: "var(--text-muted)" }}>
+            {uploadLabel}
+          </p>
         </div>
       </div>
 
       {/* Success Screen */}
-      <div className={`screen ${screen === "success" ? "active" : ""}`} id="s-success">
+      <div
+        className={`screen ${screen === "success" ? "active" : ""}`}
+        id="s-success"
+      >
         <div className="card" style={{ textAlign: "center" }}>
           <div className="success-icon">💖</div>
           <div className="title">Terima Kasih!</div>
           <div className="divider"></div>
-          <div className="guest-name-display">{guestName || "Tamu Undangan"}</div>
+          <div className="guest-name-display">
+            {guestName || "Tamu Undangan"}
+          </div>
           <p className="subtitle" style={{ marginTop: "8px" }}>
-            Foto &amp; ucapanmu sudah terkirim ke pengantin. Semoga jadi kenangan indah! 🌸
+            Foto &amp; ucapanmu sudah terkirim ke pengantin. Semoga jadi
+            kenangan indah! 🌸
           </p>
-          <div style={{ marginTop: "24px", padding: "16px", background: "var(--warm)", borderRadius: "12px" }}>
-            <p style={{ fontSize: "12px", color: "var(--text-muted)", fontStyle: "italic", fontFamily: '"Playfair Display", serif' }}>
+          <div
+            style={{
+              marginTop: "24px",
+              padding: "16px",
+              background: "var(--warm)",
+              borderRadius: "12px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "12px",
+                color: "var(--text-muted)",
+                fontStyle: "italic",
+                fontFamily: '"Playfair Display", serif',
+              }}
+            >
               "Bahagia selalu, semoga langgeng hingga kakek nenek 🙏"
             </p>
           </div>

@@ -63,18 +63,19 @@
 .guest-app-body .guest-hero-event {
   font-size: 9px;
   letter-spacing: 3px;
-  color: rgba(232, 213, 176, 0.8);
+  color: rgba(212, 212, 212, 0.8);
   text-transform: uppercase;
   margin-bottom: 2px;
   font-weight: 500;
 }
 .guest-app-body .guest-hero-couple {
   font-family: "Gyahegi", "Playfair Display", serif;
-  font-size: 26px;
+  font-size: 24px;
   font-style: italic;
   font-weight: 500;
   color: #faf6f0;
   line-height: 1.15;
+  margin: 12px 0px;
 }
 .guest-app-body .guest-hero-date {
   font-size: 11px;
@@ -104,8 +105,13 @@
   animation: guest-hero-blink 1.2s ease-in-out infinite;
 }
 @keyframes guest-hero-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 @media (min-width: 480px) {
@@ -147,12 +153,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--gold),
-    var(--rose),
-    var(--gold)
-  );
+  background: linear-gradient(90deg, var(--gold), var(--rose), var(--gold));
 }
 
 /* ── HEADER ── */
@@ -171,7 +172,7 @@
 }
 .guest-app-body .logo {
   font-family: "Gyahegi", "Playfair Display", serif;
-  font-size: 15px;
+  font-size: 8px;
   font-style: italic;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -186,8 +187,8 @@
   font-weight: 500;
   color: var(--brown-dark);
   text-align: center;
-  line-height: 1.2;
-  margin-bottom: 6px;
+  line-height: 1.5;
+  margin-bottom: 10px;
 }
 .guest-app-body .subtitle {
   font-size: 13px;
@@ -339,7 +340,9 @@
 }
 .guest-app-body .frame-option.selected {
   border-color: var(--rose);
-  box-shadow: 0 0 0 3px rgba(212, 132, 122, 0.25), 0 8px 20px rgba(212, 132, 122, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(212, 132, 122, 0.25),
+    0 8px 20px rgba(212, 132, 122, 0.15);
 }
 .guest-app-body .frame-option .check {
   position: absolute;
@@ -357,7 +360,7 @@
   opacity: 0;
   transition: all 0.2s;
   z-index: 12;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 .guest-app-body .frame-option.selected .check {
   opacity: 1;
@@ -394,7 +397,9 @@
   font-weight: 500;
   color: var(--text-muted);
   text-align: center;
-  transition: color 0.2s, font-weight 0.2s;
+  transition:
+    color 0.2s,
+    font-weight 0.2s;
 }
 
 .guest-app-body .frame-option.selected + .frame-label-below {
@@ -688,7 +693,9 @@
   resize: vertical;
   min-height: 100px;
   line-height: 1.6;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .guest-app-body .chat-textarea:focus {
   border-color: var(--gold);
