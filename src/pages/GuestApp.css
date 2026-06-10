@@ -1,0 +1,567 @@
+:root {
+  --cream: #faf6f0;
+  --warm: #f5ede0;
+  --gold: #c9a96e;
+  --gold-light: #e8d5b0;
+  --brown: #6b4c2a;
+  --brown-dark: #3d2b14;
+  --rose: #d4847a;
+  --rose-light: #f0c4be;
+  --text: #2c1810;
+  --text-muted: #9c7c5e;
+  --white: #ffffff;
+  --shadow: 0 8px 40px rgba(44, 24, 16, 0.12);
+  --shadow-deep: 0 20px 60px rgba(44, 24, 16, 0.2);
+}
+
+.guest-app-body {
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SCREENS ── */
+.guest-app-body .screen {
+  display: none;
+  width: 100%;
+  max-width: 420px;
+}
+.guest-app-body .screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── CARD ── */
+.guest-app-body .card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 36px 32px;
+  width: 100%;
+  box-shadow: var(--shadow-deep);
+  position: relative;
+  overflow: hidden;
+}
+.guest-app-body .card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--gold),
+    var(--rose),
+    var(--gold)
+  );
+}
+
+/* ── HEADER ── */
+.guest-app-body .app-header {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  z-index: 10;
+}
+.guest-app-body .app-logo-header {
+  height: 36px;
+  object-fit: contain;
+}
+.guest-app-body .logo {
+  font-family: "Gyahegi", "Playfair Display", serif;
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.guest-app-body .title {
+  font-family: "Gyahegi", "Playfair Display", serif;
+  font-size: 32px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--brown-dark);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.guest-app-body .subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* ── INPUT ── */
+.guest-app-body .input-wrap {
+  position: relative;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.guest-app-body .input-wrap label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-align: left;
+}
+.guest-app-body .input-wrap input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid var(--gold-light);
+  border-radius: 12px;
+  font-family: "SF Pro", "DM Sans", sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--warm);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.guest-app-body .input-wrap input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+}
+.guest-app-body .input-wrap input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* ── BUTTONS ── */
+.guest-app-body .btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-family: "SF Pro", "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+.guest-app-body .btn-primary {
+  background: linear-gradient(135deg, var(--gold), #b8843a);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(201, 169, 110, 0.4);
+}
+.guest-app-body .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(201, 169, 110, 0.5);
+}
+.guest-app-body .btn-primary:active {
+  transform: translateY(0);
+}
+.guest-app-body .btn-secondary {
+  background: var(--warm);
+  color: var(--brown);
+  border: 1.5px solid var(--gold-light);
+  margin-top: 10px;
+}
+.guest-app-body .btn-secondary:hover {
+  background: var(--gold-light);
+}
+.guest-app-body .btn-rose {
+  background: linear-gradient(135deg, var(--rose), #c06b60);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(212, 132, 122, 0.4);
+}
+.guest-app-body .btn-rose:hover {
+  transform: translateY(-1px);
+}
+
+/* ── STEP INDICATOR ── */
+.guest-app-body .steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+.guest-app-body .step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  transition: all 0.3s;
+}
+.guest-app-body .step-dot.active {
+  background: var(--gold);
+  width: 24px;
+  border-radius: 4px;
+}
+.guest-app-body .step-dot.done {
+  background: var(--rose-light);
+}
+
+/* ── FRAME PICKER ── */
+.guest-app-body .frames-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+.guest-app-body .frame-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+.guest-app-body .frame-option {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  border: 2.5px solid var(--gold-light);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.04);
+}
+.guest-app-body .frame-option:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 24, 16, 0.08);
+}
+.guest-app-body .frame-option.selected {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(212, 132, 122, 0.25), 0 8px 20px rgba(212, 132, 122, 0.15);
+}
+.guest-app-body .frame-option .check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rose);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 12;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.guest-app-body .frame-option.selected .check {
+  opacity: 1;
+  transform: scale(1);
+}
+.guest-app-body .frame-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* SVG & PNG Frames inline & overlays */
+.guest-app-body .frame-preview svg,
+.guest-app-body .frame-overlay svg,
+.guest-app-body .preview-frame-overlay svg,
+.guest-app-body .frame-preview img,
+.guest-app-body .frame-overlay img,
+.guest-app-body .preview-frame-overlay img,
+.guest-app-body .frame-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.guest-app-body .frame-label-below {
+  font-family: "SF Pro", "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: center;
+  transition: color 0.2s, font-weight 0.2s;
+}
+
+.guest-app-body .frame-option.selected + .frame-label-below {
+  color: var(--rose);
+  font-weight: 600;
+}
+
+/* ── CAMERA SECTION ── */
+.guest-app-body .camera-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1a0f08;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-deep);
+}
+.guest-app-body #video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+.guest-app-body #canvas {
+  display: none;
+}
+.guest-app-body .frame-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.guest-app-body .camera-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  z-index: 11;
+}
+
+.guest-app-body .shutter-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 4px solid var(--gold);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(201, 169, 110, 0.5);
+  margin: 0 auto 16px;
+}
+.guest-app-body .shutter-btn:hover {
+  transform: scale(1.05);
+}
+.guest-app-body .shutter-btn:active {
+  transform: scale(0.95);
+}
+.guest-app-body .shutter-inner {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #b8843a);
+}
+
+/* ── PREVIEW ── */
+.guest-app-body .preview-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-deep);
+}
+.guest-app-body #preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.guest-app-body .preview-frame-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ── VOICE NOTE ── */
+.guest-app-body .voice-section {
+  background: var(--warm);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1.5px solid var(--gold-light);
+  width: 100%;
+}
+.guest-app-body .voice-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose), #c06b60);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 26px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(212, 132, 122, 0.4);
+}
+.guest-app-body .voice-icon:hover {
+  transform: scale(1.05);
+}
+.guest-app-body .voice-icon.recording {
+  animation: pulse-rec 1s ease-in-out infinite;
+  background: linear-gradient(135deg, #e05a4e, #b03428);
+}
+@keyframes pulse-rec {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 20px rgba(212, 132, 122, 0.4),
+      0 0 0 0 rgba(212, 132, 122, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 4px 20px rgba(212, 132, 122, 0.4),
+      0 0 0 12px rgba(212, 132, 122, 0);
+  }
+}
+.guest-app-body .voice-status {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.guest-app-body .voice-timer {
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  color: var(--rose);
+  font-weight: 700;
+}
+
+.guest-app-body .waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 40px;
+  margin: 12px 0;
+}
+.guest-app-body .waveform .bar {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--rose-light);
+  transition: height 0.1s;
+  min-height: 4px;
+}
+.guest-app-body .waveform.active .bar {
+  background: var(--rose);
+}
+
+.guest-app-body #audio-playback {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ── SUCCESS ── */
+.guest-app-body .success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--rose));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 30px rgba(201, 169, 110, 0.4);
+  animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes pop {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.guest-app-body .divider {
+  height: 1px;
+  background: var(--gold-light);
+  margin: 20px 0;
+}
+
+.guest-app-body .guest-name-display {
+  font-family: "Gyahegi", "Playfair Display", serif;
+  font-size: 20px;
+  color: var(--brown);
+  text-align: center;
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+/* ── UPLOAD PROGRESS ── */
+.guest-app-body .upload-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--gold-light);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.guest-app-body .upload-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--rose));
+  border-radius: 2px;
+  transition: width 0.3s;
+  width: 0%;
+}
+
+/* camera error */
+.guest-app-body .cam-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+  gap: 12px;
+}
+.guest-app-body .cam-error-icon {
+  font-size: 40px;
+}
+
+@media (max-width: 420px) {
+  .guest-app-body {
+    padding: 12px;
+  }
+  .guest-app-body .card {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+  .guest-app-body .title {
+    font-size: 26px;
+  }
+  .guest-app-body .subtitle {
+    margin-bottom: 20px;
+  }
+}

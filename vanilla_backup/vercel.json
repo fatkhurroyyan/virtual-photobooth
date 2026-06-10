@@ -1,0 +1,21 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/dashboard/:event",
+      "destination": "/dashboard.html?event=:event"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/:event",
+      "destination": "/index.html?event=:event"
+    }
+  ]
+}
