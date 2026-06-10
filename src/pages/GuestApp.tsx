@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../supabaseClient";
+import logoBk from "../assets/logo-bk.svg";
 import "./GuestApp.css";
 
 interface EventConfig {
@@ -698,7 +699,7 @@ export default function GuestApp() {
         </div>
         <header className="app-header">
           <img
-            src="/src/assets/logo-bk.svg"
+            src={logoBk}
             alt="Logo Bingkis Kaca"
             className="app-logo-header"
           />
