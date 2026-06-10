@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS public.events (
   couple_photo_url TEXT,                              -- Background foto pengantin di dashboard
   theme_color      TEXT        DEFAULT '#c9a96e',     -- Warna tema utama (emas)
   allow_voice      BOOLEAN     DEFAULT TRUE,          -- Fitur voice note aktif?
+  allow_chat       BOOLEAN     DEFAULT TRUE,          -- Fitur pesan teks aktif?
   require_name     BOOLEAN     DEFAULT TRUE,          -- Wajib isi nama?
   allow_retake     BOOLEAN     DEFAULT TRUE,          -- Boleh retake foto?
   is_active        BOOLEAN     DEFAULT TRUE,          -- Event aktif? (bisa dinonaktifkan setelah acara)
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS public.submissions (
   guest_name   TEXT        NOT NULL,             -- Nama tamu
   photo_url    TEXT,                             -- URL foto di Storage bucket "photos"
   voice_url    TEXT,                             -- URL voice note di bucket "voices" (nullable)
+  message_text TEXT,                             -- Pesan teks ucapan dari tamu (nullable)
   frame_name   TEXT,                             -- Nama bingkai yang dipilih
   frame_index  INTEGER     DEFAULT 0,            -- Index bingkai (0-3)
   created_at   TIMESTAMPTZ DEFAULT NOW()

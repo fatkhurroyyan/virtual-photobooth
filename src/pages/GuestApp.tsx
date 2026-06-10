@@ -9,6 +9,7 @@ interface EventConfig {
   event_date: string | null;
   event_location: string | null;
   allow_voice: boolean;
+  allow_chat: boolean;
   require_name: boolean;
   allow_retake: boolean;
   is_active: boolean;
@@ -76,6 +77,7 @@ export default function GuestApp() {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadLabel, setUploadLabel] = useState<string>("Mempersiapkan...");
   const [uploadError, setUploadError] = useState<boolean>(false);
+  const [messageText, setMessageText] = useState<string>("");
   const [cameraError, setCameraError] = useState<boolean>(false);
   const [isEventNotFound, setIsEventNotFound] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -99,7 +101,7 @@ export default function GuestApp() {
       try {
         const { data, error } = await db
           .from("events")
-          .select("id, couple_name, event_date, event_location, allow_voice, require_name, allow_retake, is_active, couple_photo_url, theme_color")
+          .select("id, couple_name, event_date, event_location, allow_voice, allow_chat, require_name, allow_retake, is_active, couple_photo_url, theme_color")
           .eq("slug", activeSlug)
           .single();
 
@@ -144,6 +146,7 @@ export default function GuestApp() {
           event_date: "2026-06-15",
           event_location: "Gedung Serbaguna, Bandung",
           allow_voice: true,
+          allow_chat: true,
           require_name: true,
           allow_retake: true,
           is_active: true,
@@ -485,6 +488,7 @@ export default function GuestApp() {
         guest_name: guestName,
         photo_url: photoUrl,
         voice_url: voiceUrl,
+        message_text: messageText.trim() || null,
         frame_name: selectedFrame ? selectedFrame.name : "Standard",
         frame_index: selectedFrameIndex,
       });
@@ -736,14 +740,14 @@ export default function GuestApp() {
           <button
             className="btn btn-primary"
             onClick={() => {
-              if (eventConfig?.allow_voice) {
+              if (eventConfig?.allow_voice || eventConfig?.allow_chat) {
                 setScreen("voice");
               } else {
                 confirmSend();
               }
             }}
           >
-            {eventConfig?.allow_voice ? "Lanjut ke Ucapan →" : "Kirim Foto ✨"}
+            {(eventConfig?.allow_voice || eventConfig?.allow_chat) ? "Lanjut ke Ucapan →" : "Kirim Foto ✨"}
           </button>
           {eventConfig?.allow_retake && (
             <button
@@ -759,45 +763,84 @@ export default function GuestApp() {
         </div>
       </div>
 
-      {/* Voice Note Screen */}
+      {/* Voice & Chat Note Screen */}
       <div className={`screen ${screen === "voice" ? "active" : ""}`} id="s-voice">
         <div className="card">
           <div className="title">Ucapan Spesial</div>
-          <p className="subtitle">Rekam ucapan &amp; doa untuk pengantin 💌</p>
+          <p className="subtitle">Kirim ucapan &amp; doa untuk pengantin 💌</p>
           <div className="steps">
             <div className="step-dot done"></div>
             <div className="step-dot done"></div>
             <div className="step-dot done"></div>
             <div className="step-dot active"></div>
           </div>
-          <div className="voice-section">
-            <div
-              className={`voice-icon ${isRecording ? "recording" : ""}`}
-              onClick={toggleRecording}
-            >
-              {isRecording ? "⏹" : "🎙️"}
+
+          {/* Voice Note Section */}
+          {eventConfig?.allow_voice && (
+            <div className="voice-section">
+              <div className="message-section-label">🎙️ Rekam Ucapan Suara</div>
+              <div
+                className={`voice-icon ${isRecording ? "recording" : ""}`}
+                onClick={toggleRecording}
+              >
+                {isRecording ? "⏹" : "🎙️"}
+              </div>
+              <div className="voice-status">
+                {isRecording ? "Merekam... (tap untuk berhenti)" : audioUrl ? "Rekaman selesai ✓" : "Tap untuk mulai rekam"}
+              </div>
+              <div className="voice-timer">
+                0:{recordingSeconds.toString().padStart(2, "0")}
+              </div>
+              <div className={`waveform ${isRecording ? "active" : ""}`}>
+                {waveHeights.map((h, i) => (
+                  <div className="bar" key={i} style={{ height: `${h}px` }}></div>
+                ))}
+              </div>
+              {audioUrl && <audio id="audio-playback" src={audioUrl} controls></audio>}
             </div>
-            <div className="voice-status">
-              {isRecording ? "Merekam... (tap untuk berhenti)" : audioUrl ? "Rekaman selesai ✓" : "Tap untuk mulai rekam"}
+          )}
+
+          {/* Divider between voice and chat */}
+          {eventConfig?.allow_voice && eventConfig?.allow_chat && (
+            <div className="message-divider">
+              <span>atau</span>
             </div>
-            <div className="voice-timer">
-              0:{recordingSeconds.toString().padStart(2, "0")}
+          )}
+
+          {/* Chat Note Section */}
+          {eventConfig?.allow_chat && (
+            <div className="chat-section">
+              <div className="message-section-label">💬 Tulis Pesan Teks</div>
+              <textarea
+                className="chat-textarea"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                placeholder="Tulis ucapan & doa terbaikmu untuk pengantin..."
+                maxLength={500}
+                rows={4}
+              />
+              <div className="chat-char-count">{messageText.length}/500</div>
             </div>
-            <div className={`waveform ${isRecording ? "active" : ""}`}>
-              {waveHeights.map((h, i) => (
-                <div className="bar" key={i} style={{ height: `${h}px` }}></div>
-              ))}
-            </div>
-            {audioUrl && <audio id="audio-playback" src={audioUrl} controls></audio>}
-          </div>
+          )}
 
           <button
             className="btn btn-primary"
             onClick={confirmSend}
-            style={{ display: audioUrl ? "block" : "none" }}
+            style={{ display: (audioUrl || messageText.trim()) ? "block" : "none" }}
           >
             Kirim Ucapan ✨
           </button>
+
+          {/* Skip button if nothing recorded/written yet */}
+          {!audioUrl && !messageText.trim() && (
+            <button
+              className="btn btn-primary"
+              style={{ opacity: 0.7 }}
+              onClick={confirmSend}
+            >
+              Lewati, Kirim Foto Saja →
+            </button>
+          )}
 
           <button
             className="btn btn-secondary"

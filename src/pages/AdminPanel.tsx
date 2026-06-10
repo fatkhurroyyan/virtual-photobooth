@@ -12,6 +12,7 @@ interface EventItem {
   theme_color: string | null;
   couple_photo_url: string | null;
   allow_voice: boolean;
+  allow_chat: boolean;
   require_name: boolean;
   allow_retake: boolean;
   is_active: boolean;
@@ -37,7 +38,16 @@ const THEME_PRESETS = {
   rustic: { font: "Libre Baskerville", hex: "#6b4c2a" },
 };
 
-const defaultColorSwatches = ["#c9a96e", "#d4847a", "#2563eb", "#1e3a8a", "#6b4c2a", "#10b981", "#ef4444", "#3d2b14"];
+const defaultColorSwatches = [
+  "#c9a96e",
+  "#d4847a",
+  "#2563eb",
+  "#1e3a8a",
+  "#6b4c2a",
+  "#10b981",
+  "#ef4444",
+  "#3d2b14",
+];
 
 const defaultFramesData = [
   {
@@ -59,7 +69,7 @@ const defaultFramesData = [
     name: "Classic Film",
     svg_code: `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="0" y="0" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="123" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="94" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="6" y="110" width="88" height="13" fill="rgba(250,246,240,0.95)"/><text x="50" y="119" text-anchor="middle" font-size="5.5" fill="#6b4c2a" font-family="Courier,monospace" letter-spacing="2">CLASSIC FILM</text></svg>`,
     png_url: null,
-  }
+  },
 ];
 
 export default function AdminPanel() {
@@ -74,7 +84,9 @@ export default function AdminPanel() {
 
   // Events & Submissions stats states
   const [eventsList, setEventsList] = useState<EventItem[]>([]);
-  const [guestCounts, setGuestCounts] = useState<{ [eventId: string]: number }>({});
+  const [guestCounts, setGuestCounts] = useState<{ [eventId: string]: number }>(
+    {},
+  );
   const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
   const [frames, setFrames] = useState<Frame[]>([]);
   const [totalSubmissions, setTotalSubmissions] = useState<number>(0);
@@ -85,8 +97,10 @@ export default function AdminPanel() {
   const [editDate, setEditDate] = useState<string>("");
   const [editLoc, setEditLoc] = useState<string>("");
   const [editThemeColor, setEditThemeColor] = useState<string>("#c9a96e");
-  const [editTitleFont, setEditTitleFont] = useState<string>("Playfair Display");
+  const [editTitleFont, setEditTitleFont] =
+    useState<string>("Playfair Display");
   const [editAllowVoice, setEditAllowVoice] = useState<boolean>(true);
+  const [editAllowChat, setEditAllowChat] = useState<boolean>(true);
   const [editRequireName, setEditRequireName] = useState<boolean>(true);
   const [editAllowRetake, setEditAllowRetake] = useState<boolean>(true);
 
@@ -100,9 +114,14 @@ export default function AdminPanel() {
   const [createLoc, setCreateLoc] = useState<string>("");
 
   // UI Notification & Save States
-  const [toast, setToast] = useState<{ text: string; type: "success" | "info" | "danger" } | null>(null);
+  const [toast, setToast] = useState<{
+    text: string;
+    type: "success" | "info" | "danger";
+  } | null>(null);
   const [saveBarVisible, setSaveBarVisible] = useState<boolean>(false);
-  const [saveBarMessage, setSaveBarMessage] = useState<string>("Perubahan belum disimpan");
+  const [saveBarMessage, setSaveBarMessage] = useState<string>(
+    "Perubahan belum disimpan",
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const heroInputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +160,7 @@ export default function AdminPanel() {
       setEditLoc(eventData.event_location || "");
       setEditThemeColor(eventData.theme_color || "#c9a96e");
       setEditAllowVoice(eventData.allow_voice);
+      setEditAllowChat(eventData.allow_chat ?? true);
       setEditRequireName(eventData.require_name);
       setEditAllowRetake(eventData.allow_retake);
       setHeroImageUrl(eventData.couple_photo_url);
@@ -150,7 +170,6 @@ export default function AdminPanel() {
 
       // Load all events list and guest statistics
       await fetchAllEventsAndStats(eventData.id);
-
     } catch (err: any) {
       console.warn("Using admin offline/demo mode:", err.message);
       setIsDemoMode(true);
@@ -163,10 +182,11 @@ export default function AdminPanel() {
         theme_color: "#c9a96e",
         couple_photo_url: null,
         allow_voice: true,
+        allow_chat: true,
         require_name: true,
         allow_retake: true,
         is_active: true,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
       setActiveEvent(demoEvent);
       setEditHost(demoEvent.couple_name);
@@ -174,6 +194,7 @@ export default function AdminPanel() {
       setEditLoc(demoEvent.event_location || "");
       setEditThemeColor(demoEvent.theme_color || "#c9a96e");
       setEditAllowVoice(demoEvent.allow_voice);
+      setEditAllowChat(demoEvent.allow_chat);
       setEditRequireName(demoEvent.require_name);
       setEditAllowRetake(demoEvent.allow_retake);
 
@@ -184,7 +205,7 @@ export default function AdminPanel() {
         svg_code: f.svg_code,
         png_url: f.png_url,
         is_active: true,
-        sort_order: i
+        sort_order: i,
       }));
       setFrames(localFrames);
       setEventsList([demoEvent]);
@@ -233,7 +254,7 @@ export default function AdminPanel() {
         svg_code: f.svg_code,
         png_url: f.png_url,
         is_active: true,
-        sort_order: i
+        sort_order: i,
       }));
       setFrames(localFrames);
     }
@@ -298,7 +319,8 @@ export default function AdminPanel() {
   };
 
   const deleteFrame = async (id: string, name: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus bingkai "${name}"?`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus bingkai "${name}"?`))
+      return;
 
     if (id.toString().startsWith("local-")) {
       setFrames((prev) => prev.filter((f) => f.id !== id));
@@ -351,17 +373,17 @@ export default function AdminPanel() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = db.storage.from("photos").getPublicUrl(path);
+      const {
+        data: { publicUrl },
+      } = db.storage.from("photos").getPublicUrl(path);
 
-      const { error: insertError } = await db
-        .from("frames")
-        .insert({
-          event_id: activeEvent.id,
-          name: file.name.split(".")[0] || "Custom Frame",
-          png_url: publicUrl,
-          is_active: true,
-          sort_order: frames.length,
-        });
+      const { error: insertError } = await db.from("frames").insert({
+        event_id: activeEvent.id,
+        name: file.name.split(".")[0] || "Custom Frame",
+        png_url: publicUrl,
+        is_active: true,
+        sort_order: frames.length,
+      });
 
       if (insertError) throw insertError;
 
@@ -386,11 +408,14 @@ export default function AdminPanel() {
   };
 
   const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      showToast(`${label} disalin ke clipboard!`, "success");
-    }).catch((err) => {
-      showToast("Gagal menyalin link: " + err, "danger");
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showToast(`${label} disalin ke clipboard!`, "success");
+      })
+      .catch((err) => {
+        showToast("Gagal menyalin link: " + err, "danger");
+      });
   };
 
   const generateSlug = (text: string) => {
@@ -437,16 +462,14 @@ export default function AdminPanel() {
         }
       }
 
-      const { error: insertError } = await db
-        .from("events")
-        .insert({
-          slug: slug,
-          couple_name: createHost,
-          event_date: createDate || null,
-          event_location: createLoc || null,
-          theme_color: "#c9a96e",
-          is_active: true
-        });
+      const { error: insertError } = await db.from("events").insert({
+        slug: slug,
+        couple_name: createHost,
+        event_date: createDate || null,
+        event_location: createLoc || null,
+        theme_color: "#c9a96e",
+        is_active: true,
+      });
 
       if (insertError) throw insertError;
 
@@ -459,7 +482,6 @@ export default function AdminPanel() {
         setCreateLoc("");
         setActiveTab("event");
       }, 1000);
-
     } catch (err: any) {
       console.error(err);
       showToast("Gagal membuat event: " + err.message, "danger");
@@ -468,10 +490,17 @@ export default function AdminPanel() {
 
   const handleDeleteEvent = async (id: string, name: string) => {
     if (activeEvent && id === activeEvent.id) {
-      alert("Event ini sedang aktif dikelola. Silakan beralih kelola ke event lain terlebih dahulu sebelum menghapusnya!");
+      alert(
+        "Event ini sedang aktif dikelola. Silakan beralih kelola ke event lain terlebih dahulu sebelum menghapusnya!",
+      );
       return;
     }
-    if (!confirm(`Apakah Anda yakin ingin menghapus event "${name}"? Semua data frames, submissions, dan ucapan terkait juga akan terhapus secara permanen!`)) return;
+    if (
+      !confirm(
+        `Apakah Anda yakin ingin menghapus event "${name}"? Semua data frames, submissions, dan ucapan terkait juga akan terhapus secara permanen!`,
+      )
+    )
+      return;
 
     try {
       showToast("Menghapus event...", "info");
@@ -516,7 +545,10 @@ export default function AdminPanel() {
         setHeroImageFile(null);
       } catch (storageErr: any) {
         console.error("Gagal mengunggah foto pengantin:", storageErr);
-        showToast("Gagal mengunggah foto pengantin: " + storageErr.message, "danger");
+        showToast(
+          "Gagal mengunggah foto pengantin: " + storageErr.message,
+          "danger",
+        );
         return;
       }
     }
@@ -528,6 +560,7 @@ export default function AdminPanel() {
         event_location: editLoc || null,
         theme_color: editThemeColor,
         allow_voice: editAllowVoice,
+        allow_chat: editAllowChat,
         require_name: editRequireName,
         allow_retake: editAllowRetake,
       };
@@ -584,7 +617,9 @@ export default function AdminPanel() {
 
   const currentDomain = window.location.origin;
   const guestLink = activeEvent ? `${currentDomain}/${activeEvent.slug}` : "";
-  const dashLink = activeEvent ? `${currentDomain}/dashboard/${activeEvent.slug}` : "";
+  const dashLink = activeEvent
+    ? `${currentDomain}/dashboard/${activeEvent.slug}`
+    : "";
   const qrImageSrc = activeEvent
     ? `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(guestLink)}&margin=10`
     : "";
@@ -596,17 +631,36 @@ export default function AdminPanel() {
     ? new Date(activeEvent.event_date).toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
-        year: "numeric"
+        year: "numeric",
       })
     : "";
 
-  const activeEventMeta = [activeEventDateDisplay, activeEvent?.event_location].filter(Boolean).join(" · ");
+  const activeEventMeta = [activeEventDateDisplay, activeEvent?.event_location]
+    .filter(Boolean)
+    .join(" · ");
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", fontFamily: "sans-serif" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "sans-serif",
+        }}
+      >
         <div>
-          <div style={{ fontSize: "24px", color: "#6b4c2a", fontStyle: "italic", textAlign: "center" }}>Memuat Admin Panel...</div>
+          <div
+            style={{
+              fontSize: "24px",
+              color: "#6b4c2a",
+              fontStyle: "italic",
+              textAlign: "center",
+            }}
+          >
+            Memuat Admin Panel...
+          </div>
         </div>
       </div>
     );
@@ -622,7 +676,10 @@ export default function AdminPanel() {
       )}
 
       {/* Save Floating Bar */}
-      <div className={`save-bar ${saveBarVisible ? "visible" : ""}`} id="save-bar">
+      <div
+        className={`save-bar ${saveBarVisible ? "visible" : ""}`}
+        id="save-bar"
+      >
         <div className="save-msg">
           <i className="ti ti-alert-circle" />
           <span id="save-msg-text">{saveBarMessage}</span>
@@ -631,10 +688,13 @@ export default function AdminPanel() {
           <span className="saved-toast" id="saved-ok">
             <i className="ti ti-circle-check" /> Tersimpan!
           </span>
-          <button className="btn btn-secondary" onClick={() => {
-            if (activeEvent) loadEventConfigAndData(activeEvent.slug);
-            setSaveBarVisible(false);
-          }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              if (activeEvent) loadEventConfigAndData(activeEvent.slug);
+              setSaveBarVisible(false);
+            }}
+          >
             Batal
           </button>
           <button className="btn btn-primary" onClick={saveAllSettings}>
@@ -645,10 +705,18 @@ export default function AdminPanel() {
 
       <div className="dashboard-layout">
         {/* Sidebar overlay for mobile */}
-        {isSidebarOpen && <div className="sidebar-overlay open" onClick={() => setIsSidebarOpen(false)} />}
+        {isSidebarOpen && (
+          <div
+            className="sidebar-overlay open"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
         {/* Sidebar */}
-        <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`} id="sidebar">
+        <aside
+          className={`sidebar ${isSidebarOpen ? "open" : ""}`}
+          id="sidebar"
+        >
           <div className="sidebar-header">
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <div className="logo-container">
@@ -675,19 +743,49 @@ export default function AdminPanel() {
           </div>
 
           <nav className="sidebar-nav">
-            <button className={`nav-item ${activeTab === "event" ? "active" : ""}`} onClick={() => { setActiveTab("event"); setIsSidebarOpen(false); }}>
+            <button
+              className={`nav-item ${activeTab === "event" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("event");
+                setIsSidebarOpen(false);
+              }}
+            >
               <i className="ti ti-calendar" /> Kelola Event
             </button>
-            <button className={`nav-item ${activeTab === "appearance" ? "active" : ""}`} onClick={() => { setActiveTab("appearance"); setIsSidebarOpen(false); }}>
+            <button
+              className={`nav-item ${activeTab === "appearance" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("appearance");
+                setIsSidebarOpen(false);
+              }}
+            >
               <i className="ti ti-palette" /> Tampilan Aplikasi
             </button>
-            <button className={`nav-item ${activeTab === "frames" ? "active" : ""}`} onClick={() => { setActiveTab("frames"); setIsSidebarOpen(false); }}>
+            <button
+              className={`nav-item ${activeTab === "frames" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("frames");
+                setIsSidebarOpen(false);
+              }}
+            >
               <i className="ti ti-photo-frame" /> Desain Bingkai Frame
             </button>
-            <button className={`nav-item ${activeTab === "qr" ? "active" : ""}`} onClick={() => { setActiveTab("qr"); setIsSidebarOpen(false); }}>
+            <button
+              className={`nav-item ${activeTab === "qr" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("qr");
+                setIsSidebarOpen(false);
+              }}
+            >
               <i className="ti ti-qrcode" /> Link &amp; QR Code
             </button>
-            <button className={`nav-item ${activeTab === "settings" ? "active" : ""}`} onClick={() => { setActiveTab("settings"); setIsSidebarOpen(false); }}>
+            <button
+              className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("settings");
+                setIsSidebarOpen(false);
+              }}
+            >
               <i className="ti ti-settings" /> Setelan Fitur
             </button>
           </nav>
@@ -705,7 +803,10 @@ export default function AdminPanel() {
               <i className="ti ti-photo" />
               <span>Bingkis Kaca Admin</span>
             </div>
-            <button className="menu-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            <button
+              className="menu-toggle"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            >
               <i className="ti ti-menu-2" />
             </button>
           </header>
@@ -721,11 +822,16 @@ export default function AdminPanel() {
                 {activeTab === "settings" && "Setelan Fitur"}
               </span>
               <span className="page-subtitle" id="page-subtitle">
-                {activeTab === "event" && "Kelola daftar event, buat event baru, dan lihat statistik realtime."}
-                {activeTab === "appearance" && "Desain antarmuka halaman tamu, banner hero, warna, dan font tema."}
-                {activeTab === "frames" && "Kelola koleksi bingkai polaroid (PNG) dan aktifkan pilihan bingkai untuk tamu."}
-                {activeTab === "qr" && "Unduh QR Code masuk pintu acara dan konfigurasikan slug URL unik."}
-                {activeTab === "settings" && "Aktifkan modul perekam suara, wajib nama, retake, dan moderasi sensor."}
+                {activeTab === "event" &&
+                  "Kelola daftar event, buat event baru, dan lihat statistik realtime."}
+                {activeTab === "appearance" &&
+                  "Desain antarmuka halaman tamu, banner hero, warna, dan font tema."}
+                {activeTab === "frames" &&
+                  "Kelola koleksi bingkai polaroid (PNG) dan aktifkan pilihan bingkai untuk tamu."}
+                {activeTab === "qr" &&
+                  "Unduh QR Code masuk pintu acara dan konfigurasikan slug URL unik."}
+                {activeTab === "settings" &&
+                  "Aktifkan modul perekam suara, wajib nama, retake, dan moderasi sensor."}
               </span>
             </div>
             <div className="topbar-right">
@@ -738,35 +844,54 @@ export default function AdminPanel() {
           {/* Workspace grid layout */}
           <main className="workspace">
             <div className="workspace-main">
-
               {/* TAB 1: EVENT */}
-              <div className={`pane ${activeTab === "event" ? "active" : ""}`} id="pane-event">
+              <div
+                className={`pane ${activeTab === "event" ? "active" : ""}`}
+                id="pane-event"
+              >
                 <div className="stats-container">
                   <div className="stat-card">
-                    <div className="stat-icon-wrap"><i className="ti ti-users" /></div>
+                    <div className="stat-icon-wrap">
+                      <i className="ti ti-users" />
+                    </div>
                     <div className="stat-data">
-                      <span className="stat-num" id="stat-total-tamu">{totalSubmissions}</span>
+                      <span className="stat-num" id="stat-total-tamu">
+                        {totalSubmissions}
+                      </span>
                       <span className="stat-lbl">Tamu Kirim Foto</span>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon-wrap"><i className="ti ti-microphone" /></div>
+                    <div className="stat-icon-wrap">
+                      <i className="ti ti-microphone" />
+                    </div>
                     <div className="stat-data">
-                      <span className="stat-num" id="stat-total-voice">{voiceSubmissionsCount}</span>
+                      <span className="stat-num" id="stat-total-voice">
+                        {voiceSubmissionsCount}
+                      </span>
                       <span className="stat-lbl">Voice Note Ucapan</span>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon-wrap"><i className="ti ti-files" /></div>
+                    <div className="stat-icon-wrap">
+                      <i className="ti ti-files" />
+                    </div>
                     <div className="stat-data">
-                      <span className="stat-num" id="stat-total-events">{eventsList.length}</span>
+                      <span className="stat-num" id="stat-total-events">
+                        {eventsList.length}
+                      </span>
                       <span className="stat-lbl">Total Event</span>
                     </div>
                   </div>
                   <div className="stat-card">
-                    <div className="stat-icon-wrap"><i className="ti ti-world" /></div>
+                    <div className="stat-icon-wrap">
+                      <i className="ti ti-world" />
+                    </div>
                     <div className="stat-data">
-                      <span className="stat-num" style={{ fontSize: "14px", fontWeight: "bold" }}>
+                      <span
+                        className="stat-num"
+                        style={{ fontSize: "14px", fontWeight: "bold" }}
+                      >
                         {activeEvent?.slug || "demo"}
                       </span>
                       <span className="stat-lbl">Slug Aktif</span>
@@ -776,57 +901,146 @@ export default function AdminPanel() {
 
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-list" /></div>
+                    <div className="card-icon">
+                      <i className="ti ti-list" />
+                    </div>
                     <span className="card-title">Daftar Event</span>
                   </div>
-                  <p className="card-sub">Pilih event yang ingin Anda kelola atau buat baru</p>
+                  <p className="card-sub">
+                    Pilih event yang ingin Anda kelola atau buat baru
+                  </p>
                   <div className="card-content">
-                    <div className="event-list-container" id="event-list-container">
+                    <div
+                      className="event-list-container"
+                      id="event-list-container"
+                    >
                       {eventsList.map((event) => {
-                        const isCurrent = activeEvent && event.id === activeEvent.id;
+                        const isCurrent =
+                          activeEvent && event.id === activeEvent.id;
                         const guestCount = guestCounts[event.id] || 0;
                         const eventDateStr = event.event_date
-                          ? new Date(event.event_date).toLocaleDateString("id-ID", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric"
-                            })
+                          ? new Date(event.event_date).toLocaleDateString(
+                              "id-ID",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              },
+                            )
                           : "Tanggal belum diatur";
 
                         return (
-                          <div className="event-row" key={event.id} style={{ borderColor: isCurrent ? "var(--gold)" : "", background: isCurrent ? "var(--bg-secondary)" : "" }}>
-                            <div className={`event-status-indicator ${event.is_active ? "" : "draft"}`} />
+                          <div
+                            className="event-row"
+                            key={event.id}
+                            style={{
+                              borderColor: isCurrent ? "var(--gold)" : "",
+                              background: isCurrent
+                                ? "var(--bg-secondary)"
+                                : "",
+                            }}
+                          >
+                            <div
+                              className={`event-status-indicator ${event.is_active ? "" : "draft"}`}
+                            />
                             <div className="event-info">
                               <div className="event-name">
                                 {event.couple_name}
                                 {isCurrent && (
-                                  <span style={{ fontSize: "10px", padding: "2px 6px", background: "var(--gold-dark)", color: "#fff", borderRadius: "12px", marginLeft: "6px", fontWeight: 500 }}>
+                                  <span
+                                    style={{
+                                      fontSize: "10px",
+                                      padding: "2px 6px",
+                                      background: "var(--gold-dark)",
+                                      color: "#fff",
+                                      borderRadius: "12px",
+                                      marginLeft: "6px",
+                                      fontWeight: 500,
+                                    }}
+                                  >
                                     Aktif
                                   </span>
                                 )}
                               </div>
                               <div className="event-meta">
-                                <span><i className="ti ti-link" /> /{event.slug}</span>
-                                <span><i className="ti ti-calendar" /> {eventDateStr}</span>
-                                <span><i className="ti ti-users" /> {guestCount} tamu</span>
-                                <span><i className="ti ti-map-pin" /> {event.event_location || "Lokasi belum diatur"}</span>
+                                <span>
+                                  <i className="ti ti-link" /> /{event.slug}
+                                </span>
+                                <span>
+                                  <i className="ti ti-calendar" />{" "}
+                                  {eventDateStr}
+                                </span>
+                                <span>
+                                  <i className="ti ti-users" /> {guestCount}{" "}
+                                  tamu
+                                </span>
+                                <span>
+                                  <i className="ti ti-map-pin" />{" "}
+                                  {event.event_location ||
+                                    "Lokasi belum diatur"}
+                                </span>
                               </div>
                             </div>
                             <div className="event-actions">
-                              <button className="btn btn-secondary" onClick={() => copyToClipboard(`${currentDomain}/${event.slug}`, "Link Halaman Tamu")} title="Salin Link Tamu" style={{ padding: "6px", minWidth: "32px" }}>
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() =>
+                                  copyToClipboard(
+                                    `${currentDomain}/${event.slug}`,
+                                    "Link Halaman Tamu",
+                                  )
+                                }
+                                title="Salin Link Tamu"
+                                style={{ padding: "6px", minWidth: "32px" }}
+                              >
                                 <i className="ti ti-link" />
                               </button>
-                              <button className="btn btn-secondary" onClick={() => copyToClipboard(`${currentDomain}/dashboard/${event.slug}`, "Link Dashboard Realtime")} title="Salin Link Dashboard" style={{ padding: "6px", minWidth: "32px" }}>
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() =>
+                                  copyToClipboard(
+                                    `${currentDomain}/dashboard/${event.slug}`,
+                                    "Link Dashboard Realtime",
+                                  )
+                                }
+                                title="Salin Link Dashboard"
+                                style={{ padding: "6px", minWidth: "32px" }}
+                              >
                                 <i className="ti ti-device-laptop" />
                               </button>
                               <button
                                 className="btn"
-                                style={{ padding: "6px 12px", fontSize: "13px", background: isCurrent ? "var(--gold-dark)" : "", color: isCurrent ? "#fff" : "", borderColor: isCurrent ? "var(--gold-dark)" : "" }}
-                                onClick={() => setSearchParams({ event: event.slug })}
+                                style={{
+                                  padding: "6px 12px",
+                                  fontSize: "13px",
+                                  background: isCurrent
+                                    ? "var(--gold-dark)"
+                                    : "",
+                                  color: isCurrent ? "#fff" : "",
+                                  borderColor: isCurrent
+                                    ? "var(--gold-dark)"
+                                    : "",
+                                }}
+                                onClick={() =>
+                                  setSearchParams({ event: event.slug })
+                                }
                               >
                                 <i className="ti ti-settings" /> Kelola
                               </button>
-                              <button className="btn btn-danger" style={{ padding: "6px", minWidth: "32px", background: "var(--danger)", color: "#fff", borderColor: "var(--danger)" }} onClick={() => handleDeleteEvent(event.id, event.couple_name)} title="Hapus Event">
+                              <button
+                                className="btn btn-danger"
+                                style={{
+                                  padding: "6px",
+                                  minWidth: "32px",
+                                  background: "var(--danger)",
+                                  color: "#fff",
+                                  borderColor: "var(--danger)",
+                                }}
+                                onClick={() =>
+                                  handleDeleteEvent(event.id, event.couple_name)
+                                }
+                                title="Hapus Event"
+                              >
                                 <i className="ti ti-trash" />
                               </button>
                             </div>
@@ -839,26 +1053,47 @@ export default function AdminPanel() {
 
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-circle-plus" /></div>
+                    <div className="card-icon">
+                      <i className="ti ti-circle-plus" />
+                    </div>
                     <span className="card-title">Buat Event Baru</span>
                   </div>
-                  <p className="card-sub">Inisialisasi slot photobooth baru untuk pengantin</p>
+                  <p className="card-sub">
+                    Inisialisasi slot photobooth baru untuk pengantin
+                  </p>
                   <div className="card-content">
                     <div className="grid-2">
                       <div className="field">
                         <label>Nama Pengantin / Host</label>
-                        <input type="text" value={createHost} onChange={(e) => setCreateHost(e.target.value)} placeholder="Contoh: Rizky &amp; Nabila" />
+                        <input
+                          type="text"
+                          value={createHost}
+                          onChange={(e) => setCreateHost(e.target.value)}
+                          placeholder="Contoh: Rizky &amp; Nabila"
+                        />
                       </div>
                       <div className="field">
                         <label>Tanggal Acara</label>
-                        <input type="date" value={createDate} onChange={(e) => setCreateDate(e.target.value)} />
+                        <input
+                          type="date"
+                          value={createDate}
+                          onChange={(e) => setCreateDate(e.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="field">
                       <label>Lokasi Gedung / Acara</label>
-                      <input type="text" value={createLoc} onChange={(e) => setCreateLoc(e.target.value)} placeholder="Contoh: Gedung Sasana Budaya, Bandung" />
+                      <input
+                        type="text"
+                        value={createLoc}
+                        onChange={(e) => setCreateLoc(e.target.value)}
+                        placeholder="Contoh: Gedung Sasana Budaya, Bandung"
+                      />
                     </div>
-                    <button className="btn btn-primary" onClick={handleCreateNewEvent}>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleCreateNewEvent}
+                    >
                       <i className="ti ti-circle-plus" /> Buat Event Sekarang
                     </button>
                   </div>
@@ -866,33 +1101,98 @@ export default function AdminPanel() {
               </div>
 
               {/* TAB 2: APPEARANCE */}
-              <div className={`pane ${activeTab === "appearance" ? "active" : ""}`} id="pane-appearance">
+              <div
+                className={`pane ${activeTab === "appearance" ? "active" : ""}`}
+                id="pane-appearance"
+              >
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-edit" /></div>
+                    <div className="card-icon">
+                      <i className="ti ti-edit" />
+                    </div>
                     <span className="card-title">Informasi Dasar Event</span>
                   </div>
-                  <p className="card-sub">Ganti tulisan identitas utama pengantin</p>
+                  <p className="card-sub">
+                    Ganti tulisan identitas utama pengantin
+                  </p>
                   <div className="card-content">
                     <div className="field">
                       <label>Nama Pasangan Pengantin</label>
-                      <input type="text" value={editHost} onChange={(e) => { setEditHost(e.target.value); markUnsaved(); }} placeholder="Contoh: Rizky &amp; Nabila" />
+                      <input
+                        type="text"
+                        value={editHost}
+                        onChange={(e) => {
+                          setEditHost(e.target.value);
+                          markUnsaved();
+                        }}
+                        placeholder="Contoh: Rizky &amp; Nabila"
+                      />
                     </div>
                     <div className="grid-2">
                       <div className="field">
                         <label>Tanggal Pernikahan</label>
-                        <input type="date" value={editDate} onChange={(e) => { setEditDate(e.target.value); markUnsaved(); }} />
+                        <input
+                          type="date"
+                          value={editDate}
+                          onChange={(e) => {
+                            setEditDate(e.target.value);
+                            markUnsaved();
+                          }}
+                        />
                       </div>
                       <div className="field">
                         <label>Lokasi / Keterangan</label>
-                        <input type="text" value={editLoc} onChange={(e) => { setEditLoc(e.target.value); markUnsaved(); }} placeholder="Contoh: Bandung" />
+                        <input
+                          type="text"
+                          value={editLoc}
+                          onChange={(e) => {
+                            setEditLoc(e.target.value);
+                            markUnsaved();
+                          }}
+                          placeholder="Contoh: Bandung"
+                        />
                       </div>
                     </div>
                     <div className="field">
                       <label>Link Event</label>
-                      <div style={{ fontSize: "13px", padding: "12px", background: "var(--bg-secondary)", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                        <strong>Link Tamu:</strong> <a href={guestLink} target="_blank" rel="noreferrer" style={{ color: "var(--gold-dark)", textDecoration: "underline" }}>{guestLink}</a><br />
-                        <strong style={{ display: "inline-block", marginTop: "4px" }}>Link Dashboard:</strong> <a href={dashLink} target="_blank" rel="noreferrer" style={{ color: "var(--gold-dark)", textDecoration: "underline" }}>{dashLink}</a>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          padding: "12px",
+                          background: "var(--bg-secondary)",
+                          borderRadius: "8px",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        <strong>Link Tamu:</strong>{" "}
+                        <a
+                          href={guestLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            color: "var(--gold-dark)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {guestLink}
+                        </a>
+                        <br />
+                        <strong
+                          style={{ display: "inline-block", marginTop: "4px" }}
+                        >
+                          Link Dashboard:
+                        </strong>{" "}
+                        <a
+                          href={dashLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            color: "var(--gold-dark)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {dashLink}
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -900,19 +1200,62 @@ export default function AdminPanel() {
 
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-palette" /></div>
-                    <span className="card-title">Tema Warna &amp; Font Halaman Tamu</span>
+                    <div className="card-icon">
+                      <i className="ti ti-palette" />
+                    </div>
+                    <span className="card-title">
+                      Tema Warna &amp; Font Halaman Tamu
+                    </span>
                   </div>
-                  <p className="card-sub">Pilih palet premium kustom agar sesuai dengan undangan digital pengantin</p>
+                  <p className="card-sub">
+                    Pilih palet premium kustom agar sesuai dengan undangan
+                    digital pengantin
+                  </p>
                   <div className="card-content">
                     <div className="field">
                       <label>Tema Preset Cepat</label>
-                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                        <button className="btn" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => handlePresetSelect("classic")}>Classic Gold (Traditional)</button>
-                        <button className="btn" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => handlePresetSelect("romantic")}>Romantic Rose (Feminine)</button>
-                        <button className="btn" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => handlePresetSelect("modern")}>Modern Royal Blue (Clean)</button>
-                        <button className="btn" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => handlePresetSelect("elegant")}>Elegant Sapphire (Premium)</button>
-                        <button className="btn" style={{ padding: "6px 12px", fontSize: "12px" }} onClick={() => handlePresetSelect("rustic")}>Rustic Bronze (Warm)</button>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "8px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <button
+                          className="btn"
+                          style={{ padding: "6px 12px", fontSize: "12px" }}
+                          onClick={() => handlePresetSelect("classic")}
+                        >
+                          Classic Gold (Traditional)
+                        </button>
+                        <button
+                          className="btn"
+                          style={{ padding: "6px 12px", fontSize: "12px" }}
+                          onClick={() => handlePresetSelect("romantic")}
+                        >
+                          Romantic Rose (Feminine)
+                        </button>
+                        <button
+                          className="btn"
+                          style={{ padding: "6px 12px", fontSize: "12px" }}
+                          onClick={() => handlePresetSelect("modern")}
+                        >
+                          Modern Royal Blue (Clean)
+                        </button>
+                        <button
+                          className="btn"
+                          style={{ padding: "6px 12px", fontSize: "12px" }}
+                          onClick={() => handlePresetSelect("elegant")}
+                        >
+                          Elegant Sapphire (Premium)
+                        </button>
+                        <button
+                          className="btn"
+                          style={{ padding: "6px 12px", fontSize: "12px" }}
+                          onClick={() => handlePresetSelect("rustic")}
+                        >
+                          Rustic Bronze (Warm)
+                        </button>
                       </div>
                     </div>
 
@@ -924,24 +1267,55 @@ export default function AdminPanel() {
                             key={swatchColor}
                             className={`color-swatch ${editThemeColor === swatchColor ? "selected" : ""}`}
                             style={{ background: swatchColor }}
-                            onClick={() => { setEditThemeColor(swatchColor); markUnsaved(); }}
+                            onClick={() => {
+                              setEditThemeColor(swatchColor);
+                              markUnsaved();
+                            }}
                           />
                         ))}
-                        <div className="custom-color-input-wrapper" title="Warna Kustom">
-                          <input type="color" value={editThemeColor} onChange={(e) => { setEditThemeColor(e.target.value); markUnsaved(); }} />
+                        <div
+                          className="custom-color-input-wrapper"
+                          title="Warna Kustom"
+                        >
+                          <input
+                            type="color"
+                            value={editThemeColor}
+                            onChange={(e) => {
+                              setEditThemeColor(e.target.value);
+                              markUnsaved();
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
 
                     <div className="field">
                       <label>Font Judul Pasangan</label>
-                      <select value={editTitleFont} onChange={(e) => { setEditTitleFont(e.target.value); markUnsaved(); }}>
-                        <option value="Playfair Display">Playfair Display (Serif Klasik)</option>
-                        <option value="Gyahegi">Gyahegi (Modern Elegant Calligraphy)</option>
-                        <option value="Great Vibes">Great Vibes (Romantic Cursive)</option>
-                        <option value="Cormorant Garamond">Cormorant Garamond (Sleek Serif)</option>
-                        <option value="Libre Baskerville">Libre Baskerville (Bold Vintage Serif)</option>
-                        <option value="Outfit">Outfit (Clean Sans-Serif)</option>
+                      <select
+                        value={editTitleFont}
+                        onChange={(e) => {
+                          setEditTitleFont(e.target.value);
+                          markUnsaved();
+                        }}
+                      >
+                        <option value="Playfair Display">
+                          Playfair Display (Serif Klasik)
+                        </option>
+                        <option value="Gyahegi">
+                          Gyahegi (Modern Elegant Calligraphy)
+                        </option>
+                        <option value="Great Vibes">
+                          Great Vibes (Romantic Cursive)
+                        </option>
+                        <option value="Cormorant Garamond">
+                          Cormorant Garamond (Sleek Serif)
+                        </option>
+                        <option value="Libre Baskerville">
+                          Libre Baskerville (Bold Vintage Serif)
+                        </option>
+                        <option value="Outfit">
+                          Outfit (Clean Sans-Serif)
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -949,59 +1323,142 @@ export default function AdminPanel() {
 
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-photo" /></div>
-                    <span className="card-title">Foto Banner Latar Belakang (Hero Background)</span>
+                    <div className="card-icon">
+                      <i className="ti ti-photo" />
+                    </div>
+                    <span className="card-title">
+                      Foto Banner Latar Belakang (Hero Background)
+                    </span>
                   </div>
-                  <p className="card-sub">Latar belakang utama beranda photobooth</p>
+                  <p className="card-sub">
+                    Latar belakang utama beranda photobooth
+                  </p>
                   <div className="card-content">
                     <div className="hero-preview">
-                      <div className="hero-sim" id="hero-sim" style={{ backgroundImage: heroImageUrl ? `url('${heroImageUrl}')` : "" }}>
+                      <div
+                        className="hero-sim"
+                        id="hero-sim"
+                        style={{
+                          backgroundImage: heroImageUrl
+                            ? `url('${heroImageUrl}')`
+                            : "",
+                        }}
+                      >
                         <div className="hero-sim-text">
-                          <div className="hero-sim-event">PERNIKAHAN BAHAGIA</div>
-                          <div className="hero-sim-couple" style={{ fontFamily: `"${editTitleFont}", serif` }}>{editHost}</div>
-                          <div className="hero-sim-date">{editDate ? new Date(editDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "Tanggal Acara"}</div>
+                          <div className="hero-sim-event">
+                            PERNIKAHAN BAHAGIA
+                          </div>
+                          <div
+                            className="hero-sim-couple"
+                            style={{ fontFamily: `"${editTitleFont}", serif` }}
+                          >
+                            {editHost}
+                          </div>
+                          <div className="hero-sim-date">
+                            {editDate
+                              ? new Date(editDate).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : "Tanggal Acara"}
+                          </div>
                         </div>
-                        <button className="hero-edit-btn" onClick={() => heroInputRef.current?.click()}>
+                        <button
+                          className="hero-edit-btn"
+                          onClick={() => heroInputRef.current?.click()}
+                        >
                           <i className="ti ti-pencil" /> Ganti Gambar
                         </button>
                       </div>
                     </div>
-                    <input type="file" ref={heroInputRef} style={{ display: "none" }} accept="image/*" onChange={handleHeroFileChange} />
+                    <input
+                      type="file"
+                      ref={heroInputRef}
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      onChange={handleHeroFileChange}
+                    />
                     <div className="guide-box guide-success">
                       <div className="guide-title">
-                        <i className="ti ti-info-circle-filled" /> Panduan Ukuran &amp; Resolusi
+                        <i className="ti ti-info-circle-filled" /> Panduan
+                        Ukuran &amp; Resolusi
                       </div>
-                      Gunakan foto portrait resolusi sedang (rekomendasi: <strong>9:16</strong> atau minimal 720x1280 px). Format file yang diizinkan: JPG, PNG, atau WEBP dengan ukuran maksimal <strong>3MB</strong> untuk menjaga kecepatan load tamu.
+                      Gunakan foto portrait resolusi sedang (rekomendasi:{" "}
+                      <strong>9:16</strong> atau minimal 720x1280 px). Format
+                      file yang diizinkan: JPG, PNG, atau WEBP dengan ukuran
+                      maksimal <strong>3MB</strong> untuk menjaga kecepatan load
+                      tamu.
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* TAB 3: FRAMES */}
-              <div className={`pane ${activeTab === "frames" ? "active" : ""}`} id="pane-frames">
+              <div
+                className={`pane ${activeTab === "frames" ? "active" : ""}`}
+                id="pane-frames"
+              >
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-photo-frame" /></div>
-                    <span className="card-title">Koleksi Desain Bingkai Polaroid</span>
+                    <div className="card-icon">
+                      <i className="ti ti-photo-frame" />
+                    </div>
+                    <span className="card-title">
+                      Koleksi Desain Bingkai Polaroid
+                    </span>
                   </div>
-                  <p className="card-sub">Klik frame untuk mengaktifkan / menonaktifkan agar muncul di pilihan tamu</p>
+                  <p className="card-sub">
+                    Klik frame untuk mengaktifkan / menonaktifkan agar muncul di
+                    pilihan tamu
+                  </p>
                   <div className="card-content">
                     <div className="frame-grid" id="frame-grid">
                       {frames.map((frame, index) => {
                         let previewHtml = "";
                         if (frame.svg_code) {
-                          previewHtml = frame.svg_code.replace(/\{\{COUPLE_NAME\}\}/g, editHost);
+                          previewHtml = frame.svg_code.replace(
+                            /\{\{COUPLE_NAME\}\}/g,
+                            editHost,
+                          );
                         } else if (frame.png_url) {
                           previewHtml = `<img src="${frame.png_url}" style="width:100%;height:100%;object-fit:cover;" alt="${frame.name}"/>`;
                         }
 
                         return (
-                          <div key={frame.id} className={`frame-item ${frame.is_active ? "active" : ""}`} onClick={() => toggleFrameState(index)}>
-                            <div className="frame-preview" style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-                              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#f5ede0,#faf6f0)", opacity: 0.25 }} />
-                              <div className="frame-svg-mini" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                          <div
+                            key={frame.id}
+                            className={`frame-item ${frame.is_active ? "active" : ""}`}
+                            onClick={() => toggleFrameState(index)}
+                          >
+                            <div
+                              className="frame-preview"
+                              style={{
+                                position: "absolute",
+                                inset: 0,
+                                width: "100%",
+                                height: "100%",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  inset: 0,
+                                  background:
+                                    "linear-gradient(135deg,#f5ede0,#faf6f0)",
+                                  opacity: 0.25,
+                                }}
+                              />
+                              <div
+                                className="frame-svg-mini"
+                                dangerouslySetInnerHTML={{
+                                  __html: previewHtml,
+                                }}
+                              />
                             </div>
-                            <div className="fcheck"><i className="ti ti-check" /></div>
+                            <div className="fcheck">
+                              <i className="ti ti-check" />
+                            </div>
                             <button
                               className="frame-delete-btn"
                               onClick={(e) => {
@@ -1016,56 +1473,128 @@ export default function AdminPanel() {
                         );
                       })}
 
-                      <div className="frame-add" onClick={() => fileInputRef.current?.click()}>
+                      <div
+                        className="frame-add"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
                         <i className="ti ti-plus" />
                         <span>Upload Custom</span>
                       </div>
                     </div>
-                    <input type="file" ref={fileInputRef} style={{ display: "none" }} accept="image/png" onChange={handleAddFrameFile} />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      accept="image/png"
+                      onChange={handleAddFrameFile}
+                    />
 
-                    <div className="guide-box guide-success" style={{ marginTop: "24px" }}>
+                    <div
+                      className="guide-box guide-success"
+                      style={{ marginTop: "24px" }}
+                    >
                       <div className="guide-title">
-                        <i className="ti ti-info-circle-filled" /> Panduan Membuat Frame Custom PNG
+                        <i className="ti ti-info-circle-filled" /> Panduan
+                        Membuat Frame Custom PNG
                       </div>
-                      1. Buat file PNG transparan berukuran <strong>3:4 (rekomendasi: 600 x 800 pixel)</strong>.<br />
-                      2. Bagian tengah harus **bolong / transparan** agar wajah tamu terlihat di kamera.<br />
-                      3. Pinggiran diberi ornamen hiasan floral/tulisan nama pengantin secara manual.<br />
-                      4. Ekspor dengan format **PNG-24 dengan transparansi diaktifkan**.
+                      1. Buat file PNG transparan berukuran{" "}
+                      <strong>3:4 (rekomendasi: 600 x 800 pixel)</strong>.<br />
+                      2. Bagian tengah harus **bolong / transparan** agar wajah
+                      tamu terlihat di kamera.
+                      <br />
+                      3. Pinggiran diberi ornamen hiasan floral/tulisan nama
+                      pengantin secara manual.
+                      <br />
+                      4. Ekspor dengan format **PNG-24 dengan transparansi
+                      diaktifkan**.
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* TAB 4: QR CODE */}
-              <div className={`pane ${activeTab === "qr" ? "active" : ""}`} id="pane-qr">
+              <div
+                className={`pane ${activeTab === "qr" ? "active" : ""}`}
+                id="pane-qr"
+              >
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-qrcode" /></div>
-                    <span className="card-title">Link QR Code QR Masuk Pintu Acara</span>
+                    <div className="card-icon">
+                      <i className="ti ti-qrcode" />
+                    </div>
+                    <span className="card-title">
+                      Link QR Code QR Masuk Pintu Acara
+                    </span>
                   </div>
-                  <p className="card-sub">Cetak QR Code ini untuk diletakkan di stand photobooth / meja tamu agar dipindai lewat HP masing-masing</p>
+                  <p className="card-sub">
+                    Cetak QR Code ini untuk diletakkan di stand photobooth /
+                    meja tamu agar dipindai lewat HP masing-masing
+                  </p>
                   <div className="card-content">
                     <div className="qr-container">
                       <div className="qr-card-wrap" id="qr-card-wrap">
                         {qrImageSrc ? (
-                          <img src={qrImageSrc} alt="QR Code" width="160" height="160" style={{ borderRadius: "8px", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)" }} />
+                          <img
+                            src={qrImageSrc}
+                            alt="QR Code"
+                            width="160"
+                            height="160"
+                            style={{
+                              borderRadius: "8px",
+                              boxShadow: "var(--shadow-sm)",
+                              border: "1px solid var(--border)",
+                            }}
+                          />
                         ) : (
-                          <div style={{ width: "160px", height: "160px", background: "#f1f5f9", borderRadius: "8px" }} />
+                          <div
+                            style={{
+                              width: "160px",
+                              height: "160px",
+                              background: "#f1f5f9",
+                              borderRadius: "8px",
+                            }}
+                          />
                         )}
                       </div>
-                      <div className="qr-link-display" id="qr-event-link-display">
-                        <a href={guestLink} target="_blank" rel="noreferrer" style={{ color: "var(--gold-dark)", textDecoration: "underline", wordBreak: "break-all" }}>{guestLink}</a>
+                      <div
+                        className="qr-link-display"
+                        id="qr-event-link-display"
+                      >
+                        <a
+                          href={guestLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            color: "var(--gold-dark)",
+                            textDecoration: "underline",
+                            wordBreak: "break-all",
+                          }}
+                        >
+                          {guestLink}
+                        </a>
                       </div>
 
                       <div style={{ display: "flex", gap: "10px" }}>
-                        <button className="btn" onClick={() => copyToClipboard(guestLink, "Link Halaman Tamu")}>
+                        <button
+                          className="btn"
+                          onClick={() =>
+                            copyToClipboard(guestLink, "Link Halaman Tamu")
+                          }
+                        >
                           <i className="ti ti-copy" /> Salin Link
                         </button>
-                        <button className="btn btn-primary" onClick={() => {
-                          window.open(qrDownloadSrc, "_blank");
-                          showToast("QR Code dibuka di tab baru untuk diunduh!", "success");
-                        }}>
-                          <i className="ti ti-download" /> Buka QR (Resolusi Tinggi)
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => {
+                            window.open(qrDownloadSrc, "_blank");
+                            showToast(
+                              "QR Code dibuka di tab baru untuk diunduh!",
+                              "success",
+                            );
+                          }}
+                        >
+                          <i className="ti ti-download" /> Buka QR (Resolusi
+                          Tinggi)
                         </button>
                       </div>
                     </div>
@@ -1074,43 +1603,103 @@ export default function AdminPanel() {
               </div>
 
               {/* TAB 5: SETTINGS */}
-              <div className={`pane ${activeTab === "settings" ? "active" : ""}`} id="pane-settings">
+              <div
+                className={`pane ${activeTab === "settings" ? "active" : ""}`}
+                id="pane-settings"
+              >
                 <div className="card">
                   <div className="card-header">
-                    <div className="card-icon"><i className="ti ti-settings" /></div>
-                    <span className="card-title">Setelan Fitur Perekaman &amp; Modul</span>
+                    <div className="card-icon">
+                      <i className="ti ti-settings" />
+                    </div>
+                    <span className="card-title">
+                      Setelan Fitur Perekaman &amp; Modul
+                    </span>
                   </div>
-                  <p className="card-sub">Konfigurasikan alur kerja photobooth tamu di lapangan</p>
+                  <p className="card-sub">
+                    Konfigurasikan alur kerja photobooth tamu di lapangan
+                  </p>
                   <div className="card-content">
                     <div className="toggle-list">
                       <div className="toggle-row">
                         <div className="toggle-text">
-                          <span className="toggle-label">Fitur Rekam Suara (Voice Note)</span>
-                          <span className="toggle-desc">Izinkan tamu merekam pesan &amp; doa ucapan berdurasi hingga 1 menit</span>
+                          <span className="toggle-label">
+                            Fitur Rekam Suara (Voice Note)
+                          </span>
+                          <span className="toggle-desc">
+                            Izinkan tamu merekam pesan &amp; doa ucapan
+                            berdurasi hingga 1 menit
+                          </span>
                         </div>
-                        <button className={`toggle-switch ${editAllowVoice ? "on" : ""}`} onClick={() => { setEditAllowVoice(!editAllowVoice); markUnsaved(); }} />
+                        <button
+                          className={`toggle-switch ${editAllowVoice ? "on" : ""}`}
+                          onClick={() => {
+                            setEditAllowVoice(!editAllowVoice);
+                            markUnsaved();
+                          }}
+                        />
                       </div>
 
                       <div className="toggle-row">
                         <div className="toggle-text">
-                          <span className="toggle-label">Wajib Isi Nama Tamu</span>
-                          <span className="toggle-desc">Tamu tidak bisa berlanjut mengambil foto sebelum mengisi nama lengkap</span>
+                          <span className="toggle-label">
+                            Fitur Pesan Teks (Chat Note)
+                          </span>
+                          <span className="toggle-desc">
+                            Izinkan tamu menulis ucapan & doa dalam bentuk pesan
+                            teks (maksimal 500 karakter)
+                          </span>
                         </div>
-                        <button className={`toggle-switch ${editRequireName ? "on" : ""}`} onClick={() => { setEditRequireName(!editRequireName); markUnsaved(); }} />
+                        <button
+                          className={`toggle-switch ${editAllowChat ? "on" : ""}`}
+                          onClick={() => {
+                            setEditAllowChat(!editAllowChat);
+                            markUnsaved();
+                          }}
+                        />
                       </div>
 
                       <div className="toggle-row">
                         <div className="toggle-text">
-                          <span className="toggle-label">Izinkan Foto Ulang (Retake Photo)</span>
-                          <span className="toggle-desc">Izinkan tamu mengambil foto ulang berkali-kali jika hasil foto kurang memuaskan</span>
+                          <span className="toggle-label">
+                            Wajib Isi Nama Tamu
+                          </span>
+                          <span className="toggle-desc">
+                            Tamu tidak bisa berlanjut mengambil foto sebelum
+                            mengisi nama lengkap
+                          </span>
                         </div>
-                        <button className={`toggle-switch ${editAllowRetake ? "on" : ""}`} onClick={() => { setEditAllowRetake(!editAllowRetake); markUnsaved(); }} />
+                        <button
+                          className={`toggle-switch ${editRequireName ? "on" : ""}`}
+                          onClick={() => {
+                            setEditRequireName(!editRequireName);
+                            markUnsaved();
+                          }}
+                        />
+                      </div>
+
+                      <div className="toggle-row">
+                        <div className="toggle-text">
+                          <span className="toggle-label">
+                            Izinkan Foto Ulang (Retake Photo)
+                          </span>
+                          <span className="toggle-desc">
+                            Izinkan tamu mengambil foto ulang berkali-kali jika
+                            hasil foto kurang memuaskan
+                          </span>
+                        </div>
+                        <button
+                          className={`toggle-switch ${editAllowRetake ? "on" : ""}`}
+                          onClick={() => {
+                            setEditAllowRetake(!editAllowRetake);
+                            markUnsaved();
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* LIVE PREVIEW SMARTPHONE CONTAINER */}
@@ -1123,22 +1712,43 @@ export default function AdminPanel() {
                 <div className="phone-speaker" />
                 <div className="phone-screen">
                   <div className="phone-app">
-
                     {/* Smartphone pane: Welcome screen */}
-                    <div className={`phone-pane ${(activeTab === "event" || activeTab === "appearance" || activeTab === "qr") ? "active" : ""}`} id="phone-pane-welcome">
+                    <div
+                      className={`phone-pane ${activeTab === "event" || activeTab === "appearance" || activeTab === "qr" ? "active" : ""}`}
+                      id="phone-pane-welcome"
+                    >
                       <div
                         className="phone-hero"
                         id="phone-hero-bg"
-                        style={{ backgroundImage: heroImageUrl ? `url('${heroImageUrl}')` : "" }}
+                        style={{
+                          backgroundImage: heroImageUrl
+                            ? `url('${heroImageUrl}')`
+                            : "",
+                        }}
                       >
                         <div className="phone-hero-overlay" />
                         <div className="phone-hero-text">
-                          <span className="phone-hero-event">WEDDING EVENT</span>
-                          <span className="phone-hero-couple" id="phone-mock-couple" style={{ fontFamily: `"${editTitleFont}", serif` }}>
+                          <span className="phone-hero-event">
+                            WEDDING EVENT
+                          </span>
+                          <span
+                            className="phone-hero-couple"
+                            id="phone-mock-couple"
+                            style={{ fontFamily: `"${editTitleFont}", serif` }}
+                          >
                             {editHost}
                           </span>
-                          <span className="phone-hero-date" id="phone-mock-date">
-                            {editDate ? new Date(editDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "Tanggal Acara"}
+                          <span
+                            className="phone-hero-date"
+                            id="phone-mock-date"
+                          >
+                            {editDate
+                              ? new Date(editDate).toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                })
+                              : "Tanggal Acara"}
                           </span>
                         </div>
                         <div className="phone-hero-badge">
@@ -1147,21 +1757,34 @@ export default function AdminPanel() {
                       </div>
                       <div className="phone-body">
                         <div className="phone-card">
-                          <span className="phone-logo">✦ PHOTOBOOTH EVENT ✦</span>
-                          <span className="phone-welcome-title">Selamat Datang</span>
-                          <p className="phone-welcome-text" id="phone-mock-welcome">
-                            Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan
+                          <span className="phone-logo">
+                            ✦ PHOTOBOOTH EVENT ✦
+                          </span>
+                          <span className="phone-welcome-title">
+                            Selamat Datang
+                          </span>
+                          <p
+                            className="phone-welcome-text"
+                            id="phone-mock-welcome"
+                          >
+                            Abadikan momen spesial bersama &amp; kirim ucapan
+                            hangat untuk pasangan
                           </p>
 
                           <div className="phone-input-sim">
                             <span className="phone-input-lbl">Nama Kamu</span>
-                            <div className="phone-input-box">Tulis nama lengkap...</div>
+                            <div className="phone-input-box">
+                              Tulis nama lengkap...
+                            </div>
                           </div>
 
                           <button
                             className="phone-btn-primary"
                             id="phone-welcome-btn"
-                            style={{ background: editThemeColor, boxShadow: `0 4px 10px ${editThemeColor}40` }}
+                            style={{
+                              background: editThemeColor,
+                              boxShadow: `0 4px 10px ${editThemeColor}40`,
+                            }}
                             onClick={() => setActiveTab("frames")}
                           >
                             Lanjutkan →
@@ -1171,31 +1794,85 @@ export default function AdminPanel() {
                     </div>
 
                     {/* Smartphone pane: Frame Picker Screen */}
-                    <div className={`phone-pane ${activeTab === "frames" ? "active" : ""}`} id="phone-pane-frames">
-                      <div className="phone-body" style={{ background: "#fff", flex: "1" }}>
+                    <div
+                      className={`phone-pane ${activeTab === "frames" ? "active" : ""}`}
+                      id="phone-pane-frames"
+                    >
+                      <div
+                        className="phone-body"
+                        style={{ background: "#fff", flex: "1" }}
+                      >
                         <span className="phone-app-title">Pilih Bingkai</span>
-                        <p className="phone-app-sub">Pilih bingkai polaroid favoritmu</p>
+                        <p className="phone-app-sub">
+                          Pilih bingkai polaroid favoritmu
+                        </p>
 
-                        <div className="phone-frame-grid" id="phone-mock-frame-grid">
-                          {frames.filter(f => f.is_active).map((frame, idx) => {
-                            let previewHtml = "";
-                            if (frame.svg_code) {
-                              previewHtml = frame.svg_code.replace(/\{\{COUPLE_NAME\}\}/g, editHost);
-                            } else if (frame.png_url) {
-                              previewHtml = `<img src="${frame.png_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
-                            }
+                        <div
+                          className="phone-frame-grid"
+                          id="phone-mock-frame-grid"
+                        >
+                          {frames
+                            .filter((f) => f.is_active)
+                            .map((frame, idx) => {
+                              let previewHtml = "";
+                              if (frame.svg_code) {
+                                previewHtml = frame.svg_code.replace(
+                                  /\{\{COUPLE_NAME\}\}/g,
+                                  editHost,
+                                );
+                              } else if (frame.png_url) {
+                                previewHtml = `<img src="${frame.png_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
+                              }
 
-                            return (
-                              <div key={frame.id} className={`phone-frame-item ${idx === 0 ? "selected" : ""}`} style={{ borderColor: idx === 0 ? editThemeColor : "" }}>
-                                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#f5ede0,#faf6f0)", opacity: 0.25 }} />
-                                <div className="frame-preview-sim" dangerouslySetInnerHTML={{ __html: previewHtml }} style={{ position: "absolute", inset: 0, pointerEvents: "none" }} />
-                                <div className="check-icon" style={{ background: editThemeColor }}><i className="ti ti-check" /></div>
-                              </div>
-                            );
-                          })}
+                              return (
+                                <div
+                                  key={frame.id}
+                                  className={`phone-frame-item ${idx === 0 ? "selected" : ""}`}
+                                  style={{
+                                    borderColor:
+                                      idx === 0 ? editThemeColor : "",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      position: "absolute",
+                                      inset: 0,
+                                      background:
+                                        "linear-gradient(135deg,#f5ede0,#faf6f0)",
+                                      opacity: 0.25,
+                                    }}
+                                  />
+                                  <div
+                                    className="frame-preview-sim"
+                                    dangerouslySetInnerHTML={{
+                                      __html: previewHtml,
+                                    }}
+                                    style={{
+                                      position: "absolute",
+                                      inset: 0,
+                                      pointerEvents: "none",
+                                    }}
+                                  />
+                                  <div
+                                    className="check-icon"
+                                    style={{ background: editThemeColor }}
+                                  >
+                                    <i className="ti ti-check" />
+                                  </div>
+                                </div>
+                              );
+                            })}
 
-                          {frames.filter(f => f.is_active).length === 0 && (
-                            <div style={{ gridColumn: "1/-1", textAlign: "center", fontSize: "11px", color: "var(--text-secondary)", padding: "20px" }}>
+                          {frames.filter((f) => f.is_active).length === 0 && (
+                            <div
+                              style={{
+                                gridColumn: "1/-1",
+                                textAlign: "center",
+                                fontSize: "11px",
+                                color: "var(--text-secondary)",
+                                padding: "20px",
+                              }}
+                            >
                               Aktifkan minimal 1 frame di panel admin.
                             </div>
                           )}
@@ -1204,7 +1881,11 @@ export default function AdminPanel() {
                         <button
                           className="phone-btn-primary"
                           id="phone-frame-btn"
-                          style={{ marginTop: "auto", background: editThemeColor, boxShadow: `0 4px 10px ${editThemeColor}40` }}
+                          style={{
+                            marginTop: "auto",
+                            background: editThemeColor,
+                            boxShadow: `0 4px 10px ${editThemeColor}40`,
+                          }}
                           onClick={() => setActiveTab("settings")}
                         >
                           Buka Kamera →
@@ -1213,10 +1894,20 @@ export default function AdminPanel() {
                     </div>
 
                     {/* Smartphone pane: Settings (Camera/Voice simulated screen) */}
-                    <div className={`phone-pane ${activeTab === "settings" ? "active" : ""}`} id="phone-pane-settings">
-                      <div className="phone-body" style={{ background: "#fff", flex: "1" }}>
-                        <span className="phone-app-title">Ambil Foto &amp; Suara</span>
-                        <p className="phone-app-sub">Posisikan wajah Anda di tengah</p>
+                    <div
+                      className={`phone-pane ${activeTab === "settings" ? "active" : ""}`}
+                      id="phone-pane-settings"
+                    >
+                      <div
+                        className="phone-body"
+                        style={{ background: "#fff", flex: "1" }}
+                      >
+                        <span className="phone-app-title">
+                          Ambil Foto &amp; Suara
+                        </span>
+                        <p className="phone-app-sub">
+                          Posisikan wajah Anda di tengah
+                        </p>
 
                         <div className="phone-cam-wrap">
                           <div className="phone-cam-sim">👤</div>
@@ -1224,33 +1915,51 @@ export default function AdminPanel() {
                             className="phone-mock-frame-overlay"
                             id="phone-mock-frame-overlay"
                             style={{ color: editThemeColor }}
-                            dangerouslySetInnerHTML={{ __html: frames.filter(f => f.is_active)[0] ? getFrameHtml(frames.filter(f => f.is_active)[0]) : "" }}
+                            dangerouslySetInnerHTML={{
+                              __html: frames.filter((f) => f.is_active)[0]
+                                ? getFrameHtml(
+                                    frames.filter((f) => f.is_active)[0],
+                                  )
+                                : "",
+                            }}
                           />
                         </div>
 
                         {/* Simulated voice block toggled on settings */}
                         {editAllowVoice && (
-                          <div className="phone-voice-rec" id="phone-mock-voice-rec">
-                            <div className="phone-rec-mic" style={{ background: editThemeColor }}><i className="ti ti-microphone" /></div>
-                            <div className="phone-rec-timer">Simulasi Modul Suara Aktif</div>
+                          <div
+                            className="phone-voice-rec"
+                            id="phone-mock-voice-rec"
+                          >
+                            <div
+                              className="phone-rec-mic"
+                              style={{ background: editThemeColor }}
+                            >
+                              <i className="ti ti-microphone" />
+                            </div>
+                            <div className="phone-rec-timer">
+                              Simulasi Modul Suara Aktif
+                            </div>
                           </div>
                         )}
 
                         <button
                           className="phone-btn-primary"
-                          style={{ marginTop: "auto", background: editThemeColor, boxShadow: `0 4px 10px ${editThemeColor}40` }}
+                          style={{
+                            marginTop: "auto",
+                            background: editThemeColor,
+                            boxShadow: `0 4px 10px ${editThemeColor}40`,
+                          }}
                           onClick={() => setActiveTab("event")}
                         >
                           Selesai Kirim ✓
                         </button>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
             </div>
-
           </main>
         </div>
       </div>

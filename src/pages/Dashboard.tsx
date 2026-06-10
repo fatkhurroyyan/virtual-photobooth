@@ -18,6 +18,7 @@ interface Submission {
   guest_name: string;
   photo_url: string | null;
   voice_url: string | null;
+  message_text: string | null;
   frame_name: string;
   frame_index: number | null;
   created_at: string;
@@ -356,6 +357,11 @@ export default function Dashboard() {
                         <i className="ti ti-microphone" aria-hidden="true" style={{ fontSize: "10px" }}></i>
                       </div>
                     )}
+                    {sub.message_text && (
+                      <div className="voice-badge" style={{ top: sub.voice_url ? '26px' : '6px' }}>
+                        <i className="ti ti-message" aria-hidden="true" style={{ fontSize: "10px" }}></i>
+                      </div>
+                    )}
                     {isNewSubmission(sub) && <div className="new-badge">Baru</div>}
                   </div>
                   <div className="photo-strip">
@@ -444,8 +450,16 @@ export default function Dashboard() {
                         <div className="vp-time">{timeDisplay}</div>
                       </div>
                     </div>
-                  ) : (
+                  ) : !sub.message_text ? (
                     <div className="no-voice">Tamu ini tidak merekam ucapan</div>
+                  ) : null}
+                  {sub.message_text && (
+                    <div className="chat-message-display">
+                      <div className="vp-label">
+                        <i className="ti ti-message" aria-hidden="true"></i>&ensp;Pesan dari {sub.guest_name.split(" ")[0]}
+                      </div>
+                      <div className="chat-message-text">{sub.message_text}</div>
+                    </div>
                   )}
                 </div>
               </div>

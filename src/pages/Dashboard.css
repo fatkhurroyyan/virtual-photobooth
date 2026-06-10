@@ -489,3 +489,19 @@
     opacity: 1;
   }
 }
+
+/* ── CHAT MESSAGE DISPLAY ── */
+.dashboard-body .chat-message-display {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 12px 14px;
+  margin-top: 10px;
+}
+.dashboard-body .chat-message-text {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
