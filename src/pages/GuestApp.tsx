@@ -6,6 +6,8 @@ import "./GuestApp.css";
 interface EventConfig {
   id: string;
   couple_name: string;
+  event_date: string | null;
+  event_location: string | null;
   allow_voice: boolean;
   require_name: boolean;
   allow_retake: boolean;
@@ -97,7 +99,7 @@ export default function GuestApp() {
       try {
         const { data, error } = await db
           .from("events")
-          .select("id, couple_name, allow_voice, require_name, allow_retake, is_active, couple_photo_url, theme_color")
+          .select("id, couple_name, event_date, event_location, allow_voice, require_name, allow_retake, is_active, couple_photo_url, theme_color")
           .eq("slug", activeSlug)
           .single();
 
@@ -139,6 +141,8 @@ export default function GuestApp() {
         setEventConfig({
           id: "demo-id",
           couple_name: "Ahmad & Siti",
+          event_date: "2026-06-15",
+          event_location: "Gedung Serbaguna, Bandung",
           allow_voice: true,
           require_name: true,
           allow_retake: true,
@@ -540,6 +544,15 @@ export default function GuestApp() {
     );
   }
 
+  const heroDateStr = eventConfig?.event_date
+    ? new Date(eventConfig.event_date).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "";
+  const heroMeta = [heroDateStr, eventConfig?.event_location].filter(Boolean).join(" · ");
+
   return (
     <div className="guest-app-body">
       {eventConfig?.couple_photo_url && (
@@ -562,8 +575,28 @@ export default function GuestApp() {
 
       {/* Welcome Screen */}
       <div className={`screen ${screen === "welcome" ? "active" : ""}`} id="s-welcome">
+        {/* Hero Section — matches admin live mockup */}
+        <div
+          className="guest-hero"
+          style={{
+            backgroundImage: eventConfig?.couple_photo_url
+              ? `url('${eventConfig.couple_photo_url}')`
+              : undefined,
+          }}
+        >
+          <div className="guest-hero-overlay" />
+          <div className="guest-hero-text">
+            <span className="guest-hero-event">WEDDING EVENT</span>
+            <span className="guest-hero-couple">{coupleName}</span>
+            {heroMeta && <span className="guest-hero-date">{heroMeta}</span>}
+          </div>
+          <div className="guest-hero-badge">
+            <div className="guest-hero-pulse" /> Live
+          </div>
+        </div>
+
         <div className="card">
-          <div className="logo">✦ Photobooth Event ✦</div>
+          <div className="logo">✦ PHOTOBOOTH EVENT ✦</div>
           <div className="title">Selamat Datang</div>
           <p className="subtitle">
             Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk pasangan

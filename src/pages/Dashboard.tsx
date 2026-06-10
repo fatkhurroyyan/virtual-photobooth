@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../supabaseClient";
 import "./Dashboard.css";
@@ -44,6 +44,7 @@ export default function Dashboard() {
   const [activeSubIndex, setActiveSubIndex] = useState<number | null>(null);
   const [newGuestIds, setNewGuestIds] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
 
   // Audio Playback states
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -77,7 +78,13 @@ export default function Dashboard() {
           .order("created_at", { ascending: false });
 
         if (!subErr && subs) {
-          setSubmissions(subs);
+          // Sanitize URLs: fix double-slash issues from old records
+          const sanitized = subs.map((s: Submission) => ({
+            ...s,
+            photo_url: s.photo_url ? s.photo_url.replace(/([^:])\/\//g, '$1/') : null,
+            voice_url: s.voice_url ? s.voice_url.replace(/([^:])\/\//g, '$1/') : null,
+          }));
+          setSubmissions(sanitized);
         }
 
         // 3. Realtime Listener
@@ -91,7 +98,13 @@ export default function Dashboard() {
               filter: `event_id=eq.${event.id}`,
             },
             (payload) => {
-              const newSub = payload.new as Submission;
+              const raw = payload.new as Submission;
+              // Sanitize URLs for realtime submissions too
+              const newSub: Submission = {
+                ...raw,
+                photo_url: raw.photo_url ? raw.photo_url.replace(/([^:])\/\//g, '$1/') : null,
+                voice_url: raw.voice_url ? raw.voice_url.replace(/([^:])\/\//g, '$1/') : null,
+              };
               setNewGuestIds((prev) => {
                 const next = new Set(prev);
                 next.add(newSub.id);
@@ -202,6 +215,14 @@ export default function Dashboard() {
     }
     return list;
   };
+
+  const handleImageError = useCallback((subId: string) => {
+    setFailedImageIds((prev) => {
+      const next = new Set(prev);
+      next.add(subId);
+      return next;
+    });
+  }, []);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -314,15 +335,20 @@ export default function Dashboard() {
               <div className="photo-card" key={sub.id} onClick={() => setActiveSubIndex(i)}>
                 <div className="photo-inner">
                   <div className="photo-area" style={{ background: bgColors[frameIdx] }}>
-                    {sub.photo_url ? (
-                      <img src={sub.photo_url} alt={sub.guest_name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "4px" }} />
+                    {sub.photo_url && !failedImageIds.has(sub.id) ? (
+                      <img
+                        src={sub.photo_url}
+                        alt={sub.guest_name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "4px" }}
+                        onError={() => handleImageError(sub.id)}
+                      />
                     ) : (
                       <div className="photo-sim">
                         <span style={{ fontSize: "32px" }}>{getInitialEmoji(sub.guest_name)}</span>
                       </div>
                     )}
                     {/* Render local frame overlay if no photo url, otherwise merged on storage */}
-                    {!sub.photo_url && (
+                    {(!sub.photo_url || failedImageIds.has(sub.id)) && (
                       <div className="frame-overlay-sim" dangerouslySetInnerHTML={{ __html: framesSvg[frameIdx] }}></div>
                     )}
                     {sub.voice_url && (
@@ -376,9 +402,14 @@ export default function Dashboard() {
             <div className="modal">
               <div style={{ position: "relative" }}>
                 <div className="modal-photo" style={{ background: bgColors[frameIdx] }}>
-                  {sub.photo_url ? (
+                  {sub.photo_url && !failedImageIds.has(sub.id) ? (
                     <>
-                      <img src={sub.photo_url} alt={sub.guest_name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                      <img
+                        src={sub.photo_url}
+                        alt={sub.guest_name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+                        onError={() => handleImageError(sub.id)}
+                      />
                       <div className="modal-frame-ov"></div>
                     </>
                   ) : (
