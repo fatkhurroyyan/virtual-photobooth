@@ -159,10 +159,7 @@ CREATE POLICY "couple_photos_public_read" ON storage.objects
 -- REALTIME — aktifkan untuk tabel submissions
 -- Dashboard pengantin akan auto-refresh saat ada kiriman baru
 -- ================================================================
-BEGIN;
-  -- Tambahkan tabel ke realtime publication
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.submissions;
-COMMIT;
+
 
 
 -- ================================================================
