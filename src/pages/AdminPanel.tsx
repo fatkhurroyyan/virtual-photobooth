@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { db } from "../supabaseClient";
+import logoBk from "../assets/logo-bk.svg";
+import logomemoji from "../assets/bk-4.svg";
 import "./AdminPanel.css";
 
 interface EventItem {
@@ -719,11 +721,17 @@ export default function AdminPanel() {
         >
           <div className="sidebar-header">
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div className="logo-container">
-                <i className="ti ti-photo" />
-              </div>
+              <img
+                src={logomemoji}
+                alt="Logo Bingkis Kaca"
+                className="app-logo-header"
+              />
               <div className="logo-text">
-                <span className="logo-title">Bingkis Kaca</span>
+                <img
+                  src={logoBk}
+                  alt="Logo Bingkis Kaca"
+                  className="app-logo-header"
+                />
                 <span className="logo-subtitle">PHOTOBOOTH APP</span>
               </div>
             </div>
