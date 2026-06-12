@@ -80,6 +80,7 @@ export default function GuestApp() {
   const [photoDataUrl, setPhotoDataUrl] = useState<string>("");
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>("");
+  const [audioMimeType, setAudioMimeType] = useState<string>("audio/mp4");
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -298,22 +299,48 @@ export default function GuestApp() {
   };
 
   // Audio recording helpers
+  // Detect supported MIME type — iOS Safari supports audio/mp4, not audio/webm
+  const getSupportedMimeType = (): string => {
+    const candidates = [
+      "audio/mp4",
+      "audio/aac",
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+      "audio/ogg",
+    ];
+    for (const mime of candidates) {
+      if (MediaRecorder.isTypeSupported(mime)) return mime;
+    }
+    return "";
+  };
+
   const startRecording = async () => {
     try {
       const audioStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        },
       });
       audioStreamRef.current = audioStream;
       const chunks: BlobPart[] = [];
-      const mediaRecorder = new MediaRecorder(audioStream);
+
+      // Pick best supported format for this browser/device
+      const mimeType = getSupportedMimeType();
+      const recorderOptions = mimeType ? { mimeType } : {};
+      const mediaRecorder = new MediaRecorder(audioStream, recorderOptions);
       mediaRecorderRef.current = mediaRecorder;
+      const resolvedMime = mimeType || mediaRecorder.mimeType || "audio/mp4";
+      setAudioMimeType(resolvedMime);
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
+        const blob = new Blob(chunks, { type: resolvedMime });
         setAudioBlob(blob);
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
@@ -324,7 +351,8 @@ export default function GuestApp() {
         stopWave();
       };
 
-      mediaRecorder.start();
+      // Request data every 250ms to avoid losing data if tab is backgrounded (iOS)
+      mediaRecorder.start(250);
       setIsRecording(true);
       setRecordingSeconds(0);
 
@@ -494,11 +522,28 @@ export default function GuestApp() {
         setUploadProgress(65);
         setUploadLabel("Mengunggah ucapan...");
 
-        const voicePath = `${eventId}/${ts}_${safeName}.webm`;
+        // Determine file extension and content type from recorded MIME
+        // iOS records as audio/mp4 (.m4a), desktop Chrome records as audio/webm
+        const getAudioExtension = (mime: string): string => {
+          if (mime.includes("mp4") || mime.includes("aac")) return "m4a";
+          if (mime.includes("webm")) return "webm";
+          if (mime.includes("ogg")) return "ogg";
+          return "m4a"; // safe default for iOS
+        };
+        const getAudioContentType = (mime: string): string => {
+          if (mime.includes("mp4") || mime.includes("aac")) return "audio/mp4";
+          if (mime.includes("webm")) return "audio/webm";
+          if (mime.includes("ogg")) return "audio/ogg";
+          return "audio/mp4";
+        };
+        const ext = getAudioExtension(audioMimeType);
+        const contentType = getAudioContentType(audioMimeType);
+
+        const voicePath = `${eventId}/${ts}_${safeName}.${ext}`;
         const { error: voiceErr } = await db.storage
           .from("voices")
           .upload(voicePath, audioBlob, {
-            contentType: "audio/webm",
+            contentType,
             upsert: false,
           });
 
@@ -921,7 +966,13 @@ export default function GuestApp() {
                 ))}
               </div>
               {audioUrl && (
-                <audio id="audio-playback" src={audioUrl} controls></audio>
+                <audio
+                  id="audio-playback"
+                  src={audioUrl}
+                  controls
+                  playsInline
+                  style={{ width: "100%", marginTop: "8px" }}
+                ></audio>
               )}
             </div>
           )}

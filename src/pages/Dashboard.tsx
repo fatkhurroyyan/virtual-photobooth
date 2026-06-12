@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../supabaseClient";
+import logoBk from "../assets/logo-bk.svg";
 import "./Dashboard.css";
 
 interface EventConfig {
@@ -31,7 +32,12 @@ const framesSvg = [
   `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="0" y="0" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="123" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="94" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="6" y="110" width="88" height="13" fill="rgba(250,246,240,0.95)"/><text x="50" y="119" text-anchor="middle" font-size="5.5" fill="#6b4c2a" font-family="Courier,monospace" letter-spacing="2">CLASSIC FILM</text></svg>`,
 ];
 
-const frameNames = ["Garden Rose", "Vintage Gold", "Floral White", "Classic Film"];
+const frameNames = [
+  "Garden Rose",
+  "Vintage Gold",
+  "Floral White",
+  "Classic Film",
+];
 const bgColors = ["#d4c4b0", "#c8b89a", "#ddd0bc", "#e0ceba"];
 
 export default function Dashboard() {
@@ -63,7 +69,9 @@ export default function Dashboard() {
         // 1. Get Event Details
         const { data: event, error: evErr } = await db
           .from("events")
-          .select("id, couple_name, event_date, event_location, couple_photo_url, theme_color")
+          .select(
+            "id, couple_name, event_date, event_location, couple_photo_url, theme_color",
+          )
           .eq("slug", activeSlug)
           .single();
 
@@ -82,14 +90,19 @@ export default function Dashboard() {
           // Sanitize URLs: fix double-slash issues from old records
           const sanitized = subs.map((s: Submission) => ({
             ...s,
-            photo_url: s.photo_url ? s.photo_url.replace(/([^:])\/\//g, '$1/') : null,
-            voice_url: s.voice_url ? s.voice_url.replace(/([^:])\/\//g, '$1/') : null,
+            photo_url: s.photo_url
+              ? s.photo_url.replace(/([^:])\/\//g, "$1/")
+              : null,
+            voice_url: s.voice_url
+              ? s.voice_url.replace(/([^:])\/\//g, "$1/")
+              : null,
           }));
           setSubmissions(sanitized);
         }
 
         // 3. Realtime Listener
-        const channel = db.channel(`dashboard-realtime-${event.id}`)
+        const channel = db
+          .channel(`dashboard-realtime-${event.id}`)
           .on(
             "postgres_changes",
             {
@@ -103,8 +116,12 @@ export default function Dashboard() {
               // Sanitize URLs for realtime submissions too
               const newSub: Submission = {
                 ...raw,
-                photo_url: raw.photo_url ? raw.photo_url.replace(/([^:])\/\//g, '$1/') : null,
-                voice_url: raw.voice_url ? raw.voice_url.replace(/([^:])\/\//g, '$1/') : null,
+                photo_url: raw.photo_url
+                  ? raw.photo_url.replace(/([^:])\/\//g, "$1/")
+                  : null,
+                voice_url: raw.voice_url
+                  ? raw.voice_url.replace(/([^:])\/\//g, "$1/")
+                  : null,
               };
               setNewGuestIds((prev) => {
                 const next = new Set(prev);
@@ -116,7 +133,7 @@ export default function Dashboard() {
               // Show toast notification
               setToastMessage(`📸 ${newSub.guest_name} baru kirim foto!`);
               setTimeout(() => setToastMessage(null), 4000);
-            }
+            },
           )
           .subscribe();
 
@@ -131,7 +148,7 @@ export default function Dashboard() {
           event_date: "2026-06-15",
           event_location: "Gedung Istana Pernikahan, Bandung",
           couple_photo_url: null,
-          theme_color: "#c9a96e"
+          theme_color: "#c9a96e",
         });
         setSubmissions([]);
       }
@@ -146,6 +163,7 @@ export default function Dashboard() {
     if (activeSubIndex === null) {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.src = "";
         audioRef.current = null;
       }
       setIsPlaying(false);
@@ -155,7 +173,16 @@ export default function Dashboard() {
     } else {
       const sub = filteredSubmissions()[activeSubIndex];
       if (sub && sub.voice_url) {
-        const audio = new Audio(sub.voice_url);
+        const audio = new Audio();
+
+        // iOS Safari requires these attributes to play inline
+        audio.setAttribute("playsInline", "true");
+        audio.setAttribute("webkit-playsinline", "true");
+        audio.preload = "metadata";
+        // Avoid CORS issues with Supabase storage on Safari
+        audio.crossOrigin = "anonymous";
+        audio.src = sub.voice_url;
+
         audioRef.current = audio;
 
         const onTimeUpdate = () => {
@@ -180,15 +207,26 @@ export default function Dashboard() {
           }
         };
 
+        const onError = (e: Event) => {
+          console.warn("Audio load error:", e);
+          setIsPlaying(false);
+        };
+
         audio.addEventListener("timeupdate", onTimeUpdate);
         audio.addEventListener("ended", onEnded);
         audio.addEventListener("loadedmetadata", onLoadedMetadata);
+        audio.addEventListener("error", onError);
+
+        // Explicitly call load() — required for Safari to recognise new src
+        audio.load();
 
         return () => {
           audio.removeEventListener("timeupdate", onTimeUpdate);
           audio.removeEventListener("ended", onEnded);
           audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+          audio.removeEventListener("error", onError);
           audio.pause();
+          audio.src = "";
         };
       }
     }
@@ -196,7 +234,20 @@ export default function Dashboard() {
 
   // Initial Emoji Generator
   const getInitialEmoji = (name: string) => {
-    const emojis = ["👩", "👨", "👩‍🦱", "👨‍💼", "👩‍🦰", "🧔", "👩‍🎓", "👴", "👩‍⚕️", "👱‍♂️", "👧", "🧑"];
+    const emojis = [
+      "👩",
+      "👨",
+      "👩‍🦱",
+      "👨‍💼",
+      "👩‍🦰",
+      "🧔",
+      "👩‍🎓",
+      "👴",
+      "👩‍⚕️",
+      "👱‍♂️",
+      "👧",
+      "🧑",
+    ];
     const idx = (name.charCodeAt(0) || 0) % emojis.length;
     return emojis[idx];
   };
@@ -231,8 +282,20 @@ export default function Dashboard() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      // play() returns a Promise on modern browsers; handle rejection (autoplay policy, format errors)
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.warn("Audio play failed:", err);
+            setIsPlaying(false);
+          });
+      } else {
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -256,33 +319,54 @@ export default function Dashboard() {
       })
     : "";
 
-  const heroDetails = [eventDateStr, eventConfig?.event_location].filter(Boolean).join(" · ");
+  const heroDetails = [eventDateStr, eventConfig?.event_location]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="dashboard-body">
       {toastMessage && <div className="toast-notification">{toastMessage}</div>}
 
       <div className="dash">
-        {/* Logo Header */}
-        <header className="dash-logo-header">
-          <img src="/Logo Bingkiskaca.png" alt="Logo Bingkis Kaca" className="dash-logo-img" />
-        </header>
-
         {/* Hero Section */}
         <div className="hero">
           {eventConfig?.couple_photo_url ? (
-            <img className="hero-photo" src={eventConfig.couple_photo_url} alt="Foto Pengantin" />
+            <img
+              className="hero-photo"
+              src={eventConfig.couple_photo_url}
+              alt="Foto Pengantin"
+            />
           ) : (
-            <svg className="hero-photo" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              className="hero-photo"
+              viewBox="0 0 680 220"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <rect width="680" height="220" fill="#4a2f18" />
-              <ellipse cx="200" cy="110" rx="160" ry="130" fill="#6b4030" opacity=".6" />
-              <ellipse cx="480" cy="80" rx="120" ry="100" fill="#8b5a35" opacity=".4" />
+              <ellipse
+                cx="200"
+                cy="110"
+                rx="160"
+                ry="130"
+                fill="#6b4030"
+                opacity=".6"
+              />
+              <ellipse
+                cx="480"
+                cy="80"
+                rx="120"
+                ry="100"
+                fill="#8b5a35"
+                opacity=".4"
+              />
               <circle cx="340" cy="110" r="80" fill="#7a4828" opacity=".3" />
             </svg>
           )}
           <div className="hero-overlay">
             <div className="hero-event">Pernikahan Bahagia</div>
-            <div className="hero-couple">{eventConfig?.couple_name || "Memuat..."}</div>
+            <div className="hero-couple">
+              {eventConfig?.couple_name || "Memuat..."}
+            </div>
             <div className="hero-date">{heroDetails || "—"}</div>
           </div>
           <div className="hero-badge">
@@ -311,13 +395,22 @@ export default function Dashboard() {
         <div className="section-head">
           <div className="section-title">Kenangan Tamu</div>
           <div className="filter-row">
-            <div className={`pill ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>
+            <div
+              className={`pill ${filter === "all" ? "active" : ""}`}
+              onClick={() => setFilter("all")}
+            >
               Semua
             </div>
-            <div className={`pill ${filter === "voice" ? "active" : ""}`} onClick={() => setFilter("voice")}>
+            <div
+              className={`pill ${filter === "voice" ? "active" : ""}`}
+              onClick={() => setFilter("voice")}
+            >
               Ada Suara
             </div>
-            <div className={`pill ${filter === "new" ? "active" : ""}`} onClick={() => setFilter("new")}>
+            <div
+              className={`pill ${filter === "new" ? "active" : ""}`}
+              onClick={() => setFilter("new")}
+            >
               Terbaru
             </div>
           </div>
@@ -326,43 +419,81 @@ export default function Dashboard() {
         {/* Gallery Grid */}
         <div className="gallery">
           {filteredSubmissions().map((sub, i) => {
-            const frameIdx = Math.min(sub.frame_index ?? 0, framesSvg.length - 1);
-            const timeStr = new Date(sub.created_at).toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+            const frameIdx = Math.min(
+              sub.frame_index ?? 0,
+              framesSvg.length - 1,
+            );
+            const timeStr = new Date(sub.created_at).toLocaleTimeString(
+              "id-ID",
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              },
+            );
 
             return (
-              <div className="photo-card" key={sub.id} onClick={() => setActiveSubIndex(i)}>
+              <div
+                className="photo-card"
+                key={sub.id}
+                onClick={() => setActiveSubIndex(i)}
+              >
                 <div className="photo-inner">
-                  <div className="photo-area" style={{ background: bgColors[frameIdx] }}>
+                  <div
+                    className="photo-area"
+                    style={{ background: bgColors[frameIdx] }}
+                  >
                     {sub.photo_url && !failedImageIds.has(sub.id) ? (
                       <img
                         src={sub.photo_url}
                         alt={sub.guest_name}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "4px" }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                        }}
                         onError={() => handleImageError(sub.id)}
                       />
                     ) : (
                       <div className="photo-sim">
-                        <span style={{ fontSize: "32px" }}>{getInitialEmoji(sub.guest_name)}</span>
+                        <span style={{ fontSize: "32px" }}>
+                          {getInitialEmoji(sub.guest_name)}
+                        </span>
                       </div>
                     )}
                     {/* Render local frame overlay if no photo url, otherwise merged on storage */}
                     {(!sub.photo_url || failedImageIds.has(sub.id)) && (
-                      <div className="frame-overlay-sim" dangerouslySetInnerHTML={{ __html: framesSvg[frameIdx] }}></div>
+                      <div
+                        className="frame-overlay-sim"
+                        dangerouslySetInnerHTML={{
+                          __html: framesSvg[frameIdx],
+                        }}
+                      ></div>
                     )}
                     {sub.voice_url && (
                       <div className="voice-badge">
-                        <i className="ti ti-microphone" aria-hidden="true" style={{ fontSize: "10px" }}></i>
+                        <i
+                          className="ti ti-microphone"
+                          aria-hidden="true"
+                          style={{ fontSize: "10px" }}
+                        ></i>
                       </div>
                     )}
                     {sub.message_text && (
-                      <div className="voice-badge" style={{ top: sub.voice_url ? '26px' : '6px' }}>
-                        <i className="ti ti-message" aria-hidden="true" style={{ fontSize: "10px" }}></i>
+                      <div
+                        className="voice-badge"
+                        style={{ top: sub.voice_url ? "26px" : "6px" }}
+                      >
+                        <i
+                          className="ti ti-message"
+                          aria-hidden="true"
+                          style={{ fontSize: "10px" }}
+                        ></i>
                       </div>
                     )}
-                    {isNewSubmission(sub) && <div className="new-badge">Baru</div>}
+                    {isNewSubmission(sub) && (
+                      <div className="new-badge">Baru</div>
+                    )}
                   </div>
                   <div className="photo-strip">
                     <div className="photo-guest">{sub.guest_name}</div>
@@ -374,8 +505,18 @@ export default function Dashboard() {
           })}
 
           {filteredSubmissions().length === 0 && (
-            <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px", color: "#9c7c5e", fontSize: "14px" }}>
-              {filter === "all" ? "📸 Belum ada kiriman tamu." : "Tidak ada kiriman yang cocok."}
+            <div
+              style={{
+                gridColumn: "1/-1",
+                textAlign: "center",
+                padding: "40px",
+                color: "#9c7c5e",
+                fontSize: "14px",
+              }}
+            >
+              {filter === "all"
+                ? "📸 Belum ada kiriman tamu."
+                : "Tidak ada kiriman yang cocok."}
             </div>
           )}
         </div>
@@ -387,86 +528,133 @@ export default function Dashboard() {
       </div>
 
       {/* Modal View details */}
-      {activeSubIndex !== null && filteredSubmissions()[activeSubIndex] && (() => {
-        const sub = filteredSubmissions()[activeSubIndex];
-        const frameIdx = Math.min(sub.frame_index ?? 0, framesSvg.length - 1);
-        const timeStr = new Date(sub.created_at).toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+      {activeSubIndex !== null &&
+        filteredSubmissions()[activeSubIndex] &&
+        (() => {
+          const sub = filteredSubmissions()[activeSubIndex];
+          const frameIdx = Math.min(sub.frame_index ?? 0, framesSvg.length - 1);
+          const timeStr = new Date(sub.created_at).toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-        // Time calculations for voice note
-        const remainingSeconds = Math.ceil(audioDuration - audioCurrentTime);
-        const remM = Math.floor(remainingSeconds / 60);
-        const remS = remainingSeconds % 60;
-        const timeDisplay = isNaN(remainingSeconds) || remainingSeconds <= 0
-          ? "--:--"
-          : `${remM}:${remS.toString().padStart(2, "0")}`;
+          // Time calculations for voice note
+          const remainingSeconds = Math.ceil(audioDuration - audioCurrentTime);
+          const remM = Math.floor(remainingSeconds / 60);
+          const remS = remainingSeconds % 60;
+          const timeDisplay =
+            isNaN(remainingSeconds) || remainingSeconds <= 0
+              ? "--:--"
+              : `${remM}:${remS.toString().padStart(2, "0")}`;
 
-        return (
-          <div className="modal-bg open" onClick={(e) => e.target === e.currentTarget && setActiveSubIndex(null)}>
-            <div className="modal">
-              <div style={{ position: "relative" }}>
-                <div className="modal-photo" style={{ background: bgColors[frameIdx] }}>
-                  {sub.photo_url && !failedImageIds.has(sub.id) ? (
-                    <>
-                      <img
-                        src={sub.photo_url}
-                        alt={sub.guest_name}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
-                        onError={() => handleImageError(sub.id)}
-                      />
-                      <div className="modal-frame-ov"></div>
-                    </>
-                  ) : (
-                    <>
-                      <span>{getInitialEmoji(sub.guest_name)}</span>
-                      <div className="modal-frame-ov" dangerouslySetInnerHTML={{ __html: framesSvg[frameIdx] }}></div>
-                    </>
-                  )}
+          return (
+            <div
+              className="modal-bg open"
+              onClick={(e) =>
+                e.target === e.currentTarget && setActiveSubIndex(null)
+              }
+            >
+              <div className="modal">
+                <div style={{ position: "relative" }}>
+                  <div
+                    className="modal-photo"
+                    style={{ background: bgColors[frameIdx] }}
+                  >
+                    {sub.photo_url && !failedImageIds.has(sub.id) ? (
+                      <>
+                        <img
+                          src={sub.photo_url}
+                          alt={sub.guest_name}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                          }}
+                          onError={() => handleImageError(sub.id)}
+                        />
+                        <div className="modal-frame-ov"></div>
+                      </>
+                    ) : (
+                      <>
+                        <span>{getInitialEmoji(sub.guest_name)}</span>
+                        <div
+                          className="modal-frame-ov"
+                          dangerouslySetInnerHTML={{
+                            __html: framesSvg[frameIdx],
+                          }}
+                        ></div>
+                      </>
+                    )}
+                  </div>
+                  <button
+                    className="modal-close"
+                    onClick={() => setActiveSubIndex(null)}
+                  >
+                    <i className="ti ti-x" aria-hidden="true"></i>
+                  </button>
                 </div>
-                <button className="modal-close" onClick={() => setActiveSubIndex(null)}>
-                  <i className="ti ti-x" aria-hidden="true"></i>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="modal-guest">{sub.guest_name}</div>
-                <div className="modal-time">
-                  Dikirim pukul {timeStr} · Bingkai {frameNames[frameIdx]}
-                </div>
-                <div id="modal-voice-wrap">
-                  {sub.voice_url ? (
-                    <div className="voice-player">
-                      <div className="vp-label">
-                        <i className="ti ti-microphone" aria-hidden="true"></i>&ensp;Ucapan dari {sub.guest_name.split(" ")[0]}
-                      </div>
-                      <div className="vp-row">
-                        <button className="play-btn" onClick={togglePlay} aria-label="Play voice note">
-                          <i className={isPlaying ? "ti ti-player-pause" : "ti ti-player-play"} aria-hidden="true"></i>
-                        </button>
-                        <div className="progress-wrap" onClick={handleSeek}>
-                          <div className="progress-fill" style={{ width: `${audioProgress}%` }}></div>
+                <div className="modal-body">
+                  <div className="modal-guest">{sub.guest_name}</div>
+                  <div className="modal-time">
+                    Dikirim pukul {timeStr} · Bingkai {frameNames[frameIdx]}
+                  </div>
+                  <div id="modal-voice-wrap">
+                    {sub.voice_url ? (
+                      <div className="voice-player">
+                        <div className="vp-label">
+                          <i
+                            className="ti ti-microphone"
+                            aria-hidden="true"
+                          ></i>
+                          &ensp;Ucapan dari {sub.guest_name.split(" ")[0]}
                         </div>
-                        <div className="vp-time">{timeDisplay}</div>
+                        <div className="vp-row">
+                          <button
+                            className="play-btn"
+                            onClick={togglePlay}
+                            aria-label="Play voice note"
+                          >
+                            <i
+                              className={
+                                isPlaying
+                                  ? "ti ti-player-pause"
+                                  : "ti ti-player-play"
+                              }
+                              aria-hidden="true"
+                            ></i>
+                          </button>
+                          <div className="progress-wrap" onClick={handleSeek}>
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${audioProgress}%` }}
+                            ></div>
+                          </div>
+                          <div className="vp-time">{timeDisplay}</div>
+                        </div>
                       </div>
-                    </div>
-                  ) : !sub.message_text ? (
-                    <div className="no-voice">Tamu ini tidak merekam ucapan</div>
-                  ) : null}
-                  {sub.message_text && (
-                    <div className="chat-message-display">
-                      <div className="vp-label">
-                        <i className="ti ti-message" aria-hidden="true"></i>&ensp;Pesan dari {sub.guest_name.split(" ")[0]}
+                    ) : !sub.message_text ? (
+                      <div className="no-voice">
+                        Tamu ini tidak merekam ucapan
                       </div>
-                      <div className="chat-message-text">{sub.message_text}</div>
-                    </div>
-                  )}
+                    ) : null}
+                    {sub.message_text && (
+                      <div className="chat-message-display">
+                        <div className="vp-label">
+                          <i className="ti ti-message" aria-hidden="true"></i>
+                          &ensp;Pesan dari {sub.guest_name.split(" ")[0]}
+                        </div>
+                        <div className="chat-message-text">
+                          {sub.message_text}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
     </div>
   );
 }
