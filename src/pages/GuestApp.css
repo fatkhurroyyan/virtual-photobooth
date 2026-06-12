@@ -1,3 +1,7 @@
+/* ══════════════════════════════════════════
+   GUEST APP – Mobile-First Styles
+   ══════════════════════════════════════════ */
+
 :root {
   --cream: #faf6f0;
   --warm: #f5ede0;
@@ -14,32 +18,43 @@
   --shadow-deep: 0 20px 60px rgba(44, 24, 16, 0.2);
 }
 
+/* ── GLOBAL RESET ── */
+.guest-app-body *,
+.guest-app-body *::before,
+.guest-app-body *::after {
+  box-sizing: border-box;
+}
+
+/* ── BODY ── */
 .guest-app-body {
   background: var(--cream);
   color: var(--text);
   min-height: 100vh;
-  width: 100vw;
+  min-height: 100dvh; /* dynamic viewport height for mobile browsers */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 12px;
   position: relative;
   z-index: 1;
+  overflow-x: hidden;
 }
 
-/* ── HERO SECTION (matches admin mockup) ── */
+/* ── HERO SECTION ── */
 .guest-app-body .guest-hero {
   width: 100%;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
-  height: 200px;
-  margin-bottom: -12px;
+  height: 180px;
+  margin-bottom: 0;
   background: linear-gradient(135deg, #3d2b14 0%, #6b4c2a 50%, #8b5e3c 100%);
   background-size: cover;
   background-position: center;
   z-index: 1;
+  flex-shrink: 0;
 }
 .guest-app-body .guest-hero-overlay {
   position: absolute;
@@ -58,11 +73,11 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 18px 20px;
+  padding: 16px 18px;
 }
 .guest-app-body .guest-hero-event {
-  font-size: 9px;
-  letter-spacing: 3px;
+  font-size: 8px;
+  letter-spacing: 2.5px;
   color: rgba(212, 212, 212, 0.8);
   text-transform: uppercase;
   margin-bottom: 2px;
@@ -70,31 +85,31 @@
 }
 .guest-app-body .guest-hero-couple {
   font-family: "Gyahegi", "Playfair Display", serif;
-  font-size: 24px;
+  font-size: 22px;
   font-style: italic;
   font-weight: 500;
   color: #faf6f0;
   line-height: 1.15;
-  margin: 12px 0px;
+  margin: 8px 0;
 }
 .guest-app-body .guest-hero-date {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(232, 213, 176, 0.7);
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .guest-app-body .guest-hero-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   background: rgba(201, 169, 110, 0.9);
   color: #3d2b14;
   border-radius: 8px;
-  padding: 3px 10px;
-  font-size: 11px;
+  padding: 3px 8px;
+  font-size: 10px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   z-index: 3;
 }
 .guest-app-body .guest-hero-pulse {
@@ -114,16 +129,6 @@
   }
 }
 
-@media (min-width: 480px) {
-  .guest-app-body .guest-hero {
-    height: 220px;
-    border-radius: 20px;
-  }
-  .guest-app-body .guest-hero-couple {
-    font-size: 30px;
-  }
-}
-
 /* ── SCREENS ── */
 .guest-app-body .screen {
   display: none;
@@ -134,13 +139,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0;
 }
 
 /* ── CARD ── */
 .guest-app-body .card {
   background: var(--white);
-  border-radius: 24px;
-  padding: 36px 32px;
+  border-radius: 20px;
+  padding: 24px 18px;
   width: 100%;
   box-shadow: var(--shadow-deep);
   position: relative;
@@ -156,20 +162,22 @@
   background: linear-gradient(90deg, var(--gold), var(--rose), var(--gold));
 }
 
-/* ── HEADER ── */
+/* ── HEADER (Logo) ── */
 .guest-app-body .app-header {
   width: 100%;
   max-width: 420px;
   display: flex;
   justify-content: center;
   padding: 12px;
-  margin-bottom: 8px;
+  margin-top: 8px;
   z-index: 10;
 }
 .guest-app-body .app-logo-header {
-  height: 36px;
+  height: 32px;
   object-fit: contain;
 }
+
+/* ── TYPOGRAPHY ── */
 .guest-app-body .logo {
   font-family: "Gyahegi", "Playfair Display", serif;
   font-size: 8px;
@@ -177,31 +185,31 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: center;
 }
 .guest-app-body .title {
   font-family: "Gyahegi", "Playfair Display", serif;
-  font-size: 32px;
+  font-size: 26px;
   font-style: italic;
   font-weight: 500;
   color: var(--brown-dark);
   text-align: center;
-  line-height: 1.5;
-  margin-bottom: 10px;
+  line-height: 1.4;
+  margin-bottom: 8px;
 }
 .guest-app-body .subtitle {
   font-size: 13px;
   color: var(--text-muted);
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   line-height: 1.5;
 }
 
 /* ── INPUT ── */
 .guest-app-body .input-wrap {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   width: 100%;
 }
 .guest-app-body .input-wrap label {
@@ -210,17 +218,17 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
   text-align: left;
 }
 .guest-app-body .input-wrap input {
   width: 100%;
-  padding: 14px 18px;
+  padding: 12px 16px;
   border: 1.5px solid var(--gold-light);
   border-radius: 12px;
   font-family: "SF Pro", "DM Sans", sans-serif;
-  font-size: 16px;
+  font-size: 16px; /* 16px prevents iOS auto-zoom */
   color: var(--text);
   background: var(--warm);
   outline: none;
@@ -240,15 +248,20 @@
 /* ── BUTTONS ── */
 .guest-app-body .btn {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   border: none;
   border-radius: 12px;
   font-family: "SF Pro", "DM Sans", sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.5px;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Ensure buttons don't collapse into each other */
+.guest-app-body .btn + .btn {
+  margin-top: 10px;
 }
 .guest-app-body .btn-primary {
   background: linear-gradient(135deg, var(--gold), #b8843a);
@@ -284,7 +297,7 @@
 .guest-app-body .steps {
   display: flex;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   justify-content: center;
 }
 .guest-app-body .step-dot {
@@ -307,16 +320,17 @@
 .guest-app-body .frames-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 20px;
   width: 100%;
 }
 .guest-app-body .frame-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   width: 100%;
+  min-width: 0; /* prevent overflow */
 }
 .guest-app-body .frame-option {
   width: 100%;
@@ -346,17 +360,17 @@
 }
 .guest-app-body .frame-option .check {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--rose);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0;
   transition: all 0.2s;
   z-index: 12;
@@ -393,15 +407,18 @@
 
 .guest-app-body .frame-label-below {
   font-family: "SF Pro", "DM Sans", sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-muted);
   text-align: center;
   transition:
     color 0.2s,
     font-weight 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
-
 .guest-app-body .frame-option.selected + .frame-label-below {
   color: var(--rose);
   font-weight: 600;
@@ -412,10 +429,10 @@
   position: relative;
   width: 100%;
   aspect-ratio: 3/4;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
   background: #1a0f08;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow-deep);
 }
 .guest-app-body #video {
@@ -436,18 +453,18 @@
 
 .guest-app-body .camera-hint {
   position: absolute;
-  bottom: 14px;
+  bottom: 12px;
   left: 0;
   right: 0;
   text-align: center;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 12px;
+  font-size: 11px;
   z-index: 11;
 }
 
 .guest-app-body .shutter-btn {
-  width: 70px;
-  height: 70px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: var(--white);
   border: 4px solid var(--gold);
@@ -457,7 +474,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(201, 169, 110, 0.5);
-  margin: 0 auto 16px;
+  margin: 0 auto 14px;
+  -webkit-tap-highlight-color: transparent;
 }
 .guest-app-body .shutter-btn:hover {
   transform: scale(1.05);
@@ -466,8 +484,8 @@
   transform: scale(0.95);
 }
 .guest-app-body .shutter-inner {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), #b8843a);
 }
@@ -477,9 +495,9 @@
   position: relative;
   width: 100%;
   aspect-ratio: 3/4;
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow-deep);
 }
 .guest-app-body #preview-img {
@@ -496,26 +514,27 @@
 /* ── VOICE NOTE ── */
 .guest-app-body .voice-section {
   background: var(--warm);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 14px;
+  padding: 20px 16px;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   border: 1.5px solid var(--gold-light);
   width: 100%;
 }
 .guest-app-body .voice-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--rose), #c06b60);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 12px;
-  font-size: 26px;
+  margin: 0 auto 10px;
+  font-size: 24px;
   cursor: pointer;
   transition: all 0.2s;
   box-shadow: 0 4px 20px rgba(212, 132, 122, 0.4);
+  -webkit-tap-highlight-color: transparent;
 }
 .guest-app-body .voice-icon:hover {
   transform: scale(1.05);
@@ -538,13 +557,13 @@
   }
 }
 .guest-app-body .voice-status {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
   margin-bottom: 4px;
 }
 .guest-app-body .voice-timer {
   font-family: "Playfair Display", serif;
-  font-size: 28px;
+  font-size: 24px;
   color: var(--rose);
   font-weight: 700;
 }
@@ -554,8 +573,8 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  height: 40px;
-  margin: 12px 0;
+  height: 36px;
+  margin: 10px 0;
 }
 .guest-app-body .waveform .bar {
   width: 3px;
@@ -571,19 +590,20 @@
 .guest-app-body #audio-playback {
   width: 100%;
   margin-top: 10px;
+  max-width: 100%;
 }
 
 /* ── SUCCESS ── */
 .guest-app-body .success-icon {
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), var(--rose));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
-  margin: 0 auto 20px;
+  font-size: 32px;
+  margin: 0 auto 16px;
   box-shadow: 0 8px 30px rgba(201, 169, 110, 0.4);
   animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -599,12 +619,12 @@
 .guest-app-body .divider {
   height: 1px;
   background: var(--gold-light);
-  margin: 20px 0;
+  margin: 16px 0;
 }
 
 .guest-app-body .guest-name-display {
   font-family: "Gyahegi", "Playfair Display", serif;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--brown);
   text-align: center;
   margin-bottom: 4px;
@@ -618,7 +638,7 @@
   background: var(--gold-light);
   border-radius: 2px;
   overflow: hidden;
-  margin: 16px 0;
+  margin: 14px 0;
 }
 .guest-app-body .upload-fill {
   height: 100%;
@@ -628,7 +648,7 @@
   width: 0%;
 }
 
-/* camera error */
+/* ── CAMERA ERROR ── */
 .guest-app-body .cam-error {
   display: flex;
   flex-direction: column;
@@ -650,14 +670,14 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--brown);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   text-align: center;
 }
 .guest-app-body .message-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 20px 0;
+  margin: 16px 0;
   width: 100%;
 }
 .guest-app-body .message-divider::before,
@@ -674,15 +694,15 @@
 }
 .guest-app-body .chat-section {
   background: var(--warm);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
   border: 1.5px solid var(--gold-light);
   width: 100%;
 }
 .guest-app-body .chat-textarea {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1.5px solid var(--gold-light);
   border-radius: 12px;
   font-family: "SF Pro", "DM Sans", sans-serif;
@@ -690,8 +710,8 @@
   color: var(--text);
   background: var(--white);
   outline: none;
-  resize: vertical;
-  min-height: 100px;
+  resize: none; /* prevent layout-breaking resize on mobile */
+  min-height: 90px;
   line-height: 1.6;
   transition:
     border-color 0.2s,
@@ -709,21 +729,201 @@
   text-align: right;
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
-@media (max-width: 420px) {
+/* ═══════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════ */
+
+/* ── Small phones (≤360px) — iPhone SE, Galaxy S mini ── */
+@media (max-width: 360px) {
   .guest-app-body {
-    padding: 12px;
+    padding: 8px;
   }
   .guest-app-body .card {
-    padding: 24px 20px;
-    border-radius: 20px;
+    padding: 20px 14px;
+    border-radius: 16px;
   }
   .guest-app-body .title {
-    font-size: 26px;
+    font-size: 22px;
   }
   .guest-app-body .subtitle {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  .guest-app-body .guest-hero {
+    height: 150px;
+    border-radius: 14px;
+  }
+  .guest-app-body .guest-hero-couple {
+    font-size: 18px;
+  }
+  .guest-app-body .guest-hero-text {
+    padding: 12px 14px;
+  }
+  .guest-app-body .frames-grid {
+    gap: 8px;
+  }
+  .guest-app-body .frame-label-below {
+    font-size: 11px;
+  }
+  .guest-app-body .btn {
+    padding: 12px;
+    font-size: 13px;
+  }
+  .guest-app-body .shutter-btn {
+    width: 56px;
+    height: 56px;
+  }
+  .guest-app-body .shutter-inner {
+    width: 42px;
+    height: 42px;
+  }
+  .guest-app-body .voice-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+  .guest-app-body .voice-timer {
+    font-size: 20px;
+  }
+  .guest-app-body .success-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+  .guest-app-body .chat-section {
+    padding: 14px 12px;
+  }
+  .guest-app-body .chat-textarea {
+    padding: 10px 12px;
+    min-height: 80px;
+  }
+  .guest-app-body .input-wrap input {
+    padding: 11px 14px;
+  }
+}
+
+/* ── Medium phones (≤420px) — iPhone 12/13/14, Pixel ── */
+@media (max-width: 420px) and (min-width: 361px) {
+  .guest-app-body {
+    padding: 10px;
+  }
+  .guest-app-body .card {
+    padding: 22px 16px;
+    border-radius: 18px;
+  }
+  .guest-app-body .title {
+    font-size: 24px;
+  }
+  .guest-app-body .guest-hero {
+    height: 170px;
+  }
+  .guest-app-body .guest-hero-couple {
+    font-size: 20px;
+  }
+}
+
+/* ── Larger phones & small tablets (≥480px) ── */
+@media (min-width: 480px) {
+  .guest-app-body {
+    padding: 20px;
+  }
+  .guest-app-body .guest-hero {
+    height: 220px;
+    border-radius: 20px;
+  }
+  .guest-app-body .guest-hero-couple {
+    font-size: 28px;
+  }
+  .guest-app-body .guest-hero-event {
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+  .guest-app-body .guest-hero-text {
+    padding: 18px 20px;
+  }
+  .guest-app-body .card {
+    padding: 32px 28px;
+    border-radius: 24px;
+  }
+  .guest-app-body .title {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+  .guest-app-body .subtitle {
+    margin-bottom: 24px;
+  }
+  .guest-app-body .btn {
+    padding: 15px;
+    font-size: 15px;
+  }
+  .guest-app-body .input-wrap input {
+    padding: 14px 18px;
+  }
+  .guest-app-body .camera-wrap,
+  .guest-app-body .preview-wrap {
+    border-radius: 16px;
     margin-bottom: 20px;
+  }
+  .guest-app-body .shutter-btn {
+    width: 70px;
+    height: 70px;
+  }
+  .guest-app-body .shutter-inner {
+    width: 52px;
+    height: 52px;
+  }
+  .guest-app-body .voice-section {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+  .guest-app-body .voice-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+  .guest-app-body .voice-timer {
+    font-size: 28px;
+  }
+  .guest-app-body .success-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 36px;
+  }
+  .guest-app-body .chat-section {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  .guest-app-body .chat-textarea {
+    padding: 14px 16px;
+    min-height: 100px;
+  }
+  .guest-app-body .app-logo-header {
+    height: 36px;
+  }
+  .guest-app-body .frames-grid {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .guest-app-body .frame-label-below {
+    font-size: 13px;
+  }
+}
+
+/* ── Desktop (≥600px) — cap max-width, center everything ── */
+@media (min-width: 600px) {
+  .guest-app-body .card {
+    padding: 36px 32px;
+  }
+  .guest-app-body .title {
+    font-size: 32px;
+  }
+  .guest-app-body .guest-hero {
+    height: 240px;
+  }
+  .guest-app-body .guest-hero-couple {
+    font-size: 30px;
   }
 }
