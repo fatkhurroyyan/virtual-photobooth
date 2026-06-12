@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../supabaseClient";
-import logoBk from "../assets/logo-bk.svg";
 import "./Dashboard.css";
 
 interface EventConfig {
