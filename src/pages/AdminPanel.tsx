@@ -808,8 +808,16 @@ export default function AdminPanel() {
           {/* Mobile header */}
           <header className="mobile-header">
             <div className="mobile-logo">
-              <i className="ti ti-photo" />
-              <span>Bingkis Kaca Admin</span>
+              <img
+                src={logomemoji}
+                alt="Logo Bingkis Kaca"
+                className="app-logo-header"
+              />
+              <img
+                src={logoBk}
+                alt="Logo Bingkis Kaca"
+                className="app-logo-header"
+              />
             </div>
             <button
               className="menu-toggle"
