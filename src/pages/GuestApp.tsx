@@ -272,16 +272,35 @@ export default function GuestApp() {
       return;
     }
 
-    canvas.width = video.videoWidth || 720;
-    canvas.height = video.videoHeight || 960;
+    const videoWidth = video.videoWidth || 720;
+    const videoHeight = video.videoHeight || 960;
+    
+    // Calculate center crop for 3:4 aspect ratio
+    const targetRatio = 3 / 4;
+    const videoRatio = videoWidth / videoHeight;
+    
+    let sx = 0, sy = 0, sWidth = videoWidth, sHeight = videoHeight;
+    if (videoRatio > targetRatio) {
+      // Video is wider than 3:4, crop sides
+      sWidth = videoHeight * targetRatio;
+      sx = (videoWidth - sWidth) / 2;
+    } else {
+      // Video is taller than 3:4, crop top/bottom
+      sHeight = videoWidth / targetRatio;
+      sy = (videoHeight - sHeight) / 2;
+    }
+
+    // Fix canvas size to 3:4 (720x960)
+    canvas.width = 720;
+    canvas.height = 960;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Snapshot mirrored video
+    // Snapshot mirrored video with crop
     ctx.save();
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
     ctx.restore();
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
