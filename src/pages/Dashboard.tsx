@@ -264,8 +264,8 @@ export default function Dashboard() {
 
       <div className="dash">
         {/* Logo Header */}
-        <header style={{ display: "flex", justifyContent: "center", padding: "12px 0", marginBottom: "8px" }}>
-          <img src="/Logo Bingkiskaca.png" alt="Logo Bingkis Kaca" style={{ height: "38px", objectFit: "contain" }} />
+        <header className="dash-logo-header">
+          <img src="/Logo Bingkiskaca.png" alt="Logo Bingkis Kaca" className="dash-logo-img" />
         </header>
 
         {/* Hero Section */}
