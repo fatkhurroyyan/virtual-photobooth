@@ -93,7 +93,7 @@
   margin-bottom: 3px;
 }
 .dashboard-body .hero-couple {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 24px;
   font-style: italic;
   font-weight: 500;
@@ -171,7 +171,7 @@
   flex-wrap: wrap;
 }
 .dashboard-body .section-title {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 20px;
   font-style: italic;
   font-weight: 500;
@@ -359,7 +359,7 @@
   -webkit-overflow-scrolling: touch;
 }
 .dashboard-body .modal-guest {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 20px;
   font-style: italic;
   font-weight: 500;

@@ -84,7 +84,7 @@
   font-weight: 500;
 }
 .guest-app-body .guest-hero-couple {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 22px;
   font-style: italic;
   font-weight: 500;
@@ -179,7 +179,7 @@
 
 /* ── TYPOGRAPHY ── */
 .guest-app-body .logo {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 8px;
   font-style: italic;
   letter-spacing: 2px;
@@ -189,7 +189,7 @@
   text-align: center;
 }
 .guest-app-body .title {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 26px;
   font-style: italic;
   font-weight: 500;
@@ -623,7 +623,7 @@
 }
 
 .guest-app-body .guest-name-display {
-  font-family: "Gyahegi", "Playfair Display", serif;
+  font-family: "Poppins", "Playfair Display", serif;
   font-size: 18px;
   color: var(--brown);
   text-align: center;
