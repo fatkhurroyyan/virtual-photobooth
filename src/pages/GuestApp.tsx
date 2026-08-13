@@ -542,10 +542,9 @@ export default function GuestApp() {
   const totalShots = Math.max(1, activeLayout.shot_count || 3);
 
   // Current target slot for camera framing
-  const currentSlot =
-    activeLayout.slots.find(
-      (s) => (s.photo_index ?? s.photoIndex ?? 0) === currentShotIndex,
-    ) ||
+  const currentSlot = activeLayout.slots.find(
+    (s) => (s.photo_index ?? s.photoIndex ?? 0) === currentShotIndex,
+  ) ||
     activeLayout.slots[0] || { width: 500, height: 410, x: 0, y: 0 };
   const currentSlotRatio =
     (currentSlot.width || 500) / (currentSlot.height || 410);
@@ -973,7 +972,10 @@ export default function GuestApp() {
           } = db.storage.from(voiceBucket).getPublicUrl(audioPath);
           voiceUrl = vUrl;
         } else {
-          console.error("Gagal mengunggah file rekaman suara:", uploadRes.error);
+          console.error(
+            "Gagal mengunggah file rekaman suara:",
+            uploadRes.error,
+          );
         }
       }
 
@@ -1106,7 +1108,7 @@ export default function GuestApp() {
         >
           <div className="guest-hero-overlay" />
           <div className="guest-hero-text">
-            <span className="guest-hero-event">WEDDING EVENT</span>
+            <span className="guest-hero-event">EVENT</span>
             <span className="guest-hero-couple">{coupleName}</span>
             {heroMeta && <span className="guest-hero-date">{heroMeta}</span>}
           </div>
@@ -1168,7 +1170,8 @@ export default function GuestApp() {
         <div className="card">
           <div className="title">Pilih Bingkai</div>
           <p className="subtitle">
-            Geser untuk memilih desain bingkai favoritmu ({selectedFrameIndex + 1}/{frames.length}):
+            Geser untuk memilih desain bingkai favoritmu (
+            {selectedFrameIndex + 1}/{frames.length}):
           </p>
           <div className="steps">
             <div className="step-dot done"></div>
@@ -1219,9 +1222,7 @@ export default function GuestApp() {
                     <div className="frame-card-canvas-wrap">
                       {renderFramePreview(frame)}
                       {isCurrent && (
-                        <div className="active-frame-pill">
-                          ✓ Dipilih
-                        </div>
+                        <div className="active-frame-pill">✓ Dipilih</div>
                       )}
                     </div>
 
@@ -1469,7 +1470,8 @@ export default function GuestApp() {
         <div className="card">
           <div className="title">Hasil Photobooth</div>
           <p className="subtitle">
-            {activeLayout.slots.length} Foto ({totalShots} Pose) di dalam bingkai {activeLayout.width}×{activeLayout.height} px ✨
+            {activeLayout.slots.length} Foto ({totalShots} Pose) di dalam
+            bingkai {activeLayout.width}×{activeLayout.height} px ✨
           </p>
 
           <div
@@ -1495,7 +1497,9 @@ export default function GuestApp() {
           {/* Retake individual pose chips */}
           {eventConfig?.allow_retake && !isGeneratingComposite && (
             <div className="retake-strip">
-              <div className="retake-strip-title">Ambil ulang pose tertentu:</div>
+              <div className="retake-strip-title">
+                Ambil ulang pose tertentu:
+              </div>
               <div className="retake-chip-group">
                 {Array.from({ length: totalShots }).map((_, idx) => (
                   <button
