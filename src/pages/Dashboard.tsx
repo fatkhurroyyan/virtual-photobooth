@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../supabaseClient";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import "./Dashboard.css";
 
 interface EventConfig {
@@ -27,7 +29,9 @@ interface Submission {
 const framesSvg = [
   `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="16" width="1168" height="1768" rx="16" fill="none" stroke="#c9a96e" stroke-width="10"/><rect x="36" y="36" width="1128" height="1728" rx="10" fill="none" stroke="#e8d5b0" stroke-width="3"/><rect x="70" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="630" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="70" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="630" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="70" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="630" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/><rect x="40" y="1450" width="1120" height="310" rx="12" fill="rgba(255,255,255,0.96)"/><text x="600" y="1590" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="56" fill="#6b4c2a">Garden Rose</text><text x="600" y="1670" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" font-weight="600" fill="#c9a96e" letter-spacing="6">HAPPY WEDDING</text></svg>`,
   `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="12" width="1176" height="1776" rx="8" fill="none" stroke="#c9a96e" stroke-width="8"/><rect x="32" y="32" width="1136" height="1736" rx="6" fill="none" stroke="#e8d5b0" stroke-width="2"/><path d="M12 120 L12 12 L120 12" fill="none" stroke="#b8843a" stroke-width="8"/><path d="M1080 12 L1188 12 L1188 120" fill="none" stroke="#b8843a" stroke-width="8"/><path d="M12 1680 L12 1788 L120 1788" fill="none" stroke="#b8843a" stroke-width="8"/><path d="M1080 1788 L1188 1788 L1188 1680" fill="none" stroke="#b8843a" stroke-width="8"/><rect x="70" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="630" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="70" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="630" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="70" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="630" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/><rect x="36" y="1440" width="1128" height="320" rx="4" fill="rgba(255,250,240,0.97)"/><text x="600" y="1580" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="58" fill="#6b4c2a">Vintage Gold</text><text x="600" y="1660" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="6">FOREVER &amp; ALWAYS</text></svg>`,
-  `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="1160" height="1760" rx="28" fill="none" stroke="#f0c4be" stroke-width="16"/><rect x="44" y="44" width="1112" height="1712" rx="20" fill="none" stroke="#d4847a" stroke-width="4"/><circle cx="120" cy="80" r="32" fill="rgba(212,132,122,0.3)"/><circle cx="1080" cy="80" r="32" fill="rgba(212,132,122,0.3)"/><rect x="70" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="70" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="70" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="44" y="1450" width="1112" height="300" rx="16" fill="rgba(255,255,255,0.97)"/><text x="600" y="1575" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="54" fill="#d4847a">Floral White</text><text x="600" y="1655" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#c06b60" letter-spacing="5">LOVE CELEBRATION</text></svg>`,
+  `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="1160" height="1760" rx="28" fill="none" stroke="#f0c4be" stroke-width="16"/><rect x="44" y="44" width="1112" height="1712" rx="20" fill="none" stroke="#d4847a" stroke-width="4"/><circle cx="120" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <circle cx="1080" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <rect x="70" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="70" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="70" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="630" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/><rect x="44" y="1450" width="1112" height="300" rx="16" fill="rgba(255,255,255,0.97)"/><text x="600" y="1575" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="54" fill="#d4847a">Floral White</text><text x="600" y="1655" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#c06b60" letter-spacing="5">LOVE CELEBRATION</text></svg>`,
   `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="1200" height="1800" rx="0" fill="rgba(30,20,10,0.06)"/><rect x="0" y="0" width="1200" height="60" fill="rgba(44,24,16,0.85)"/><rect x="0" y="1740" width="1200" height="60" fill="rgba(44,24,16,0.85)"/><rect x="70" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="630" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="70" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="630" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="70" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="630" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/><rect x="40" y="1450" width="1120" height="260" fill="rgba(250,246,240,0.96)"/><text x="600" y="1560" text-anchor="middle" font-family="'SF Pro', sans-serif" font-weight="bold" font-size="44" fill="#6b4c2a" letter-spacing="8">Classic Film</text><text x="600" y="1635" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="4">⬛ SWEET MOMENTS ⬛</text></svg>`,
 ];
 
@@ -51,6 +55,8 @@ export default function Dashboard() {
   const [newGuestIds, setNewGuestIds] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [failedImageIds, setFailedImageIds] = useState<Set<string>>(new Set());
+  const [isDownloadingAll, setIsDownloadingAll] = useState<boolean>(false);
+  const [downloadProgressText, setDownloadProgressText] = useState<string>("");
 
   // Audio Playback states
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -305,6 +311,96 @@ export default function Dashboard() {
     audioRef.current.currentTime = pct * audioDuration;
   };
 
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleDownloadAllPhotos = async () => {
+    const photoSubs = submissions.filter(
+      (s) => !!s.photo_url && !failedImageIds.has(s.id),
+    );
+
+    if (photoSubs.length === 0) {
+      showToast("Belum ada foto tamu yang tersedia untuk diunduh");
+      return;
+    }
+
+    setIsDownloadingAll(true);
+    setDownloadProgressText(`Menyiapkan ${photoSubs.length} foto...`);
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder("Foto_Tamu") || zip;
+
+      for (let i = 0; i < photoSubs.length; i++) {
+        const sub = photoSubs[i];
+        setDownloadProgressText(
+          `Mengunduh ${i + 1}/${photoSubs.length} (${Math.round(((i + 1) / photoSubs.length) * 100)}%)...`,
+        );
+
+        try {
+          const response = await fetch(sub.photo_url!);
+          if (!response.ok) throw new Error("Fetch failed");
+          const blob = await response.blob();
+
+          const cleanName = (sub.guest_name || "Tamu").replace(
+            /[^a-zA-Z0-9_-]/g,
+            "_",
+          );
+          const time = new Date(sub.created_at).toISOString().slice(0, 10);
+          const indexNum = String(i + 1).padStart(2, "0");
+          const filename = `${indexNum}_${cleanName}_${time}.jpg`;
+
+          folder.file(filename, blob);
+        } catch (fetchErr) {
+          console.warn(
+            `Gagal mengunduh foto untuk ${sub.guest_name}:`,
+            fetchErr,
+          );
+        }
+      }
+
+      setDownloadProgressText("Mengompres file ZIP...");
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const eventTitle = (eventConfig?.couple_name || "Wedding").replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_",
+      );
+      const zipName = `Photobooth_${eventTitle}_${new Date().toISOString().slice(0, 10)}.zip`;
+
+      saveAs(zipBlob, zipName);
+      showToast(
+        `✓ Berhasil mengunduh ${photoSubs.length} foto dalam format ZIP!`,
+      );
+    } catch (err: any) {
+      console.error("Download all error:", err);
+      showToast("Terjadi kesalahan saat mengunduh semua foto");
+    } finally {
+      setIsDownloadingAll(false);
+      setDownloadProgressText("");
+    }
+  };
+
+  const handleDownloadSinglePhoto = async (sub: Submission) => {
+    if (!sub.photo_url) return;
+    try {
+      showToast("Mengunduh foto...");
+      const response = await fetch(sub.photo_url);
+      const blob = await response.blob();
+      const cleanName = (sub.guest_name || "Tamu").replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_",
+      );
+      const filename = `Photobooth_${cleanName}_${new Date().toISOString().slice(0, 10)}.jpg`;
+      saveAs(blob, filename);
+      showToast("✓ Foto berhasil diunduh!");
+    } catch (err) {
+      console.error("Single photo download failed:", err);
+      window.open(sub.photo_url, "_blank");
+    }
+  };
+
   // Stats Counters
   const totalTamu = submissions.length;
   const totalVoice = submissions.filter((s) => s.voice_url).length;
@@ -324,8 +420,6 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-body">
-      {toastMessage && <div className="toast-notification">{toastMessage}</div>}
-
       <div className="dash">
         {/* Hero Section */}
         <div className="hero">
@@ -362,9 +456,9 @@ export default function Dashboard() {
             </svg>
           )}
           <div className="hero-overlay">
-            <div className="hero-event">Pernikahan Bahagia</div>
+            <div className="hero-event">WEDDING CELEBRATION</div>
             <div className="hero-couple">
-              {eventConfig?.couple_name || "Memuat..."}
+              {eventConfig?.couple_name || "Ahmad & Siti"}
             </div>
             <div className="hero-date">{heroDetails || "—"}</div>
           </div>
@@ -392,26 +486,54 @@ export default function Dashboard() {
 
         {/* Gallery Section Head */}
         <div className="section-head">
-          <div className="section-title">Kenangan Tamu</div>
-          <div className="filter-row">
-            <div
-              className={`pill ${filter === "all" ? "active" : ""}`}
-              onClick={() => setFilter("all")}
+          <div className="section-title-wrap">
+            <div className="section-title">Kenangan Tamu</div>
+            <span className="section-count-badge">{submissions.length} Foto</span>
+          </div>
+
+          <div className="section-actions-right">
+            <button
+              type="button"
+              className="btn-download-all-zip"
+              onClick={handleDownloadAllPhotos}
+              disabled={isDownloadingAll}
+              title="Unduh seluruh foto tamu dalam 1 file ZIP"
             >
-              Semua
-            </div>
-            <div
-              className={`pill ${filter === "voice" ? "active" : ""}`}
-              onClick={() => setFilter("voice")}
-            >
-              Ada Suara
-            </div>
-            <div
-              className={`pill ${filter === "new" ? "active" : ""}`}
-              onClick={() => setFilter("new")}
-            >
-              Terbaru
-            </div>
+              <i
+                className={
+                  isDownloadingAll
+                    ? "ti ti-loader animate-spin"
+                    : "ti ti-download"
+                }
+              />
+              <span>
+                {isDownloadingAll
+                  ? downloadProgressText
+                  : `Download Semua Foto (${submissions.filter((s) => !!s.photo_url).length})`}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="filter-row">
+          <div
+            className={`pill ${filter === "all" ? "active" : ""}`}
+            onClick={() => setFilter("all")}
+          >
+            Semua ({submissions.length})
+          </div>
+          <div
+            className={`pill ${filter === "voice" ? "active" : ""}`}
+            onClick={() => setFilter("voice")}
+          >
+            Ada Suara ({submissions.filter((s) => !!s.voice_url).length})
+          </div>
+          <div
+            className={`pill ${filter === "new" ? "active" : ""}`}
+            onClick={() => setFilter("new")}
+          >
+            Terbaru ({submissions.filter(isNewSubmission).length})
           </div>
         </div>
 
@@ -560,20 +682,14 @@ export default function Dashboard() {
                     style={{ background: bgColors[frameIdx] }}
                   >
                     {sub.photo_url && !failedImageIds.has(sub.id) ? (
-                      <>
+                      <div className="modal-photo-stage">
                         <img
                           src={sub.photo_url}
                           alt={sub.guest_name}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                            borderRadius: "8px",
-                          }}
+                          className="modal-img-full"
                           onError={() => handleImageError(sub.id)}
                         />
-                        <div className="modal-frame-ov"></div>
-                      </>
+                      </div>
                     ) : (
                       <>
                         <span>{getInitialEmoji(sub.guest_name)}</span>
@@ -589,15 +705,31 @@ export default function Dashboard() {
                   <button
                     className="modal-close"
                     onClick={() => setActiveSubIndex(null)}
+                    title="Tutup"
                   >
                     <i className="ti ti-x" aria-hidden="true"></i>
                   </button>
                 </div>
                 <div className="modal-body">
-                  <div className="modal-guest">{sub.guest_name}</div>
-                  <div className="modal-time">
-                    Dikirim pukul {timeStr} · Bingkai {frameNames[frameIdx]}
+                  <div className="modal-header-row">
+                    <div>
+                      <div className="modal-guest">{sub.guest_name}</div>
+                      <div className="modal-time">
+                        Dikirim pukul {timeStr} · Bingkai {frameNames[frameIdx]}
+                      </div>
+                    </div>
+                    {sub.photo_url && !failedImageIds.has(sub.id) && (
+                      <button
+                        type="button"
+                        className="modal-download-single-btn"
+                        onClick={() => handleDownloadSinglePhoto(sub)}
+                        title="Unduh Foto Ini"
+                      >
+                        <i className="ti ti-download" /> Unduh
+                      </button>
+                    )}
                   </div>
+
                   <div id="modal-voice-wrap">
                     {sub.voice_url ? (
                       <div className="voice-player">
@@ -654,6 +786,11 @@ export default function Dashboard() {
             </div>
           );
         })()}
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="toast-notification">{toastMessage}</div>
+      )}
     </div>
   );
 }
