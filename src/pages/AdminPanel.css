@@ -902,7 +902,7 @@
 }
 
 .admin-layout-body .frame-item {
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   border-radius: var(--radius-md);
   border: 2px solid var(--border);
   cursor: pointer;
@@ -983,7 +983,7 @@
 }
 
 .admin-layout-body .frame-add {
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   border-radius: var(--radius-md);
   border: 2px dashed var(--border);
   cursor: pointer;
@@ -1527,7 +1527,7 @@
 }
 
 .admin-layout-body .phone-frame-item {
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   border-radius: 8px;
   border: 1.5px solid var(--border);
   background: #fff;

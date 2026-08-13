@@ -231,7 +231,7 @@
   flex-direction: column;
 }
 .dashboard-body .photo-area {
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   width: 100%;
   flex: none;
   background: var(--color-background-secondary);
@@ -340,7 +340,7 @@
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
 }
 .dashboard-body .modal-photo {
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3;
   width: 100%;
   background: var(--color-background-secondary);
   position: relative;

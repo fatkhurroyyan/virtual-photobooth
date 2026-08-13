@@ -54,22 +54,83 @@ const defaultColorSwatches = [
 const defaultFramesData = [
   {
     name: "Garden Rose",
-    svg_code: `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="1" y="1" width="98" height="131" rx="2" fill="none" stroke="#c9a96e" stroke-width="3"/><rect x="4" y="4" width="92" height="92" fill="none" stroke="#e8d5b0" stroke-width="1" stroke-dasharray="3 2"/><rect x="1" y="110" width="98" height="22" fill="rgba(255,255,255,0.9)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#9c7c5e" font-family="Georgia,serif" font-style="italic">Garden Rose</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="16" width="1168" height="1768" rx="16" fill="none" stroke="#c9a96e" stroke-width="10"/>
+  <rect x="36" y="36" width="1128" height="1728" rx="10" fill="none" stroke="#e8d5b0" stroke-width="3"/>
+  <rect x="70" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="70" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="70" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <circle cx="36" cy="36" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="1164" cy="36" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="36" cy="1764" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="1164" cy="1764" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="40" y="1450" width="1120" height="310" rx="12" fill="rgba(255,255,255,0.96)"/>
+  <line x1="200" y1="1490" x2="1000" y2="1490" stroke="#e8d5b0" stroke-width="2"/>
+  <text x="600" y="1590" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="56" fill="#6b4c2a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1670" text-anchor="middle" font-family="'SF Pro', 'Arial', sans-serif" font-size="24" font-weight="600" fill="#c9a96e" letter-spacing="6">HAPPY WEDDING • SWEET MOMENTS</text>
+</svg>`,
     png_url: null,
   },
   {
     name: "Vintage Gold",
-    svg_code: `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="1" y="1" width="98" height="131" rx="1" fill="none" stroke="#c9a96e" stroke-width="3"/><path d="M1 14 L1 1 L14 1" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M86 1 L99 1 L99 14" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M1 119 L1 131 L14 131" fill="none" stroke="#b8843a" stroke-width="2"/><path d="M86 131 L99 131 L99 119" fill="none" stroke="#b8843a" stroke-width="2"/><rect x="1" y="110" width="98" height="22" fill="rgba(255,250,240,0.95)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#6b4c2a" font-family="Georgia,serif">Vintage Gold</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="12" y="12" width="1176" height="1776" rx="8" fill="none" stroke="#c9a96e" stroke-width="8"/>
+  <rect x="32" y="32" width="1136" height="1736" rx="6" fill="none" stroke="#e8d5b0" stroke-width="2"/>
+  <path d="M12 120 L12 12 L120 12" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M1080 12 L1188 12 L1188 120" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M12 1680 L12 1788 L120 1788" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M1080 1788 L1188 1788 L1188 1680" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <rect x="70" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="70" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="70" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="36" y="1440" width="1128" height="320" rx="4" fill="rgba(255,250,240,0.97)"/>
+  <line x1="160" y1="1480" x2="1040" y2="1480" stroke="#e8d5b0" stroke-width="2"/>
+  <text x="600" y="1580" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="58" fill="#6b4c2a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1660" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="6">FOREVER &amp; ALWAYS</text>
+</svg>`,
     png_url: null,
   },
   {
     name: "Floral White",
-    svg_code: `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="3" y="3" width="94" height="127" rx="4" fill="none" stroke="#f0c4be" stroke-width="5"/><rect x="6" y="6" width="88" height="88" rx="2" fill="none" stroke="#d4847a" stroke-width="1"/><circle cx="13" cy="10" r="4" fill="rgba(212,132,122,0.4)"/><circle cx="87" cy="10" r="4" fill="rgba(212,132,122,0.4)"/><rect x="3" y="110" width="94" height="22" fill="rgba(255,255,255,0.95)"/><text x="50" y="123" text-anchor="middle" font-size="6" fill="#d4847a" font-family="Georgia,serif">Floral White</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="20" width="1160" height="1760" rx="28" fill="none" stroke="#f0c4be" stroke-width="16"/>
+  <rect x="44" y="44" width="1112" height="1712" rx="20" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="120" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <circle cx="1080" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <rect x="70" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="70" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="70" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="44" y="1450" width="1112" height="300" rx="16" fill="rgba(255,255,255,0.97)"/>
+  <text x="600" y="1575" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="54" fill="#d4847a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1655" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#c06b60" letter-spacing="5">LOVE CELEBRATION</text>
+</svg>`,
     png_url: null,
   },
   {
     name: "Classic Film",
-    svg_code: `<svg viewBox="0 0 100 133" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect x="0" y="0" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="123" width="100" height="10" fill="rgba(44,24,16,0.75)"/><rect x="0" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="94" y="10" width="6" height="113" fill="rgba(44,24,16,0.45)"/><rect x="6" y="110" width="88" height="13" fill="rgba(250,246,240,0.95)"/><text x="50" y="119" text-anchor="middle" font-size="5.5" fill="#6b4c2a" font-family="Courier,monospace" letter-spacing="2">CLASSIC FILM</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1200" height="1800" rx="0" fill="rgba(30,20,10,0.06)"/>
+  <rect x="0" y="0" width="1200" height="60" fill="rgba(44,24,16,0.85)"/>
+  <rect x="0" y="1740" width="1200" height="60" fill="rgba(44,24,16,0.85)"/>
+  <rect x="70" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="70" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="70" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="40" y="1450" width="1120" height="260" fill="rgba(250,246,240,0.96)"/>
+  <text x="600" y="1560" text-anchor="middle" font-family="'SF Pro', sans-serif" font-weight="bold" font-size="44" fill="#6b4c2a" letter-spacing="8">{{COUPLE_NAME}}</text>
+  <text x="600" y="1635" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="4">⬛ SWEET MOMENTS ⬛</text>
+</svg>`,
     png_url: null,
   },
 ];
@@ -1503,18 +1564,15 @@ export default function AdminPanel() {
                     >
                       <div className="guide-title">
                         <i className="ti ti-info-circle-filled" /> Panduan
-                        Membuat Frame Custom PNG
+                        Membuat Frame Custom PNG (1200×1800 px)
                       </div>
                       1. Buat file PNG transparan berukuran{" "}
-                      <strong>3:4 (rekomendasi: 600 x 800 pixel)</strong>.<br />
-                      2. Bagian tengah harus **bolong / transparan** agar wajah
-                      tamu terlihat di kamera.
+                      <strong>2:3 (1200px × 1800px)</strong>.<br />
+                      2. Sediakan <strong>6 jendela / cutout transparan</strong> (Grid 2 kolom × 3 baris) agar 6 foto tamu terlihat jelas.
                       <br />
-                      3. Pinggiran diberi ornamen hiasan floral/tulisan nama
-                      pengantin secara manual.
+                      3. Bagian bawah (footer) dan tepi bingkai dapat diberi dekorasi ornamen, logo, atau tulisan nama pengantin.
                       <br />
-                      4. Ekspor dengan format **PNG-24 dengan transparansi
-                      diaktifkan**.
+                      4. Ekspor dengan format <strong>PNG-24 (Alpha Transparency diaktifkan)</strong>.
                     </div>
                   </div>
                 </div>

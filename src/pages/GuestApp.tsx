@@ -4,6 +4,25 @@ import { db } from "../supabaseClient";
 import logoBk from "../assets/logo-bk.svg";
 import "./GuestApp.css";
 
+export const FRAME_WIDTH = 1200;
+export const FRAME_HEIGHT = 1800;
+
+// Option B: 6 Photo Slots (2 columns x 3 rows) on 1200x1800px canvas
+// Row 1: Photo 0 & Photo 0 (Slot 0, 1)
+// Row 2: Photo 1 & Photo 1 (Slot 2, 3)
+// Row 3: Photo 2 & Photo 2 (Slot 4, 5)
+export const PHOTO_SLOTS = [
+  // Row 1
+  { x: 70, y: 90, width: 500, height: 410, photoIndex: 0 },
+  { x: 630, y: 90, width: 500, height: 410, photoIndex: 0 },
+  // Row 2
+  { x: 70, y: 540, width: 500, height: 410, photoIndex: 1 },
+  { x: 630, y: 540, width: 500, height: 410, photoIndex: 1 },
+  // Row 3
+  { x: 70, y: 990, width: 500, height: 410, photoIndex: 2 },
+  { x: 630, y: 990, width: 500, height: 410, photoIndex: 2 },
+];
+
 interface EventConfig {
   id: string;
   couple_name: string;
@@ -39,33 +58,136 @@ type ScreenName =
 const defaultFramesData = [
   {
     name: "Garden Rose",
-    svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="292" height="392" rx="4" fill="none" stroke="#c9a96e" stroke-width="8"/><rect x="14" y="14" width="272" height="372" rx="2" fill="none" stroke="#e8d5b0" stroke-width="2"/><rect x="18" y="18" width="264" height="310" rx="2" fill="none" stroke="#c9a96e" stroke-width="1" stroke-dasharray="4 4"/><rect x="4" y="336" width="292" height="60" rx="0" fill="rgba(255,255,255,0.95)"/><circle cx="4" cy="4" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="296" cy="4" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="4" cy="396" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><circle cx="296" cy="396" r="16" fill="none" stroke="#d4847a" stroke-width="3"/><text x="150" y="362" text-anchor="middle" font-family="'Poppins', 'Georgia', 'Times New Roman', sans-serif" font-style="italic" font-size="14" fill="#9c7c5e">{{COUPLE_NAME}}</text><text x="150" y="380" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#c9a96e" letter-spacing="1.5">HAPPY WEDDING</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="16" width="1168" height="1768" rx="16" fill="none" stroke="#c9a96e" stroke-width="10"/>
+  <rect x="36" y="36" width="1128" height="1728" rx="10" fill="none" stroke="#e8d5b0" stroke-width="3"/>
+  <rect x="70" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="90" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="70" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="540" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="70" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <rect x="630" y="990" width="500" height="410" rx="8" fill="none" stroke="#c9a96e" stroke-width="4" stroke-dasharray="6 6"/>
+  <circle cx="36" cy="36" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="1164" cy="36" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="36" cy="1764" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="1164" cy="1764" r="32" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="40" y="1450" width="1120" height="310" rx="12" fill="rgba(255,255,255,0.96)"/>
+  <line x1="200" y1="1490" x2="1000" y2="1490" stroke="#e8d5b0" stroke-width="2"/>
+  <text x="600" y="1590" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="56" fill="#6b4c2a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1670" text-anchor="middle" font-family="'SF Pro', 'Arial', sans-serif" font-size="24" font-weight="600" fill="#c9a96e" letter-spacing="6">HAPPY WEDDING • SWEET MOMENTS</text>
+</svg>`,
     png_url: null,
     is_active: true,
     sort_order: 0,
   },
   {
     name: "Vintage Gold",
-    svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="296" height="396" rx="2" fill="none" stroke="#c9a96e" stroke-width="4"/><rect x="10" y="10" width="280" height="380" rx="2" fill="none" stroke="#e8d5b0" stroke-width="1"/><path d="M2 40 L2 2 L40 2" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M260 2 L298 2 L298 40" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M2 360 L2 398 L40 398" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M260 398 L298 398 L298 360" fill="none" stroke="#b8843a" stroke-width="3"/><path d="M120 2 Q150 16 180 2" fill="none" stroke="#c9a96e" stroke-width="2"/><circle cx="150" cy="8" r="4" fill="#c9a96e"/><rect x="2" y="330" width="296" height="68" rx="0" fill="rgba(255,255,255,0.97)"/><line x1="20" y1="340" x2="280" y2="340" stroke="#e8d5b0" stroke-width="1"/><text x="150" y="360" text-anchor="middle" font-family="'Poppins', 'Georgia', 'Times New Roman', sans-serif" font-style="italic" font-size="15" fill="#6b4c2a">{{COUPLE_NAME}}</text><text x="150" y="378" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#9c7c5e" letter-spacing="1.5">FOREVER & ALWAYS</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="12" y="12" width="1176" height="1776" rx="8" fill="none" stroke="#c9a96e" stroke-width="8"/>
+  <rect x="32" y="32" width="1136" height="1736" rx="6" fill="none" stroke="#e8d5b0" stroke-width="2"/>
+  <path d="M12 120 L12 12 L120 12" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M1080 12 L1188 12 L1188 120" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M12 1680 L12 1788 L120 1788" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <path d="M1080 1788 L1188 1788 L1188 1680" fill="none" stroke="#b8843a" stroke-width="8"/>
+  <rect x="70" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="90" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="70" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="540" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="70" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="630" y="990" width="500" height="410" rx="4" fill="none" stroke="#b8843a" stroke-width="3"/>
+  <rect x="36" y="1440" width="1128" height="320" rx="4" fill="rgba(255,250,240,0.97)"/>
+  <line x1="160" y1="1480" x2="1040" y2="1480" stroke="#e8d5b0" stroke-width="2"/>
+  <text x="600" y="1580" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="58" fill="#6b4c2a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1660" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="6">FOREVER &amp; ALWAYS</text>
+</svg>`,
     png_url: null,
     is_active: true,
     sort_order: 1,
   },
   {
     name: "Floral White",
-    svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="284" height="384" rx="12" fill="none" stroke="#f0c4be" stroke-width="10"/><rect x="16" y="16" width="268" height="368" rx="8" fill="none" stroke="#d4847a" stroke-width="2"/><circle cx="40" cy="30" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="40" cy="30" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="260" cy="30" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="260" cy="30" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="40" cy="370" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="40" cy="370" r="6" fill="rgba(212,132,122,0.5)"/><circle cx="260" cy="370" r="12" fill="rgba(212,132,122,0.3)"/><circle cx="260" cy="370" r="6" fill="rgba(212,132,122,0.5)"/><rect x="8" y="330" width="284" height="62" rx="0" fill="rgba(255,255,255,0.96)"/><text x="150" y="358" text-anchor="middle" font-family="'Poppins', 'Georgia', 'Times New Roman', sans-serif" font-style="italic" font-size="14" fill="#d4847a">{{COUPLE_NAME}}</text><text x="150" y="378" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#c06b60" letter-spacing="1.5">LOVE CELEBRATION</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="20" width="1160" height="1760" rx="28" fill="none" stroke="#f0c4be" stroke-width="16"/>
+  <rect x="44" y="44" width="1112" height="1712" rx="20" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <circle cx="120" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <circle cx="1080" cy="80" r="32" fill="rgba(212,132,122,0.3)"/>
+  <rect x="70" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="90" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="70" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="540" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="70" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="630" y="990" width="500" height="410" rx="12" fill="none" stroke="#d4847a" stroke-width="4"/>
+  <rect x="44" y="1450" width="1112" height="300" rx="16" fill="rgba(255,255,255,0.97)"/>
+  <text x="600" y="1575" text-anchor="middle" font-family="'Poppins', 'Georgia', serif" font-style="italic" font-size="54" fill="#d4847a">{{COUPLE_NAME}}</text>
+  <text x="600" y="1655" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#c06b60" letter-spacing="5">LOVE CELEBRATION</text>
+</svg>`,
     png_url: null,
     is_active: true,
     sort_order: 2,
   },
   {
     name: "Classic Film",
-    svg_code: `<svg width="300" height="400" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="300" height="400" rx="0" fill="rgba(30,20,10,0.06)"/><rect x="0" y="0" width="300" height="28" fill="rgba(44,24,16,0.7)"/><rect x="0" y="372" width="300" height="28" fill="rgba(44,24,16,0.7)"/><rect x="4" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="38" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="72" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="106" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="140" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="174" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="208" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="242" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="276" y="4" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="4" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="38" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="72" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="106" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="140" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="174" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="208" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="242" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="276" y="376" width="24" height="20" rx="3" fill="rgba(255,255,255,0.15)"/><rect x="0" y="28" width="16" height="344" fill="rgba(44,24,16,0.5)"/><rect x="284" y="28" width="16" height="344" fill="rgba(44,24,16,0.5)"/><rect x="16" y="330" width="268" height="42" fill="rgba(250,246,240,0.95)"/><text x="150" y="350" text-anchor="middle" font-family="'SF Pro', sans-serif" font-weight="bold" font-size="10" fill="#6b4c2a" letter-spacing="3">{{COUPLE_NAME}}</text><text x="150" y="364" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="8" fill="#9c7c5e">⬛ SWEET MOMENTS ⬛</text></svg>`,
+    svg_code: `<svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1200" height="1800" rx="0" fill="rgba(30,20,10,0.06)"/>
+  <rect x="0" y="0" width="1200" height="60" fill="rgba(44,24,16,0.85)"/>
+  <rect x="0" y="1740" width="1200" height="60" fill="rgba(44,24,16,0.85)"/>
+  <rect x="70" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="90" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="70" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="540" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="70" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="630" y="990" width="500" height="410" rx="0" fill="none" stroke="rgba(44,24,16,0.4)" stroke-width="4"/>
+  <rect x="40" y="1450" width="1120" height="260" fill="rgba(250,246,240,0.96)"/>
+  <text x="600" y="1560" text-anchor="middle" font-family="'SF Pro', sans-serif" font-weight="bold" font-size="44" fill="#6b4c2a" letter-spacing="8">{{COUPLE_NAME}}</text>
+  <text x="600" y="1635" text-anchor="middle" font-family="'SF Pro', sans-serif" font-size="24" fill="#9c7c5e" letter-spacing="4">⬛ SWEET MOMENTS ⬛</text>
+</svg>`,
     png_url: null,
     is_active: true,
     sort_order: 3,
   },
 ];
+
+// Helper to draw cover-cropped image into canvas slot
+function drawCoverImage(
+  ctx: CanvasRenderingContext2D,
+  img: CanvasImageSource,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const iw =
+    (img as HTMLVideoElement).videoWidth ||
+    (img as HTMLImageElement).naturalWidth ||
+    (img as HTMLCanvasElement).width;
+  const ih =
+    (img as HTMLVideoElement).videoHeight ||
+    (img as HTMLImageElement).naturalHeight ||
+    (img as HTMLCanvasElement).height;
+  if (!iw || !ih) return;
+
+  const targetRatio = w / h;
+  const imgRatio = iw / ih;
+  let sx = 0,
+    sy = 0,
+    sWidth = iw,
+    sHeight = ih;
+
+  if (imgRatio > targetRatio) {
+    sWidth = ih * targetRatio;
+    sx = (iw - sWidth) / 2;
+  } else {
+    sHeight = iw / targetRatio;
+    sy = (ih - sHeight) / 2;
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, w, h);
+  ctx.restore();
+}
 
 export default function GuestApp() {
   const { eventSlug } = useParams<{ eventSlug: string }>();
@@ -77,7 +199,16 @@ export default function GuestApp() {
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number>(0);
   const [guestName, setGuestName] = useState<string>("");
   const [screen, setScreen] = useState<ScreenName>("welcome");
-  const [photoDataUrl, setPhotoDataUrl] = useState<string>("");
+
+  // Multi-shot photo states (3 photos taken, duplicated into 6 slots)
+  const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
+  const [currentShotIndex, setCurrentShotIndex] = useState<number>(0);
+  const [shotReviewUrl, setShotReviewUrl] = useState<string | null>(null);
+  const [compositePreviewUrl, setCompositePreviewUrl] = useState<string>("");
+  const [isGeneratingComposite, setIsGeneratingComposite] =
+    useState<boolean>(false);
+
+  // Audio recording states
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string>("");
   const [audioMimeType, setAudioMimeType] = useState<string>("audio/mp4");
@@ -215,15 +346,15 @@ export default function GuestApp() {
 
   // Manage camera streaming based on screen
   useEffect(() => {
-    if (screen === "camera") {
+    if (screen === "camera" && !shotReviewUrl) {
       startCamera(facingMode);
-    } else {
+    } else if (screen !== "camera") {
       stopCamera();
     }
     return () => {
       stopCamera();
     };
-  }, [screen]);
+  }, [screen, shotReviewUrl]);
 
   // Clean up timers on unmount
   useEffect(() => {
@@ -244,7 +375,7 @@ export default function GuestApp() {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: mode },
-          width: { ideal: 720 },
+          width: { ideal: 1280 },
           height: { ideal: 960 },
         },
         audio: false,
@@ -255,7 +386,6 @@ export default function GuestApp() {
       }
     } catch (e) {
       console.error("Camera access failed:", e);
-      // Fallback: try default without facingMode constraint if ideal fails
       try {
         const fallbackStream = await navigator.mediaDevices.getUserMedia({
           video: true,
@@ -285,6 +415,7 @@ export default function GuestApp() {
     startCamera(nextMode);
   };
 
+  // Capture current pose snapshot
   const takePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -293,44 +424,63 @@ export default function GuestApp() {
       return;
     }
 
-    const videoWidth = video.videoWidth || 720;
+    const videoWidth = video.videoWidth || 1280;
     const videoHeight = video.videoHeight || 960;
-    
-    // Calculate center crop for 3:4 aspect ratio
-    const targetRatio = 3 / 4;
+
+    // Slot aspect ratio is 500:410 = 1.2195
+    const slotRatio = 500 / 410;
     const videoRatio = videoWidth / videoHeight;
-    
-    let sx = 0, sy = 0, sWidth = videoWidth, sHeight = videoHeight;
-    if (videoRatio > targetRatio) {
-      // Video is wider than 3:4, crop sides
-      sWidth = videoHeight * targetRatio;
+
+    let sx = 0,
+      sy = 0,
+      sWidth = videoWidth,
+      sHeight = videoHeight;
+    if (videoRatio > slotRatio) {
+      sWidth = videoHeight * slotRatio;
       sx = (videoWidth - sWidth) / 2;
     } else {
-      // Video is taller than 3:4, crop top/bottom
-      sHeight = videoWidth / targetRatio;
+      sHeight = videoWidth / slotRatio;
       sy = (videoHeight - sHeight) / 2;
     }
 
-    // Fix canvas size to 3:4 (720x960)
-    canvas.width = 720;
-    canvas.height = 960;
+    // Capture at high resolution (1000 x 820)
+    canvas.width = 1000;
+    canvas.height = 820;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     if (facingMode === "user") {
-      // Snapshot mirrored video for front selfie camera
       ctx.save();
       ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
-      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(
+        video,
+        sx,
+        sy,
+        sWidth,
+        sHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
       ctx.restore();
     } else {
-      // Normal orientation for back/rear camera
-      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(
+        video,
+        sx,
+        sy,
+        sWidth,
+        sHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
     }
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
-    setPhotoDataUrl(dataUrl);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    setShotReviewUrl(dataUrl);
 
     // Flash animation effect
     const flash = document.createElement("div");
@@ -338,13 +488,143 @@ export default function GuestApp() {
       "position:absolute;inset:0;background:#fff;z-index:99;border-radius:16px;";
     video.parentElement?.appendChild(flash);
     setTimeout(() => flash.remove(), 200);
+  };
 
-    stopCamera();
-    setScreen("preview");
+  // Accept current pose photo and advance or finish
+  const acceptCurrentShot = async () => {
+    if (!shotReviewUrl) return;
+
+    const newPhotos = [...capturedPhotos];
+    newPhotos[currentShotIndex] = shotReviewUrl;
+    setCapturedPhotos(newPhotos);
+    setShotReviewUrl(null);
+
+    if (currentShotIndex < 2) {
+      // Proceed to next pose (Pose 2 or Pose 3)
+      setCurrentShotIndex(currentShotIndex + 1);
+    } else {
+      // All 3 photos completed! Generate composite 1200x1800 preview
+      stopCamera();
+      setIsGeneratingComposite(true);
+      setScreen("preview");
+
+      try {
+        const mergedCanvas = await mergePhotosAndFrame(
+          newPhotos,
+          frames[selectedFrameIndex],
+          coupleName,
+        );
+        setCompositePreviewUrl(mergedCanvas.toDataURL("image/jpeg", 0.92));
+      } catch (err) {
+        console.error("Failed to generate composite preview:", err);
+      } finally {
+        setIsGeneratingComposite(false);
+      }
+    }
+  };
+
+  // Retake current shot in camera
+  const retakeCurrentShot = () => {
+    setShotReviewUrl(null);
+  };
+
+  // Retake a specific pose or all from Preview screen
+  const retakePose = (poseIndex: number) => {
+    setCurrentShotIndex(poseIndex);
+    setShotReviewUrl(null);
+    setScreen("camera");
+  };
+
+  const retakeAllPhotos = () => {
+    setCapturedPhotos([]);
+    setCurrentShotIndex(0);
+    setShotReviewUrl(null);
+    setCompositePreviewUrl("");
+    setScreen("camera");
+  };
+
+  // Merging 6 photos into 1200x1800 Canvas with Frame overlay
+  const mergePhotosAndFrame = async (
+    photoDataUrls: string[],
+    frame: Frame | null,
+    coupleNameStr: string,
+  ): Promise<HTMLCanvasElement> => {
+    const out = document.createElement("canvas");
+    out.width = FRAME_WIDTH;
+    out.height = FRAME_HEIGHT;
+    const ctx = out.getContext("2d");
+    if (!ctx) return out;
+
+    // Fill background with clean white
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+
+    // Pre-load all captured photos
+    const loadedPhotos: (HTMLImageElement | null)[] = await Promise.all(
+      photoDataUrls.map(
+        (url) =>
+          new Promise<HTMLImageElement | null>((resolve) => {
+            if (!url) return resolve(null);
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = url;
+          }),
+      ),
+    );
+
+    // Draw the 6 photo slots (Option B Grid)
+    for (const slot of PHOTO_SLOTS) {
+      const photoImg = loadedPhotos[slot.photoIndex] || loadedPhotos[0];
+      if (photoImg && photoImg.complete && photoImg.naturalWidth > 0) {
+        drawCoverImage(ctx, photoImg, slot.x, slot.y, slot.width, slot.height);
+      } else {
+        // Soft placeholder if not yet taken
+        ctx.fillStyle = "#f5ede0";
+        ctx.fillRect(slot.x, slot.y, slot.width, slot.height);
+      }
+    }
+
+    // Draw the selected frame overlay on top
+    if (frame) {
+      try {
+        if (frame.svg_code) {
+          const svgCode = frame.svg_code
+            .replace(/\{\{COUPLE_NAME\}\}/g, coupleNameStr)
+            .replace(/\{\{COUPLE_NAME_UPPER\}\}/g, coupleNameStr.toUpperCase());
+          const svgBlob = new Blob([svgCode], { type: "image/svg+xml" });
+          const svgUrl = URL.createObjectURL(svgBlob);
+          await new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+              resolve();
+            };
+            img.onerror = reject;
+            img.src = svgUrl;
+          });
+          URL.revokeObjectURL(svgUrl);
+        } else if (frame.png_url) {
+          await new Promise<void>((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+              resolve();
+            };
+            img.onerror = reject;
+            img.src = frame.png_url || "";
+          });
+        }
+      } catch (e) {
+        console.warn("Merging frame overlay failed:", e);
+      }
+    }
+
+    return out;
   };
 
   // Audio recording helpers
-  // Detect supported MIME type — iOS Safari supports audio/mp4, not audio/webm
   const getSupportedMimeType = (): string => {
     const candidates = [
       "audio/mp4",
@@ -372,7 +652,6 @@ export default function GuestApp() {
       audioStreamRef.current = audioStream;
       const chunks: BlobPart[] = [];
 
-      // Pick best supported format for this browser/device
       const mimeType = getSupportedMimeType();
       const recorderOptions = mimeType ? { mimeType } : {};
       const mediaRecorder = new MediaRecorder(audioStream, recorderOptions);
@@ -390,13 +669,11 @@ export default function GuestApp() {
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
 
-        // stop audio tracks
         audioStream.getTracks().forEach((t) => t.stop());
         audioStreamRef.current = null;
         stopWave();
       };
 
-      // Request data every 250ms to avoid losing data if tab is backgrounded (iOS)
       mediaRecorder.start(250);
       setIsRecording(true);
       setRecordingSeconds(0);
@@ -454,61 +731,6 @@ export default function GuestApp() {
     setWaveHeights(new Array(12).fill(8));
   };
 
-  // Image and Frame merging
-  const mergePhotoAndFrame = async (
-    photoCanvas: HTMLCanvasElement,
-  ): Promise<HTMLCanvasElement> => {
-    const out = document.createElement("canvas");
-    out.width = photoCanvas.width;
-    out.height = photoCanvas.height;
-    const ctx = out.getContext("2d");
-    if (!ctx) return photoCanvas;
-
-    // Draw the main taken guest photo
-    ctx.drawImage(photoCanvas, 0, 0);
-
-    // Draw the selected frame on top
-    try {
-      const frame = frames[selectedFrameIndex];
-      if (frame) {
-        if (frame.svg_code) {
-          const svgCode = frame.svg_code
-            .replace(/\{\{COUPLE_NAME\}\}/g, coupleName)
-            .replace(/\{\{COUPLE_NAME_UPPER\}\}/g, coupleName.toUpperCase());
-          const svgBlob = new Blob([svgCode], { type: "image/svg+xml" });
-          const svgUrl = URL.createObjectURL(svgBlob);
-          await new Promise<void>((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, out.width, out.height);
-              resolve();
-            };
-            img.onerror = reject;
-            img.src = svgUrl;
-          });
-          URL.revokeObjectURL(svgUrl);
-        } else if (frame.png_url) {
-          await new Promise<void>((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, out.width, out.height);
-              resolve();
-            };
-            img.onerror = reject;
-            img.src = frame.png_url || "";
-          });
-        }
-      }
-    } catch (e) {
-      console.warn(
-        "Merging frame overlay failed, uploading original photo:",
-        e,
-      );
-    }
-    return out;
-  };
-
   // Upload to Supabase
   const confirmSend = async () => {
     setScreen("upload");
@@ -531,22 +753,23 @@ export default function GuestApp() {
       }
 
       setUploadProgress(25);
-      setUploadLabel("Memproses foto...");
+      setUploadLabel("Merender frame 1200x1800 HD...");
 
-      const canvas = canvasRef.current;
-      if (!canvas) throw new Error("Canvas element not found");
-
-      const finalCanvas = await mergePhotoAndFrame(canvas);
+      const finalCanvas = await mergePhotosAndFrame(
+        capturedPhotos,
+        frames[selectedFrameIndex],
+        coupleName,
+      );
       const photoBlob = await new Promise<Blob | null>((resolve) =>
-        finalCanvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9),
+        finalCanvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92),
       );
       if (!photoBlob) throw new Error("Gagal mengolah file foto");
 
       setUploadProgress(45);
-      setUploadLabel("Mengunggah foto...");
+      setUploadLabel("Mengunggah foto photobooth...");
 
       const ts = Date.now();
-      const safeName = guestName.replace(/[^a-zA-Z0-9]/g, "_");
+      const safeName = guestName.replace(/[^a-zA-Z0-9]/g, "_") || "Tamu";
       const photoPath = `${eventId}/${ts}_${safeName}.jpg`;
 
       const { error: photoErr } = await db.storage
@@ -567,13 +790,11 @@ export default function GuestApp() {
         setUploadProgress(65);
         setUploadLabel("Mengunggah ucapan...");
 
-        // Determine file extension and content type from recorded MIME
-        // iOS records as audio/mp4 (.m4a), desktop Chrome records as audio/webm
         const getAudioExtension = (mime: string): string => {
           if (mime.includes("mp4") || mime.includes("aac")) return "m4a";
           if (mime.includes("webm")) return "webm";
           if (mime.includes("ogg")) return "ogg";
-          return "m4a"; // safe default for iOS
+          return "m4a";
         };
         const getAudioContentType = (mime: string): string => {
           if (mime.includes("mp4") || mime.includes("aac")) return "audio/mp4";
@@ -581,22 +802,23 @@ export default function GuestApp() {
           if (mime.includes("ogg")) return "audio/ogg";
           return "audio/mp4";
         };
-        const ext = getAudioExtension(audioMimeType);
-        const contentType = getAudioContentType(audioMimeType);
 
-        const voicePath = `${eventId}/${ts}_${safeName}.${ext}`;
+        const ext = getAudioExtension(audioMimeType);
+        const cType = getAudioContentType(audioMimeType);
+        const audioPath = `${eventId}/${ts}_${safeName}.${ext}`;
+
         const { error: voiceErr } = await db.storage
-          .from("voices")
-          .upload(voicePath, audioBlob, {
-            contentType,
+          .from("photos")
+          .upload(audioPath, audioBlob, {
+            contentType: cType,
             upsert: false,
           });
 
         if (!voiceErr) {
           const {
-            data: { publicUrl },
-          } = db.storage.from("voices").getPublicUrl(voicePath);
-          voiceUrl = publicUrl;
+            data: { publicUrl: vUrl },
+          } = db.storage.from("photos").getPublicUrl(audioPath);
+          voiceUrl = vUrl;
         }
       }
 
@@ -645,7 +867,7 @@ export default function GuestApp() {
     return "";
   };
 
-  // Rendering screens
+  // Screen rendering
   if (isLoading) {
     return (
       <div
@@ -731,7 +953,6 @@ export default function GuestApp() {
         className={`screen ${screen === "welcome" ? "active" : ""}`}
         id="s-welcome"
       >
-        {/* Hero Section — matches admin live mockup */}
         <div
           className="guest-hero"
           style={{
@@ -755,7 +976,7 @@ export default function GuestApp() {
           <div className="logo">✦ PHOTOBOOTH EVENT ✦</div>
           <div className="title">Selamat Datang</div>
           <p className="subtitle">
-            Abadikan momen spesial bersama &amp; kirim ucapan hangat untuk
+            Abadikan 3 pose spesial bersama &amp; kirim ucapan hangat untuk
             pasangan
           </p>
           <div className="steps">
@@ -803,7 +1024,9 @@ export default function GuestApp() {
       >
         <div className="card">
           <div className="title">Pilih Bingkai</div>
-          <p className="subtitle">Pilih bingkai polaroid favoritmu</p>
+          <p className="subtitle">
+            Format 6 Foto (1200×1800 px). Pilih desain favoritmu:
+          </p>
           <div className="steps">
             <div className="step-dot done"></div>
             <div className="step-dot active"></div>
@@ -823,7 +1046,7 @@ export default function GuestApp() {
                         position: "absolute",
                         inset: 0,
                         background: "linear-gradient(135deg,#f5ede0,#faf6f0)",
-                        opacity: 0.25,
+                        opacity: 0.35,
                       }}
                     ></div>
                     <div
@@ -839,9 +1062,14 @@ export default function GuestApp() {
           </div>
           <button
             className="btn btn-primary"
-            onClick={() => setScreen("camera")}
+            onClick={() => {
+              setCapturedPhotos([]);
+              setCurrentShotIndex(0);
+              setShotReviewUrl(null);
+              setScreen("camera");
+            }}
           >
-            Buka Kamera →
+            Mulai Foto (3x Pose) →
           </button>
           <button
             className="btn btn-secondary"
@@ -859,13 +1087,32 @@ export default function GuestApp() {
       >
         <div className="card">
           <div className="title">Ambil Foto</div>
-          <p className="subtitle">Senyum ya! 😊</p>
-          <div className="steps">
-            <div className="step-dot done"></div>
-            <div className="step-dot done"></div>
-            <div className="step-dot active"></div>
-            <div className="step-dot"></div>
+          <p className="subtitle">
+            {shotReviewUrl
+              ? `Review Pose ${currentShotIndex + 1} dari 3`
+              : `Pose ${currentShotIndex + 1} dari 3 — Siapkan gayamu! 📸`}
+          </p>
+
+          {/* Multi-pose progress badges */}
+          <div className="pose-indicator-bar">
+            {[0, 1, 2].map((idx) => {
+              const isDone = capturedPhotos[idx] !== undefined;
+              const isCurrent = idx === currentShotIndex;
+              return (
+                <div
+                  key={idx}
+                  className={`pose-badge ${isCurrent ? "current" : isDone ? "done" : ""}`}
+                >
+                  {isDone && !isCurrent ? (
+                    <span className="pose-check">✓</span>
+                  ) : (
+                    `Pose ${idx + 1}`
+                  )}
+                </div>
+              );
+            })}
           </div>
+
           <div className="camera-wrap">
             {cameraError ? (
               <div className="cam-error">
@@ -889,32 +1136,65 @@ export default function GuestApp() {
                   autoPlay
                   playsInline
                   muted
+                  style={{ display: shotReviewUrl ? "none" : "block" }}
                 ></video>
-                <canvas ref={canvasRef} id="canvas"></canvas>
-                <button
-                  type="button"
-                  className="cam-flip-floating"
-                  onClick={toggleCameraFacing}
-                  title="Ganti Kamera Depan / Belakang"
-                >
-                  <i className="ti ti-camera-rotate" aria-hidden="true"></i>
-                </button>
-                <div className="camera-viewfinder-guides">
-                  <div className="corner-guide top-left"></div>
-                  <div className="corner-guide top-right"></div>
-                  <div className="corner-guide bottom-left"></div>
-                  <div className="corner-guide bottom-right"></div>
-                </div>
-                <div className="camera-hint">
-                  {facingMode === "user" ? "Kamera Depan (Selfie)" : "Kamera Belakang"}
-                </div>
+
+                {/* Instant Shot Review Overlay */}
+                {shotReviewUrl && (
+                  <div className="shot-review-container">
+                    <img
+                      src={shotReviewUrl}
+                      alt={`Pose ${currentShotIndex + 1}`}
+                      className="shot-review-img"
+                    />
+                    <div className="shot-review-badge">
+                      Pose {currentShotIndex + 1} Tersimpan
+                    </div>
+                  </div>
+                )}
+
+                <canvas
+                  ref={canvasRef}
+                  id="canvas"
+                  style={{ display: "none" }}
+                ></canvas>
+
+                {!shotReviewUrl && (
+                  <>
+                    <button
+                      type="button"
+                      className="cam-flip-floating"
+                      onClick={toggleCameraFacing}
+                      title="Ganti Kamera Depan / Belakang"
+                    >
+                      <i className="ti ti-camera-rotate" aria-hidden="true"></i>
+                    </button>
+                    <div className="camera-viewfinder-guides">
+                      <div className="corner-guide top-left"></div>
+                      <div className="corner-guide top-right"></div>
+                      <div className="corner-guide bottom-left"></div>
+                      <div className="corner-guide bottom-right"></div>
+                    </div>
+                    <div className="camera-hint">
+                      {facingMode === "user"
+                        ? "Kamera Depan (Selfie)"
+                        : "Kamera Belakang"}
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>
-          {!cameraError && (
+
+          {/* Camera Controls */}
+          {!cameraError && !shotReviewUrl && (
             <div className="camera-controls-bar">
               <div className="cam-ctrl-space"></div>
-              <div className="shutter-btn" onClick={takePhoto} title="Ambil Foto">
+              <div
+                className="shutter-btn"
+                onClick={takePhoto}
+                title="Jepret Foto"
+              >
                 <div className="shutter-inner"></div>
               </div>
               <button
@@ -927,39 +1207,91 @@ export default function GuestApp() {
               </button>
             </div>
           )}
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              stopCamera();
-              setScreen("frame");
-            }}
-          >
-            ← Ganti Frame
-          </button>
+
+          {/* Shot Review Action Buttons */}
+          {shotReviewUrl && (
+            <div className="shot-review-actions">
+              <button
+                className="btn btn-primary"
+                onClick={acceptCurrentShot}
+                style={{ width: "100%", marginBottom: "8px" }}
+              >
+                {currentShotIndex < 2
+                  ? `✓ Gunakan, Lanjut Pose ${currentShotIndex + 2} →`
+                  : "✓ Selesai, Lihat Frame →"}
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={retakeCurrentShot}
+                style={{ width: "100%" }}
+              >
+                🔄 Ambil Ulang Pose Ini
+              </button>
+            </div>
+          )}
+
+          {!shotReviewUrl && (
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                stopCamera();
+                setScreen("frame");
+              }}
+            >
+              ← Ganti Frame
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Preview Screen */}
+      {/* Preview Screen (1200x1800 Option B 6-Slot Output) */}
       <div
         className={`screen ${screen === "preview" ? "active" : ""}`}
         id="s-preview"
       >
         <div className="card">
-          <div className="title">Preview Foto</div>
-          <p className="subtitle">Bagus? Lanjutkan atau ambil ulang</p>
-          <div className="preview-wrap">
-            <img id="preview-img" src={photoDataUrl} alt="preview" />
-            <div
-              className="preview-frame-overlay"
-              dangerouslySetInnerHTML={{
-                __html: frames[selectedFrameIndex]
-                  ? getFrameHtml(frames[selectedFrameIndex])
-                  : "",
-              }}
-            ></div>
+          <div className="title">Hasil Photobooth</div>
+          <p className="subtitle">
+            6 Foto (3 Pose terduplikasi) di dalam frame 1200×1800 px ✨
+          </p>
+
+          <div className="preview-wrap-1200">
+            {isGeneratingComposite ? (
+              <div className="preview-loading">
+                <div className="preview-spinner"></div>
+                <span>Menyusun 6 foto ke dalam frame...</span>
+              </div>
+            ) : (
+              <img
+                id="preview-img"
+                src={compositePreviewUrl}
+                alt="Photobooth Frame Final"
+              />
+            )}
           </div>
+
+          {/* Retake individual pose chips */}
+          {eventConfig?.allow_retake && !isGeneratingComposite && (
+            <div className="retake-strip">
+              <div className="retake-strip-title">Ambil ulang pose tertentu:</div>
+              <div className="retake-chip-group">
+                {[0, 1, 2].map((idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="retake-chip-btn"
+                    onClick={() => retakePose(idx)}
+                  >
+                    🔄 Ulangi Pose {idx + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <button
             className="btn btn-primary"
+            disabled={isGeneratingComposite}
             onClick={() => {
               if (eventConfig?.allow_voice || eventConfig?.allow_chat) {
                 setScreen("voice");
@@ -972,15 +1304,14 @@ export default function GuestApp() {
               ? "Lanjut ke Ucapan →"
               : "Kirim Foto ✨"}
           </button>
+
           {eventConfig?.allow_retake && (
             <button
               className="btn btn-secondary"
-              onClick={() => {
-                setPhotoDataUrl("");
-                setScreen("camera");
-              }}
+              disabled={isGeneratingComposite}
+              onClick={retakeAllPhotos}
             >
-              🔄 Ambil Ulang
+              🔄 Ambil Ulang Semua (3 Pose)
             </button>
           )}
         </div>
@@ -1075,7 +1406,6 @@ export default function GuestApp() {
             Kirim Ucapan ✨
           </button>
 
-          {/* Skip button if nothing recorded/written yet */}
           {!audioUrl && !messageText.trim() && (
             <button
               className="btn btn-primary"
@@ -1106,7 +1436,7 @@ export default function GuestApp() {
           <div style={{ fontSize: "48px", marginBottom: "16px" }}>📡</div>
           <div className="title">Mengirim...</div>
           <p className="subtitle">
-            Foto &amp; ucapanmu sedang dikirim ke pengantin
+            Foto 1200×1800 &amp; ucapanmu sedang dikirim ke pengantin
           </p>
           <div className="upload-bar">
             <div
