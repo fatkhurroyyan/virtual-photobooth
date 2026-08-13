@@ -1431,15 +1431,7 @@ export default function AdminPanel() {
                   <div className="card-content">
                     <div className="frame-grid" id="frame-grid">
                       {frames.map((frame, index) => {
-                        let previewHtml = "";
-                        if (frame.svg_code) {
-                          previewHtml = frame.svg_code.replace(
-                            /\{\{COUPLE_NAME\}\}/g,
-                            editHost,
-                          );
-                        } else if (frame.png_url) {
-                          previewHtml = `<img src="${frame.png_url}" style="width:100%;height:100%;object-fit:cover;" alt="${frame.name}"/>`;
-                        }
+                        const previewHtml = getFrameHtml(frame);
 
                         return (
                           <div
@@ -1830,15 +1822,7 @@ export default function AdminPanel() {
                           {frames
                             .filter((f) => f.is_active)
                             .map((frame, idx) => {
-                              let previewHtml = "";
-                              if (frame.svg_code) {
-                                previewHtml = frame.svg_code.replace(
-                                  /\{\{COUPLE_NAME\}\}/g,
-                                  editHost,
-                                );
-                              } else if (frame.png_url) {
-                                previewHtml = `<img src="${frame.png_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
-                              }
+                              const previewHtml = getFrameHtml(frame);
 
                               return (
                                 <div
@@ -1927,18 +1911,12 @@ export default function AdminPanel() {
 
                         <div className="phone-cam-wrap">
                           <div className="phone-cam-sim">👤</div>
-                          <div
-                            className="phone-mock-frame-overlay"
-                            id="phone-mock-frame-overlay"
-                            style={{ color: editThemeColor }}
-                            dangerouslySetInnerHTML={{
-                              __html: frames.filter((f) => f.is_active)[0]
-                                ? getFrameHtml(
-                                    frames.filter((f) => f.is_active)[0],
-                                  )
-                                : "",
-                            }}
-                          />
+                          <div className="phone-cam-guides">
+                            <div className="corner-guide top-left"></div>
+                            <div className="corner-guide top-right"></div>
+                            <div className="corner-guide bottom-left"></div>
+                            <div className="corner-guide bottom-right"></div>
+                          </div>
                         </div>
 
                         {/* Simulated voice block toggled on settings */}

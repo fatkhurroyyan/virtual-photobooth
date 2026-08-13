@@ -864,15 +864,13 @@ export default function GuestApp() {
                   muted
                 ></video>
                 <canvas ref={canvasRef} id="canvas"></canvas>
-                <div
-                  className="frame-overlay"
-                  dangerouslySetInnerHTML={{
-                    __html: frames[selectedFrameIndex]
-                      ? getFrameHtml(frames[selectedFrameIndex])
-                      : "",
-                  }}
-                ></div>
-                <div className="camera-hint">Posisikan wajah di tengah</div>
+                <div className="camera-viewfinder-guides">
+                  <div className="corner-guide top-left"></div>
+                  <div className="corner-guide top-right"></div>
+                  <div className="corner-guide bottom-left"></div>
+                  <div className="corner-guide bottom-right"></div>
+                </div>
+                <div className="camera-hint">Posisikan diri di tengah kamera</div>
               </>
             )}
           </div>

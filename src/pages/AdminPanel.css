@@ -1586,21 +1586,44 @@
   margin-bottom: 10px;
 }
 
-.admin-layout-body .phone-mock-frame-overlay {
+.admin-layout-body .phone-cam-guides {
   position: absolute;
-  inset: 0;
+  inset: 8px;
   pointer-events: none;
   z-index: 5;
 }
 
-.admin-layout-body .phone-mock-frame-overlay svg,
-.admin-layout-body .phone-mock-frame-overlay img {
+.admin-layout-body .phone-cam-guides .corner-guide {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(255, 255, 255, 0.4);
+  border-style: solid;
   pointer-events: none;
+}
+.admin-layout-body .phone-cam-guides .corner-guide.top-left {
+  top: 0;
+  left: 0;
+  border-width: 1.5px 0 0 1.5px;
+  border-top-left-radius: 4px;
+}
+.admin-layout-body .phone-cam-guides .corner-guide.top-right {
+  top: 0;
+  right: 0;
+  border-width: 1.5px 1.5px 0 0;
+  border-top-right-radius: 4px;
+}
+.admin-layout-body .phone-cam-guides .corner-guide.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1.5px 1.5px;
+  border-bottom-left-radius: 4px;
+}
+.admin-layout-body .phone-cam-guides .corner-guide.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1.5px 1.5px 0;
+  border-bottom-right-radius: 4px;
 }
 
 .admin-layout-body .phone-cam-sim {
