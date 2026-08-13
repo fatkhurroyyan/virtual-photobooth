@@ -223,6 +223,39 @@ export default function GuestApp() {
   const [guestName, setGuestName] = useState<string>("");
   const [screen, setScreen] = useState<ScreenName>("welcome");
 
+  // Frame Slider Touch States & Handlers
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const nextFrameSlide = () => {
+    if (frames.length <= 1) return;
+    setSelectedFrameIndex((prev) => (prev + 1) % frames.length);
+  };
+
+  const prevFrameSlide = () => {
+    if (frames.length <= 1) return;
+    setSelectedFrameIndex((prev) => (prev - 1 + frames.length) % frames.length);
+  };
+
+  const handleSliderTouchStart = (e: React.TouchEvent) => {
+    if (e.touches && e.touches[0]) {
+      setTouchStartX(e.touches[0].clientX);
+    }
+  };
+
+  const handleSliderTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        nextFrameSlide();
+      } else {
+        prevFrameSlide();
+      }
+    }
+    setTouchStartX(null);
+  };
+
   // Multi-shot photo states (3 photos taken, duplicated into 6 slots)
   const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
   const [currentShotIndex, setCurrentShotIndex] = useState<number>(0);
@@ -388,8 +421,6 @@ export default function GuestApp() {
     };
   }, []);
 
-  const coupleName = eventConfig?.couple_name || "Ahmad & Siti";
-
   // Camera helpers
   const startCamera = async (mode: "user" | "environment" = facingMode) => {
     setCameraError(false);
@@ -436,6 +467,74 @@ export default function GuestApp() {
     const nextMode = facingMode === "user" ? "environment" : "user";
     setFacingMode(nextMode);
     startCamera(nextMode);
+  };
+
+  const coupleName = eventConfig?.couple_name || "Ahmad & Siti";
+
+  // Render high-fidelity frame preview with PNG/SVG support and photo slot indicators
+  const renderFramePreview = (frame: Frame) => {
+    const fLayout = getFrameLayout(frame);
+
+    return (
+      <div
+        className="frame-canvas-stage"
+        style={{
+          aspectRatio: `${fLayout.width || 1200} / ${fLayout.height || 1800}`,
+        }}
+      >
+        {/* Background Frame (PNG / SVG) */}
+        {frame.png_url ? (
+          <img
+            src={frame.png_url}
+            alt={frame.name}
+            className="frame-canvas-media-img"
+          />
+        ) : frame.svg_code ? (
+          <div
+            className="frame-canvas-media-svg"
+            dangerouslySetInnerHTML={{
+              __html: frame.svg_code.replace(
+                /\{\{COUPLE_NAME\}\}/g,
+                coupleName,
+              ),
+            }}
+          />
+        ) : (
+          <div className="frame-canvas-fallback">
+            <span>{frame.name}</span>
+          </div>
+        )}
+
+        {/* Photo slot overlay guides */}
+        <div className="frame-canvas-slots-overlay">
+          {fLayout.slots.map((slot, sIdx) => {
+            const leftPct = (slot.x / (fLayout.width || 1200)) * 100;
+            const topPct = (slot.y / (fLayout.height || 1800)) * 100;
+            const widthPct = (slot.width / (fLayout.width || 1200)) * 100;
+            const heightPct = (slot.height / (fLayout.height || 1800)) * 100;
+            const poseNum = (slot.photo_index ?? slot.photoIndex ?? 0) + 1;
+
+            return (
+              <div
+                key={sIdx}
+                className="frame-slot-preview-box"
+                style={{
+                  left: `${leftPct}%`,
+                  top: `${topPct}%`,
+                  width: `${widthPct}%`,
+                  height: `${heightPct}%`,
+                }}
+              >
+                <div className="slot-box-inner">
+                  <span className="slot-cam-icon">📷</span>
+                  <span className="slot-pose-label">Foto {poseNum}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   const selectedFrame = frames[selectedFrameIndex] || null;
@@ -894,18 +993,6 @@ export default function GuestApp() {
     }
   };
 
-  const getFrameHtml = (frame: Frame) => {
-    if (!frame) return "";
-    if (frame.svg_code) {
-      return frame.svg_code
-        .replace(/\{\{COUPLE_NAME\}\}/g, coupleName)
-        .replace(/\{\{COUPLE_NAME_UPPER\}\}/g, coupleName.toUpperCase());
-    } else if (frame.png_url) {
-      return `<img src="${frame.png_url}" class="frame-png-overlay" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
-    }
-    return "";
-  };
-
   // Screen rendering
   if (isLoading) {
     return (
@@ -1056,7 +1143,7 @@ export default function GuestApp() {
         </header>
       </div>
 
-      {/* Frame Picker Screen */}
+      {/* Frame Picker Screen (Interactive Mobile-First Slider) */}
       <div
         className={`screen ${screen === "frame" ? "active" : ""}`}
         id="s-frame"
@@ -1064,7 +1151,7 @@ export default function GuestApp() {
         <div className="card">
           <div className="title">Pilih Bingkai</div>
           <p className="subtitle">
-            Pilih desain bingkai favoritmu untuk event ini ({frames.length} pilihan):
+            Geser untuk memilih desain bingkai favoritmu ({selectedFrameIndex + 1}/{frames.length}):
           </p>
           <div className="steps">
             <div className="step-dot done"></div>
@@ -1072,41 +1159,102 @@ export default function GuestApp() {
             <div className="step-dot"></div>
             <div className="step-dot"></div>
           </div>
-          <div className="frames-grid">
-            {frames.map((frame, index) => {
-              const fLayout = getFrameLayout(frame);
-              return (
-                <div className="frame-item" key={frame.id}>
+
+          {/* Smooth Interactive Frame Slider */}
+          <div
+            className="frame-slider-container"
+            onTouchStart={handleSliderTouchStart}
+            onTouchEnd={handleSliderTouchEnd}
+          >
+            {/* Prev Button */}
+            {frames.length > 1 && (
+              <button
+                type="button"
+                className="frame-nav-arrow arrow-left"
+                onClick={prevFrameSlide}
+                aria-label="Bingkai Sebelumnya"
+              >
+                ‹
+              </button>
+            )}
+
+            <div className="frame-slider-stage">
+              {frames.map((frame, index) => {
+                const fLayout = getFrameLayout(frame);
+                const isCurrent = index === selectedFrameIndex;
+                const isPrev =
+                  index ===
+                  (selectedFrameIndex - 1 + frames.length) % frames.length;
+                const isNext =
+                  index === (selectedFrameIndex + 1) % frames.length;
+
+                let slideClass = "slide-hidden";
+                if (isCurrent) slideClass = "slide-current";
+                else if (isPrev && frames.length > 1) slideClass = "slide-prev";
+                else if (isNext && frames.length > 1) slideClass = "slide-next";
+
+                return (
                   <div
-                    className={`frame-option ${index === selectedFrameIndex ? "selected" : ""}`}
+                    key={frame.id}
+                    className={`frame-slide-card ${slideClass}`}
                     onClick={() => setSelectedFrameIndex(index)}
                   >
-                    <div className="frame-preview">
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          background: "linear-gradient(135deg,#f5ede0,#faf6f0)",
-                          opacity: 0.35,
-                        }}
-                      ></div>
-                      <div
-                        className="frame-svg"
-                        dangerouslySetInnerHTML={{
-                          __html: getFrameHtml(frame),
-                        }}
-                      />
+                    <div className="frame-card-canvas-wrap">
+                      {renderFramePreview(frame)}
+                      {isCurrent && (
+                        <div className="active-frame-pill">
+                          ✓ Dipilih
+                        </div>
+                      )}
                     </div>
-                    <div className="check">✓</div>
+
+                    <div className="frame-slide-footer">
+                      <h4 className="frame-slide-title">{frame.name}</h4>
+                      <div className="frame-meta-tags">
+                        <span className="frame-meta-chip chip-gold">
+                          📸 {fLayout.shot_count}x Pose
+                        </span>
+                        <span className="frame-meta-chip chip-warm">
+                          🖼️ {fLayout.slots.length} Foto
+                        </span>
+                        <span className="frame-meta-chip chip-dim">
+                          {fLayout.width}×{fLayout.height} px
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="frame-label-below">{frame.name}</div>
-                  <div className="frame-tag-below">
-                    {fLayout.shot_count}x Pose · {fLayout.slots.length} Foto
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
+            {frames.length > 1 && (
+              <button
+                type="button"
+                className="frame-nav-arrow arrow-right"
+                onClick={nextFrameSlide}
+                aria-label="Bingkai Berikutnya"
+              >
+                ›
+              </button>
+            )}
+
+            {/* Dots Indicator */}
+            {frames.length > 1 && (
+              <div className="frame-slider-dots">
+                {frames.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`frame-dot ${idx === selectedFrameIndex ? "active" : ""}`}
+                    onClick={() => setSelectedFrameIndex(idx)}
+                    aria-label={`Pilih bingkai ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
+
           <button
             className="btn btn-primary"
             onClick={() => {
