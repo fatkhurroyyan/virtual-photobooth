@@ -307,6 +307,7 @@ export default function AdminPanel() {
   const heroInputRef = useRef<HTMLInputElement>(null);
 
   // Frame Studio Modal States (Dynamic Resolution & Slots)
+  const studioCanvasRef = useRef<HTMLDivElement>(null);
   const [isFrameStudioOpen, setIsFrameStudioOpen] = useState<boolean>(false);
   const [editingFrameId, setEditingFrameId] = useState<string | null>(null);
   const [studioFrameName, setStudioFrameName] = useState<string>("");
@@ -320,6 +321,138 @@ export default function AdminPanel() {
   const [studioSvgCode, setStudioSvgCode] = useState<string | null>(null);
   const [studioPendingFile, setStudioPendingFile] = useState<File | null>(null);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number>(0);
+  const [dragState, setDragState] = useState<{
+    type: "move" | "resize";
+    slotIndex: number;
+    startX: number;
+    startY: number;
+    initialSlot: PhotoSlot;
+  } | null>(null);
+
+  // Global mousemove & touchmove listener for smooth visual dragging/resizing
+  useEffect(() => {
+    if (!dragState) return;
+
+    const handlePointerMove = (clientX: number, clientY: number) => {
+      const canvasEl = studioCanvasRef.current;
+      if (!canvasEl) return;
+      const rect = canvasEl.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const scaleX = (Number(studioWidth) || 1200) / rect.width;
+      const scaleY = (Number(studioHeight) || 1800) / rect.height;
+
+      const dx = (clientX - dragState.startX) * scaleX;
+      const dy = (clientY - dragState.startY) * scaleY;
+
+      const maxW = Number(studioWidth) || 1200;
+      const maxH = Number(studioHeight) || 1800;
+
+      setStudioSlots((prev) => {
+        const copy = [...prev];
+        const initial = dragState.initialSlot;
+        if (!copy[dragState.slotIndex]) return prev;
+
+        if (dragState.type === "move") {
+          let newX = Math.round(initial.x + dx);
+          let newY = Math.round(initial.y + dy);
+          newX = Math.max(0, Math.min(maxW - initial.width, newX));
+          newY = Math.max(0, Math.min(maxH - initial.height, newY));
+          copy[dragState.slotIndex] = {
+            ...copy[dragState.slotIndex],
+            x: newX,
+            y: newY,
+          };
+        } else if (dragState.type === "resize") {
+          let newW = Math.round(initial.width + dx);
+          let newH = Math.round(initial.height + dy);
+          newW = Math.max(40, Math.min(maxW - initial.x, newW));
+          newH = Math.max(40, Math.min(maxH - initial.y, newH));
+          copy[dragState.slotIndex] = {
+            ...copy[dragState.slotIndex],
+            width: newW,
+            height: newH,
+          };
+        }
+        return copy;
+      });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches[0]) {
+        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handlePointerUp = () => {
+      setDragState(null);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handlePointerUp);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handlePointerUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handlePointerUp);
+    };
+  }, [dragState, studioWidth, studioHeight]);
+
+  const handleStartDrag = (
+    e: React.MouseEvent | React.TouchEvent,
+    slotIndex: number,
+    type: "move" | "resize",
+  ) => {
+    e.stopPropagation();
+    setSelectedSlotIndex(slotIndex);
+
+    let clientX = 0;
+    let clientY = 0;
+    if ("clientX" in e) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else if ("touches" in e && e.touches[0]) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
+    if (studioSlots[slotIndex]) {
+      setDragState({
+        type,
+        slotIndex,
+        startX: clientX,
+        startY: clientY,
+        initialSlot: { ...studioSlots[slotIndex] },
+      });
+    }
+  };
+
+  const handleNudgeSlot = (idx: number, dx: number, dy: number) => {
+    setStudioSlots((prev) => {
+      const copy = [...prev];
+      if (copy[idx]) {
+        const maxW = Number(studioWidth) || 1200;
+        const maxH = Number(studioHeight) || 1800;
+        const newX = Math.max(
+          0,
+          Math.min(maxW - copy[idx].width, copy[idx].x + dx),
+        );
+        const newY = Math.max(
+          0,
+          Math.min(maxH - copy[idx].height, copy[idx].y + dy),
+        );
+        copy[idx] = { ...copy[idx], x: newX, y: newY };
+      }
+      return copy;
+    });
+  };
 
   // Load configuration & data
   const loadEventConfigAndData = async (slug: string) => {
@@ -2388,6 +2521,7 @@ export default function AdminPanel() {
                 </div>
                 <div className="studio-canvas-outer">
                   <div
+                    ref={studioCanvasRef}
                     className="studio-canvas-wrap"
                     style={{
                       aspectRatio: `${studioWidth || 1200} / ${studioHeight || 1800}`,
@@ -2416,9 +2550,11 @@ export default function AdminPanel() {
                       </div>
                     )}
 
-                    {/* Slot Overlays */}
+                    {/* Interactive Draggable & Resizable Slot Overlays */}
                     {studioSlots.map((slot, idx) => {
                       const isSelected = idx === selectedSlotIndex;
+                      const isDraggingThis =
+                        dragState?.slotIndex === idx;
                       const leftPct =
                         (slot.x / (studioWidth || 1200)) * 100;
                       const topPct =
@@ -2431,21 +2567,61 @@ export default function AdminPanel() {
                       return (
                         <div
                           key={idx}
-                          className={`studio-slot-box ${isSelected ? "selected" : ""}`}
+                          className={`studio-slot-box ${isSelected ? "selected" : ""} ${
+                            isDraggingThis ? "is-dragging" : ""
+                          }`}
                           style={{
                             left: `${leftPct}%`,
                             top: `${topPct}%`,
                             width: `${widthPct}%`,
                             height: `${heightPct}%`,
                           }}
-                          onClick={() => setSelectedSlotIndex(idx)}
-                          title={`Slot #${idx + 1}: Foto ${slot.photo_index + 1}`}
+                          onMouseDown={(e) =>
+                            handleStartDrag(e, idx, "move")
+                          }
+                          onTouchStart={(e) =>
+                            handleStartDrag(e, idx, "move")
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedSlotIndex(idx);
+                          }}
+                          title={`Slot #${idx + 1}: Foto ${slot.photo_index + 1} — Klik & geser untuk memindahkan`}
                         >
                           <div className="studio-slot-badge">
                             #{idx + 1} 📷 Foto {slot.photo_index + 1}
                           </div>
+
+                          <div className="studio-slot-drag-hint">
+                            <i className="ti ti-arrows-move" /> Geser
+                          </div>
+
                           <div className="studio-slot-dim-txt">
-                            {slot.width}×{slot.height}px
+                            X:{slot.x} Y:{slot.y} | {slot.width}×{slot.height}px
+                          </div>
+
+                          {/* Resize Handle Corner */}
+                          <div
+                            className="studio-resize-handle"
+                            title="Tarik untuk ubah ukuran (W & H)"
+                            onMouseDown={(e) =>
+                              handleStartDrag(e, idx, "resize")
+                            }
+                            onTouchStart={(e) =>
+                              handleStartDrag(e, idx, "resize")
+                            }
+                          >
+                            <svg
+                              viewBox="0 0 6 6"
+                              className="resize-grip-dots"
+                            >
+                              <circle cx="5" cy="5" r="0.8" fill="currentColor" />
+                              <circle cx="5" cy="3" r="0.8" fill="currentColor" />
+                              <circle cx="3" cy="5" r="0.8" fill="currentColor" />
+                              <circle cx="1" cy="5" r="0.8" fill="currentColor" />
+                              <circle cx="5" cy="1" r="0.8" fill="currentColor" />
+                              <circle cx="3" cy="3" r="0.8" fill="currentColor" />
+                            </svg>
                           </div>
                         </div>
                       );
@@ -2463,6 +2639,9 @@ export default function AdminPanel() {
                   <span>
                     🖼️ <strong>Total Slot:</strong> {studioSlots.length} Kotak
                   </span>
+                </div>
+                <div className="studio-drag-tip">
+                  💡 <strong>Tip:</strong> Klik &amp; geser kotak di atas untuk memindahkan posisi. Tarik titik biru di sudut kanan-bawah kotak untuk memperbesar/memperkecil.
                 </div>
               </div>
 
@@ -2624,6 +2803,7 @@ export default function AdminPanel() {
                           )}
                         </div>
 
+                        {/* Pixel coordinate inputs */}
                         <div
                           className="studio-coords-grid"
                           onClick={(e) => e.stopPropagation()}
@@ -2683,6 +2863,52 @@ export default function AdminPanel() {
                                 )
                               }
                             />
+                          </div>
+                        </div>
+
+                        {/* Fine Tuning Nudge Bar */}
+                        <div
+                          className="slot-card-nudge-bar"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span>Geser Halus (±10px):</span>
+                          <div className="nudge-btn-group">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleNudgeSlot(idx, -10, 0)
+                              }
+                              title="Geser Kiri 10px"
+                            >
+                              ◀ Kiri
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleNudgeSlot(idx, 10, 0)
+                              }
+                              title="Geser Kanan 10px"
+                            >
+                              Kanan ▶
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleNudgeSlot(idx, 0, -10)
+                              }
+                              title="Geser Atas 10px"
+                            >
+                              ▲ Atas
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleNudgeSlot(idx, 0, 10)
+                              }
+                              title="Geser Bawah 10px"
+                            >
+                              ▼ Bawah
+                            </button>
                           </div>
                         </div>
                       </div>
