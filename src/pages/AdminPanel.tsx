@@ -21,14 +21,131 @@ interface EventItem {
   created_at: string;
 }
 
-interface Frame {
+export interface PhotoSlot {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  photo_index: number;
+}
+
+export interface FrameLayoutConfig {
+  width: number;
+  height: number;
+  shot_count: number;
+  slots: PhotoSlot[];
+}
+
+export interface Frame {
   id: string;
   name: string;
   svg_code: string | null;
   png_url: string | null;
+  layout_config?: FrameLayoutConfig | null;
   is_active: boolean;
   sort_order: number;
 }
+
+export const DEFAULT_LAYOUT_1200_1800: FrameLayoutConfig = {
+  width: 1200,
+  height: 1800,
+  shot_count: 3,
+  slots: [
+    { x: 70, y: 90, width: 500, height: 410, photo_index: 0 },
+    { x: 630, y: 90, width: 500, height: 410, photo_index: 0 },
+    { x: 70, y: 540, width: 500, height: 410, photo_index: 1 },
+    { x: 630, y: 540, width: 500, height: 410, photo_index: 1 },
+    { x: 70, y: 990, width: 500, height: 410, photo_index: 2 },
+    { x: 630, y: 990, width: 500, height: 410, photo_index: 2 },
+  ],
+};
+
+export const FRAME_PRESETS = [
+  {
+    id: "postcard_6",
+    label: "Postcard 6 Foto (Grid 2x3)",
+    desc: "1200×1800 px · 3x Jepret (duplikat jadi 6 slot)",
+    width: 1200,
+    height: 1800,
+    shot_count: 3,
+    slots: [
+      { x: 70, y: 90, width: 500, height: 410, photo_index: 0 },
+      { x: 630, y: 90, width: 500, height: 410, photo_index: 0 },
+      { x: 70, y: 540, width: 500, height: 410, photo_index: 1 },
+      { x: 630, y: 540, width: 500, height: 410, photo_index: 1 },
+      { x: 70, y: 990, width: 500, height: 410, photo_index: 2 },
+      { x: 630, y: 990, width: 500, height: 410, photo_index: 2 },
+    ],
+  },
+  {
+    id: "photostrip_double_6",
+    label: "Double Photostrip (2 Kolom)",
+    desc: "1200×1800 px · 3x Jepret (Kolom Kiri & Kanan identik)",
+    width: 1200,
+    height: 1800,
+    shot_count: 3,
+    slots: [
+      { x: 60, y: 80, width: 510, height: 410, photo_index: 0 },
+      { x: 630, y: 80, width: 510, height: 410, photo_index: 0 },
+      { x: 60, y: 530, width: 510, height: 410, photo_index: 1 },
+      { x: 630, y: 530, width: 510, height: 410, photo_index: 1 },
+      { x: 60, y: 980, width: 510, height: 410, photo_index: 2 },
+      { x: 630, y: 980, width: 510, height: 410, photo_index: 2 },
+    ],
+  },
+  {
+    id: "photostrip_single_3",
+    label: "Single Photostrip (1 Kolom 3 Foto)",
+    desc: "600×1800 px · 3x Jepret (3 slot vertikal)",
+    width: 600,
+    height: 1800,
+    shot_count: 3,
+    slots: [
+      { x: 50, y: 80, width: 500, height: 410, photo_index: 0 },
+      { x: 50, y: 530, width: 500, height: 410, photo_index: 1 },
+      { x: 50, y: 980, width: 500, height: 410, photo_index: 2 },
+    ],
+  },
+  {
+    id: "polaroid_single_1",
+    label: "Single Polaroid (1 Foto)",
+    desc: "1200×1600 px · 1x Jepret",
+    width: 1200,
+    height: 1600,
+    shot_count: 1,
+    slots: [{ x: 80, y: 100, width: 1040, height: 1100, photo_index: 0 }],
+  },
+  {
+    id: "grid_4",
+    label: "Grid 4 Foto (2x2)",
+    desc: "1200×1800 px · 4x Jepret",
+    width: 1200,
+    height: 1800,
+    shot_count: 4,
+    slots: [
+      { x: 70, y: 100, width: 500, height: 580, photo_index: 0 },
+      { x: 630, y: 100, width: 500, height: 580, photo_index: 1 },
+      { x: 70, y: 720, width: 500, height: 580, photo_index: 2 },
+      { x: 630, y: 720, width: 500, height: 580, photo_index: 3 },
+    ],
+  },
+  {
+    id: "square_single_1",
+    label: "Square Instagram (1:1)",
+    desc: "1200×1200 px · 1x Jepret",
+    width: 1200,
+    height: 1200,
+    shot_count: 1,
+    slots: [{ x: 80, y: 80, width: 1040, height: 900, photo_index: 0 }],
+  },
+];
+
+export const getFrameLayout = (frame: Frame): FrameLayoutConfig => {
+  if (frame.layout_config && frame.layout_config.slots && frame.layout_config.slots.length > 0) {
+    return frame.layout_config;
+  }
+  return DEFAULT_LAYOUT_1200_1800;
+};
 
 type TabId = "event" | "appearance" | "frames" | "qr" | "settings";
 
@@ -188,6 +305,21 @@ export default function AdminPanel() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const heroInputRef = useRef<HTMLInputElement>(null);
+
+  // Frame Studio Modal States (Dynamic Resolution & Slots)
+  const [isFrameStudioOpen, setIsFrameStudioOpen] = useState<boolean>(false);
+  const [editingFrameId, setEditingFrameId] = useState<string | null>(null);
+  const [studioFrameName, setStudioFrameName] = useState<string>("");
+  const [studioWidth, setStudioWidth] = useState<number>(1200);
+  const [studioHeight, setStudioHeight] = useState<number>(1800);
+  const [studioShotCount, setStudioShotCount] = useState<number>(3);
+  const [studioSlots, setStudioSlots] = useState<PhotoSlot[]>(
+    DEFAULT_LAYOUT_1200_1800.slots,
+  );
+  const [studioPngUrl, setStudioPngUrl] = useState<string | null>(null);
+  const [studioSvgCode, setStudioSvgCode] = useState<string | null>(null);
+  const [studioPendingFile, setStudioPendingFile] = useState<File | null>(null);
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number>(0);
 
   // Load configuration & data
   const loadEventConfigAndData = async (slug: string) => {
@@ -401,63 +533,235 @@ export default function AdminPanel() {
     }
   };
 
+  const handleOpenFrameStudio = (frame: Frame) => {
+    const layout = getFrameLayout(frame);
+    setEditingFrameId(frame.id);
+    setStudioPendingFile(null);
+    setStudioPngUrl(frame.png_url);
+    setStudioSvgCode(frame.svg_code);
+    setStudioFrameName(frame.name);
+    setStudioWidth(layout.width || 1200);
+    setStudioHeight(layout.height || 1800);
+    setStudioShotCount(layout.shot_count || 3);
+    setStudioSlots(
+      layout.slots && layout.slots.length > 0
+        ? layout.slots
+        : DEFAULT_LAYOUT_1200_1800.slots,
+    );
+    setSelectedSlotIndex(0);
+    setIsFrameStudioOpen(true);
+  };
+
   const handleAddFrameFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    showToast("Mengunggah frame kustom...", "info");
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const naturalW = img.naturalWidth || 1200;
+      const naturalH = img.naturalHeight || 1800;
+      const ratio = naturalW / naturalH;
+
+      // Pick closest default preset
+      let defaultPreset = FRAME_PRESETS[0]; // 1200x1800 6-slot
+      if (ratio < 0.45) {
+        defaultPreset = FRAME_PRESETS[2]; // Single photostrip (1:3)
+      } else if (ratio > 0.9 && ratio < 1.1) {
+        defaultPreset = FRAME_PRESETS[5]; // Square (1:1)
+      } else if (ratio > 0.65 && ratio < 0.8) {
+        defaultPreset = FRAME_PRESETS[3]; // Polaroid (3:4)
+      }
+
+      setEditingFrameId(null);
+      setStudioPendingFile(file);
+      setStudioPngUrl(url);
+      setStudioSvgCode(null);
+      setStudioFrameName(file.name.split(".")[0] || "Custom Frame");
+      setStudioWidth(naturalW);
+      setStudioHeight(naturalH);
+      setStudioShotCount(defaultPreset.shot_count);
+
+      // Scale preset slots to match naturalW and naturalH
+      const scaleX = naturalW / defaultPreset.width;
+      const scaleY = naturalH / defaultPreset.height;
+      const scaledSlots = defaultPreset.slots.map((s) => ({
+        x: Math.round(s.x * scaleX),
+        y: Math.round(s.y * scaleY),
+        width: Math.round(s.width * scaleX),
+        height: Math.round(s.height * scaleY),
+        photo_index: s.photo_index,
+      }));
+      setStudioSlots(scaledSlots);
+      setSelectedSlotIndex(0);
+      setIsFrameStudioOpen(true);
+    };
+    img.src = url;
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleApplyPreset = (presetId: string) => {
+    const p = FRAME_PRESETS.find((x) => x.id === presetId);
+    if (!p) return;
+    setStudioWidth(p.width);
+    setStudioHeight(p.height);
+    setStudioShotCount(p.shot_count);
+    setStudioSlots([...p.slots]);
+    setSelectedSlotIndex(0);
+    showToast(`Preset "${p.label}" diterapkan!`, "info");
+  };
+
+  const handleAddSlot = () => {
+    const newSlot: PhotoSlot = {
+      x: 100,
+      y: 100,
+      width: Math.round((studioWidth || 1200) * 0.4),
+      height: Math.round((studioHeight || 1800) * 0.25),
+      photo_index: Math.min(studioSlots.length, studioShotCount - 1),
+    };
+    setStudioSlots([...studioSlots, newSlot]);
+    setSelectedSlotIndex(studioSlots.length);
+  };
+
+  const handleDeleteSlot = (idx: number) => {
+    if (studioSlots.length <= 1) {
+      showToast("Minimal harus ada 1 slot foto pada frame", "danger");
+      return;
+    }
+    const filtered = studioSlots.filter((_, i) => i !== idx);
+    setStudioSlots(filtered);
+    setSelectedSlotIndex(Math.max(0, idx - 1));
+  };
+
+  const handleUpdateSlot = (
+    idx: number,
+    field: keyof PhotoSlot,
+    val: number,
+  ) => {
+    setStudioSlots((prev) => {
+      const copy = [...prev];
+      if (copy[idx]) {
+        copy[idx] = { ...copy[idx], [field]: val };
+      }
+      return copy;
+    });
+  };
+
+  const handleSaveFrameStudio = async () => {
+    if (!studioFrameName.trim()) {
+      showToast("Nama frame tidak boleh kosong", "danger");
+      return;
+    }
+
+    const layoutConfig: FrameLayoutConfig = {
+      width: Number(studioWidth) || 1200,
+      height: Number(studioHeight) || 1800,
+      shot_count: Number(studioShotCount) || 1,
+      slots: studioSlots.map((s) => ({
+        x: Math.round(Number(s.x) || 0),
+        y: Math.round(Number(s.y) || 0),
+        width: Math.round(Number(s.width) || 100),
+        height: Math.round(Number(s.height) || 100),
+        photo_index: Number(s.photo_index) || 0,
+      })),
+    };
 
     if (isDemoMode || !activeEvent) {
-      const url = URL.createObjectURL(file);
-      const newFrame = {
-        id: `local-${Date.now()}`,
-        name: file.name.split(".")[0] || "Custom Frame",
-        svg_code: null,
-        png_url: url,
-        is_active: true,
-        sort_order: frames.length,
-      };
-      setFrames((prev) => [...prev, newFrame]);
-      showToast("Frame ditambahkan (Mode Demo)", "success");
+      if (editingFrameId) {
+        setFrames((prev) =>
+          prev.map((f) =>
+            f.id === editingFrameId
+              ? {
+                  ...f,
+                  name: studioFrameName,
+                  layout_config: layoutConfig,
+                  png_url: studioPngUrl,
+                  svg_code: studioSvgCode,
+                }
+              : f,
+          ),
+        );
+        showToast("Pengaturan frame berhasil disimpan (Mode Demo)", "success");
+      } else {
+        const newFrame: Frame = {
+          id: `local-${Date.now()}`,
+          name: studioFrameName,
+          svg_code: studioSvgCode,
+          png_url: studioPngUrl,
+          layout_config: layoutConfig,
+          is_active: true,
+          sort_order: frames.length,
+        };
+        setFrames((prev) => [...prev, newFrame]);
+        showToast("Frame baru berhasil ditambahkan (Mode Demo)", "success");
+      }
+      setIsFrameStudioOpen(false);
       return;
     }
 
     try {
-      const ts = Date.now();
-      const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-      const path = `frames/${activeEvent.id}/${ts}_${cleanName}`;
+      let finalPngUrl = studioPngUrl;
 
-      const { error: uploadError } = await db.storage
-        .from("photos")
-        .upload(path, file, {
-          contentType: file.type,
-          upsert: false,
+      // If a new pending file is uploaded
+      if (studioPendingFile) {
+        showToast("Mengunggah gambar frame...", "info");
+        const ts = Date.now();
+        const cleanName = studioPendingFile.name.replace(
+          /[^a-zA-Z0-9.]/g,
+          "_",
+        );
+        const path = `frames/${activeEvent.id}/${ts}_${cleanName}`;
+
+        const { error: uploadError } = await db.storage
+          .from("photos")
+          .upload(path, studioPendingFile, {
+            contentType: studioPendingFile.type,
+            upsert: false,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = db.storage.from("photos").getPublicUrl(path);
+        finalPngUrl = publicUrl;
+      }
+
+      if (editingFrameId && !editingFrameId.startsWith("local-")) {
+        const { error: updateErr } = await db
+          .from("frames")
+          .update({
+            name: studioFrameName,
+            png_url: finalPngUrl,
+            svg_code: studioSvgCode,
+            layout_config: layoutConfig,
+          })
+          .eq("id", editingFrameId);
+
+        if (updateErr) throw updateErr;
+        showToast("Konfigurasi frame berhasil disimpan!", "success");
+      } else {
+        const { error: insertErr } = await db.from("frames").insert({
+          event_id: activeEvent.id,
+          name: studioFrameName,
+          png_url: finalPngUrl,
+          svg_code: studioSvgCode,
+          layout_config: layoutConfig,
+          is_active: true,
+          sort_order: frames.length,
         });
 
-      if (uploadError) throw uploadError;
+        if (insertErr) throw insertErr;
+        showToast("Frame kustom berhasil ditambahkan!", "success");
+      }
 
-      const {
-        data: { publicUrl },
-      } = db.storage.from("photos").getPublicUrl(path);
-
-      const { error: insertError } = await db.from("frames").insert({
-        event_id: activeEvent.id,
-        name: file.name.split(".")[0] || "Custom Frame",
-        png_url: publicUrl,
-        is_active: true,
-        sort_order: frames.length,
-      });
-
-      if (insertError) throw insertError;
-
-      showToast("Bingkai kustom berhasil diunggah!", "success");
-      loadFrames(activeEvent.id);
+      await loadFrames(activeEvent.id);
+      setIsFrameStudioOpen(false);
     } catch (err: any) {
-      console.error(err);
-      showToast("Gagal mengunggah frame: " + err.message, "danger");
+      console.error("Save frame studio error:", err);
+      showToast("Gagal menyimpan frame: " + err.message, "danger");
     }
-
-    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleHeroFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1493,6 +1797,7 @@ export default function AdminPanel() {
                     <div className="frame-grid" id="frame-grid">
                       {frames.map((frame, index) => {
                         const previewHtml = getFrameHtml(frame);
+                        const layout = getFrameLayout(frame);
 
                         return (
                           <div
@@ -1525,19 +1830,40 @@ export default function AdminPanel() {
                                 }}
                               />
                             </div>
+
+                            {/* Frame Layout Badge */}
+                            <div className="frame-card-badge">
+                              {layout.shot_count}x Pose · {layout.slots.length} Foto ({layout.width}×{layout.height})
+                            </div>
+
                             <div className="fcheck">
                               <i className="ti ti-check" />
                             </div>
-                            <button
-                              className="frame-delete-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteFrame(frame.id, frame.name);
-                              }}
-                              title="Hapus Frame"
-                            >
-                              <i className="ti ti-trash" />
-                            </button>
+
+                            <div className="frame-card-actions">
+                              <button
+                                type="button"
+                                className="frame-studio-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenFrameStudio(frame);
+                                }}
+                                title="Edit Posisi Slot & Ukuran Frame"
+                              >
+                                <i className="ti ti-adjustments" /> Atur Slot
+                              </button>
+                              <button
+                                type="button"
+                                className="frame-delete-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteFrame(frame.id, frame.name);
+                                }}
+                                title="Hapus Frame"
+                              >
+                                <i className="ti ti-trash" />
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
@@ -1547,7 +1873,10 @@ export default function AdminPanel() {
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <i className="ti ti-plus" />
-                        <span>Upload Custom</span>
+                        <span>Upload Custom Frame</span>
+                        <small style={{ fontSize: "11px", opacity: 0.7 }}>
+                          Auto-detect ukuran &amp; atur slot
+                        </small>
                       </div>
                     </div>
                     <input
@@ -2015,6 +2344,373 @@ export default function AdminPanel() {
           </main>
         </div>
       </div>
+      {/* ── FRAME STUDIO & SLOT EDITOR MODAL ── */}
+      {isFrameStudioOpen && (
+        <div
+          className="studio-modal-backdrop"
+          onClick={() => setIsFrameStudioOpen(false)}
+        >
+          <div
+            className="studio-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="studio-modal-header">
+              <div className="studio-header-title-wrap">
+                <div className="studio-header-icon">
+                  <i className="ti ti-layout-dashboard" />
+                </div>
+                <div>
+                  <h3 className="studio-modal-title">
+                    Studio Desain Bingkai &amp; Posisi Foto
+                  </h3>
+                  <p className="studio-modal-sub">
+                    Atur dimensi kanvas, jumlah jepretan pose, dan koordinat
+                    penempelan foto di frame
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="studio-modal-close"
+                onClick={() => setIsFrameStudioOpen(false)}
+                title="Tutup Modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="studio-modal-body">
+              {/* Left Col: Live Visual Preview */}
+              <div className="studio-preview-col">
+                <div className="studio-section-label">
+                  <i className="ti ti-eye" /> Live Visual Canvas ({studioWidth} ×{" "}
+                  {studioHeight} px)
+                </div>
+                <div className="studio-canvas-outer">
+                  <div
+                    className="studio-canvas-wrap"
+                    style={{
+                      aspectRatio: `${studioWidth || 1200} / ${studioHeight || 1800}`,
+                    }}
+                  >
+                    {/* Background / Frame Overlay */}
+                    {studioSvgCode ? (
+                      <div
+                        className="studio-canvas-svg"
+                        dangerouslySetInnerHTML={{
+                          __html: studioSvgCode.replace(
+                            /\{\{COUPLE_NAME\}\}/g,
+                            editHost,
+                          ),
+                        }}
+                      />
+                    ) : studioPngUrl ? (
+                      <img
+                        src={studioPngUrl}
+                        alt="Frame"
+                        className="studio-canvas-img"
+                      />
+                    ) : (
+                      <div className="studio-canvas-blank">
+                        <i className="ti ti-photo" />
+                      </div>
+                    )}
+
+                    {/* Slot Overlays */}
+                    {studioSlots.map((slot, idx) => {
+                      const isSelected = idx === selectedSlotIndex;
+                      const leftPct =
+                        (slot.x / (studioWidth || 1200)) * 100;
+                      const topPct =
+                        (slot.y / (studioHeight || 1800)) * 100;
+                      const widthPct =
+                        (slot.width / (studioWidth || 1200)) * 100;
+                      const heightPct =
+                        (slot.height / (studioHeight || 1800)) * 100;
+
+                      return (
+                        <div
+                          key={idx}
+                          className={`studio-slot-box ${isSelected ? "selected" : ""}`}
+                          style={{
+                            left: `${leftPct}%`,
+                            top: `${topPct}%`,
+                            width: `${widthPct}%`,
+                            height: `${heightPct}%`,
+                          }}
+                          onClick={() => setSelectedSlotIndex(idx)}
+                          title={`Slot #${idx + 1}: Foto ${slot.photo_index + 1}`}
+                        >
+                          <div className="studio-slot-badge">
+                            #{idx + 1} 📷 Foto {slot.photo_index + 1}
+                          </div>
+                          <div className="studio-slot-dim-txt">
+                            {slot.width}×{slot.height}px
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="studio-canvas-meta-bar">
+                  <span>
+                    📐 <strong>Rasio:</strong>{" "}
+                    {(studioWidth / (studioHeight || 1)).toFixed(2)}:1
+                  </span>
+                  <span>
+                    📸 <strong>Jumlah Pose:</strong> {studioShotCount}x
+                  </span>
+                  <span>
+                    🖼️ <strong>Total Slot:</strong> {studioSlots.length} Kotak
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Col: Controls & Slot Properties */}
+              <div className="studio-controls-col">
+                {/* Section: Info & Canvas Dimensions */}
+                <div className="studio-control-group">
+                  <div className="studio-section-label">
+                    <i className="ti ti-settings" /> Informasi &amp; Dimensi Kanvas
+                  </div>
+                  <div className="field">
+                    <label>Nama Bingkai Frame</label>
+                    <input
+                      type="text"
+                      value={studioFrameName}
+                      onChange={(e) => setStudioFrameName(e.target.value)}
+                      placeholder="Contoh: Double Strip Vintage 1200x1800"
+                    />
+                  </div>
+                  <div className="studio-grid-2col">
+                    <div className="field">
+                      <label>Lebar Kanvas (px)</label>
+                      <input
+                        type="number"
+                        min="300"
+                        max="4000"
+                        value={studioWidth}
+                        onChange={(e) =>
+                          setStudioWidth(
+                            Math.max(100, Number(e.target.value)),
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="field">
+                      <label>Tinggi Kanvas (px)</label>
+                      <input
+                        type="number"
+                        min="300"
+                        max="4000"
+                        value={studioHeight}
+                        onChange={(e) =>
+                          setStudioHeight(
+                            Math.max(100, Number(e.target.value)),
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>Jumlah Jepret Foto untuk Frame Ini</label>
+                    <select
+                      value={studioShotCount}
+                      onChange={(e) =>
+                        setStudioShotCount(Number(e.target.value))
+                      }
+                    >
+                      <option value={1}>1x Jepret (1 Pose)</option>
+                      <option value={2}>2x Jepret (2 Pose)</option>
+                      <option value={3}>
+                        3x Jepret (3 Pose — Standar Bingkis Kaca)
+                      </option>
+                      <option value={4}>4x Jepret (4 Pose)</option>
+                      <option value={6}>6x Jepret (6 Pose)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Section: Quick Presets */}
+                <div className="studio-control-group">
+                  <div className="studio-section-label">
+                    <i className="ti ti-bolt" /> Template Preset Cepat
+                  </div>
+                  <div className="studio-preset-chips">
+                    {FRAME_PRESETS.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className="studio-preset-btn"
+                        onClick={() => handleApplyPreset(p.id)}
+                        title={p.desc}
+                      >
+                        <span className="preset-name">{p.label}</span>
+                        <span className="preset-sub">
+                          {p.width}×{p.height} ({p.shot_count}x)
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section: Slot Positions */}
+                <div className="studio-control-group">
+                  <div className="studio-slots-header">
+                    <div
+                      className="studio-section-label"
+                      style={{ margin: 0 }}
+                    >
+                      <i className="ti ti-layout-grid" /> Koordinat Slot Foto (
+                      {studioSlots.length})
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-secondary"
+                      onClick={handleAddSlot}
+                    >
+                      <i className="ti ti-plus" /> Tambah Slot
+                    </button>
+                  </div>
+
+                  <div className="studio-slots-list">
+                    {studioSlots.map((slot, idx) => (
+                      <div
+                        key={idx}
+                        className={`studio-slot-card ${idx === selectedSlotIndex ? "active" : ""}`}
+                        onClick={() => setSelectedSlotIndex(idx)}
+                      >
+                        <div className="studio-slot-card-header">
+                          <div className="slot-card-title">
+                            <span className="slot-num-badge">
+                              #{idx + 1}
+                            </span>
+                            <strong>Slot {idx + 1}</strong>
+                          </div>
+                          <div className="slot-source-select-wrap">
+                            <label>Sumber Foto:</label>
+                            <select
+                              value={slot.photo_index}
+                              onChange={(e) =>
+                                handleUpdateSlot(
+                                  idx,
+                                  "photo_index",
+                                  Number(e.target.value),
+                                )
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {Array.from({ length: studioShotCount }).map(
+                                (_, shotI) => (
+                                  <option key={shotI} value={shotI}>
+                                    Foto Pose {shotI + 1}
+                                  </option>
+                                ),
+                              )}
+                            </select>
+                          </div>
+                          {studioSlots.length > 1 && (
+                            <button
+                              type="button"
+                              className="slot-delete-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSlot(idx);
+                              }}
+                              title="Hapus slot ini"
+                            >
+                              <i className="ti ti-trash" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div
+                          className="studio-coords-grid"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="coord-item">
+                            <span>X (Kiri):</span>
+                            <input
+                              type="number"
+                              value={slot.x}
+                              onChange={(e) =>
+                                handleUpdateSlot(
+                                  idx,
+                                  "x",
+                                  Number(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="coord-item">
+                            <span>Y (Atas):</span>
+                            <input
+                              type="number"
+                              value={slot.y}
+                              onChange={(e) =>
+                                handleUpdateSlot(
+                                  idx,
+                                  "y",
+                                  Number(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="coord-item">
+                            <span>Lebar (W):</span>
+                            <input
+                              type="number"
+                              value={slot.width}
+                              onChange={(e) =>
+                                handleUpdateSlot(
+                                  idx,
+                                  "width",
+                                  Number(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="coord-item">
+                            <span>Tinggi (H):</span>
+                            <input
+                              type="number"
+                              value={slot.height}
+                              onChange={(e) =>
+                                handleUpdateSlot(
+                                  idx,
+                                  "height",
+                                  Number(e.target.value),
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="studio-modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsFrameStudioOpen(false)}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSaveFrameStudio}
+              >
+                <i className="ti ti-check" /> Simpan Pengaturan Frame
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

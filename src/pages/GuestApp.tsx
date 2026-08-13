@@ -4,24 +4,46 @@ import { db } from "../supabaseClient";
 import logoBk from "../assets/logo-bk.svg";
 import "./GuestApp.css";
 
-export const FRAME_WIDTH = 1200;
-export const FRAME_HEIGHT = 1800;
+export interface PhotoSlot {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  photo_index?: number;
+  photoIndex?: number;
+}
 
-// Option B: 6 Photo Slots (2 columns x 3 rows) on 1200x1800px canvas
-// Row 1: Photo 0 & Photo 0 (Slot 0, 1)
-// Row 2: Photo 1 & Photo 1 (Slot 2, 3)
-// Row 3: Photo 2 & Photo 2 (Slot 4, 5)
-export const PHOTO_SLOTS = [
-  // Row 1
-  { x: 70, y: 90, width: 500, height: 410, photoIndex: 0 },
-  { x: 630, y: 90, width: 500, height: 410, photoIndex: 0 },
-  // Row 2
-  { x: 70, y: 540, width: 500, height: 410, photoIndex: 1 },
-  { x: 630, y: 540, width: 500, height: 410, photoIndex: 1 },
-  // Row 3
-  { x: 70, y: 990, width: 500, height: 410, photoIndex: 2 },
-  { x: 630, y: 990, width: 500, height: 410, photoIndex: 2 },
-];
+export interface FrameLayoutConfig {
+  width: number;
+  height: number;
+  shot_count: number;
+  slots: PhotoSlot[];
+}
+
+export const DEFAULT_LAYOUT: FrameLayoutConfig = {
+  width: 1200,
+  height: 1800,
+  shot_count: 3,
+  slots: [
+    { x: 70, y: 90, width: 500, height: 410, photo_index: 0 },
+    { x: 630, y: 90, width: 500, height: 410, photo_index: 0 },
+    { x: 70, y: 540, width: 500, height: 410, photo_index: 1 },
+    { x: 630, y: 540, width: 500, height: 410, photo_index: 1 },
+    { x: 70, y: 990, width: 500, height: 410, photo_index: 2 },
+    { x: 630, y: 990, width: 500, height: 410, photo_index: 2 },
+  ],
+};
+
+export const getFrameLayout = (frame: Frame | null): FrameLayoutConfig => {
+  if (
+    frame?.layout_config &&
+    frame.layout_config.slots &&
+    frame.layout_config.slots.length > 0
+  ) {
+    return frame.layout_config;
+  }
+  return DEFAULT_LAYOUT;
+};
 
 interface EventConfig {
   id: string;
@@ -37,11 +59,12 @@ interface EventConfig {
   theme_color: string | null;
 }
 
-interface Frame {
+export interface Frame {
   id: string;
   name: string;
   svg_code: string | null;
   png_url: string | null;
+  layout_config?: FrameLayoutConfig | null;
   is_active: boolean;
   sort_order: number;
 }
@@ -415,6 +438,19 @@ export default function GuestApp() {
     startCamera(nextMode);
   };
 
+  const selectedFrame = frames[selectedFrameIndex] || null;
+  const activeLayout = getFrameLayout(selectedFrame);
+  const totalShots = Math.max(1, activeLayout.shot_count || 3);
+
+  // Current target slot for camera framing
+  const currentSlot =
+    activeLayout.slots.find(
+      (s) => (s.photo_index ?? s.photoIndex ?? 0) === currentShotIndex,
+    ) ||
+    activeLayout.slots[0] || { width: 500, height: 410, x: 0, y: 0 };
+  const currentSlotRatio =
+    (currentSlot.width || 500) / (currentSlot.height || 410);
+
   // Capture current pose snapshot
   const takePhoto = () => {
     const video = videoRef.current;
@@ -427,8 +463,7 @@ export default function GuestApp() {
     const videoWidth = video.videoWidth || 1280;
     const videoHeight = video.videoHeight || 960;
 
-    // Slot aspect ratio is 500:410 = 1.2195
-    const slotRatio = 500 / 410;
+    const slotRatio = currentSlotRatio;
     const videoRatio = videoWidth / videoHeight;
 
     let sx = 0,
@@ -443,9 +478,11 @@ export default function GuestApp() {
       sy = (videoHeight - sHeight) / 2;
     }
 
-    // Capture at high resolution (1000 x 820)
-    canvas.width = 1000;
-    canvas.height = 820;
+    // Capture at high resolution proportional to slot
+    const captureW = Math.max(800, (currentSlot.width || 500) * 2);
+    const captureH = Math.round(captureW / slotRatio);
+    canvas.width = captureW;
+    canvas.height = captureH;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -499,11 +536,11 @@ export default function GuestApp() {
     setCapturedPhotos(newPhotos);
     setShotReviewUrl(null);
 
-    if (currentShotIndex < 2) {
-      // Proceed to next pose (Pose 2 or Pose 3)
+    if (currentShotIndex < totalShots - 1) {
+      // Proceed to next pose
       setCurrentShotIndex(currentShotIndex + 1);
     } else {
-      // All 3 photos completed! Generate composite 1200x1800 preview
+      // All photos completed! Generate composite preview
       stopCamera();
       setIsGeneratingComposite(true);
       setScreen("preview");
@@ -543,21 +580,22 @@ export default function GuestApp() {
     setScreen("camera");
   };
 
-  // Merging 6 photos into 1200x1800 Canvas with Frame overlay
+  // Merging captured photos into Canvas with Frame overlay
   const mergePhotosAndFrame = async (
     photoDataUrls: string[],
     frame: Frame | null,
     coupleNameStr: string,
   ): Promise<HTMLCanvasElement> => {
+    const layout = getFrameLayout(frame);
     const out = document.createElement("canvas");
-    out.width = FRAME_WIDTH;
-    out.height = FRAME_HEIGHT;
+    out.width = layout.width || 1200;
+    out.height = layout.height || 1800;
     const ctx = out.getContext("2d");
     if (!ctx) return out;
 
     // Fill background with clean white
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+    ctx.fillRect(0, 0, out.width, out.height);
 
     // Pre-load all captured photos
     const loadedPhotos: (HTMLImageElement | null)[] = await Promise.all(
@@ -573,9 +611,10 @@ export default function GuestApp() {
       ),
     );
 
-    // Draw the 6 photo slots (Option B Grid)
-    for (const slot of PHOTO_SLOTS) {
-      const photoImg = loadedPhotos[slot.photoIndex] || loadedPhotos[0];
+    // Draw each photo slot defined in layout_config
+    for (const slot of layout.slots) {
+      const pIdx = slot.photo_index ?? slot.photoIndex ?? 0;
+      const photoImg = loadedPhotos[pIdx] || loadedPhotos[0];
       if (photoImg && photoImg.complete && photoImg.naturalWidth > 0) {
         drawCoverImage(ctx, photoImg, slot.x, slot.y, slot.width, slot.height);
       } else {
@@ -597,19 +636,19 @@ export default function GuestApp() {
           await new Promise<void>((resolve, reject) => {
             const img = new Image();
             img.onload = () => {
-              ctx.drawImage(img, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+              ctx.drawImage(img, 0, 0, out.width, out.height);
+              URL.revokeObjectURL(svgUrl);
               resolve();
             };
             img.onerror = reject;
             img.src = svgUrl;
           });
-          URL.revokeObjectURL(svgUrl);
         } else if (frame.png_url) {
           await new Promise<void>((resolve, reject) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => {
-              ctx.drawImage(img, 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+              ctx.drawImage(img, 0, 0, out.width, out.height);
               resolve();
             };
             img.onerror = reject;
@@ -976,8 +1015,8 @@ export default function GuestApp() {
           <div className="logo">✦ PHOTOBOOTH EVENT ✦</div>
           <div className="title">Selamat Datang</div>
           <p className="subtitle">
-            Abadikan 3 pose spesial bersama &amp; kirim ucapan hangat untuk
-            pasangan
+            Abadikan momen foto spesial &amp; kirim ucapan hangat untuk
+            kebahagiaan pasangan
           </p>
           <div className="steps">
             <div className="step-dot active"></div>
@@ -1025,7 +1064,7 @@ export default function GuestApp() {
         <div className="card">
           <div className="title">Pilih Bingkai</div>
           <p className="subtitle">
-            Format 6 Foto (1200×1800 px). Pilih desain favoritmu:
+            Pilih desain bingkai favoritmu untuk event ini ({frames.length} pilihan):
           </p>
           <div className="steps">
             <div className="step-dot done"></div>
@@ -1034,31 +1073,39 @@ export default function GuestApp() {
             <div className="step-dot"></div>
           </div>
           <div className="frames-grid">
-            {frames.map((frame, index) => (
-              <div className="frame-item" key={frame.id}>
-                <div
-                  className={`frame-option ${index === selectedFrameIndex ? "selected" : ""}`}
-                  onClick={() => setSelectedFrameIndex(index)}
-                >
-                  <div className="frame-preview">
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "linear-gradient(135deg,#f5ede0,#faf6f0)",
-                        opacity: 0.35,
-                      }}
-                    ></div>
-                    <div
-                      className="frame-svg"
-                      dangerouslySetInnerHTML={{ __html: getFrameHtml(frame) }}
-                    />
+            {frames.map((frame, index) => {
+              const fLayout = getFrameLayout(frame);
+              return (
+                <div className="frame-item" key={frame.id}>
+                  <div
+                    className={`frame-option ${index === selectedFrameIndex ? "selected" : ""}`}
+                    onClick={() => setSelectedFrameIndex(index)}
+                  >
+                    <div className="frame-preview">
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: "linear-gradient(135deg,#f5ede0,#faf6f0)",
+                          opacity: 0.35,
+                        }}
+                      ></div>
+                      <div
+                        className="frame-svg"
+                        dangerouslySetInnerHTML={{
+                          __html: getFrameHtml(frame),
+                        }}
+                      />
+                    </div>
+                    <div className="check">✓</div>
                   </div>
-                  <div className="check">✓</div>
+                  <div className="frame-label-below">{frame.name}</div>
+                  <div className="frame-tag-below">
+                    {fLayout.shot_count}x Pose · {fLayout.slots.length} Foto
+                  </div>
                 </div>
-                <div className="frame-label-below">{frame.name}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <button
             className="btn btn-primary"
@@ -1069,7 +1116,7 @@ export default function GuestApp() {
               setScreen("camera");
             }}
           >
-            Mulai Foto (3x Pose) →
+            Mulai Foto ({totalShots}x Pose) →
           </button>
           <button
             className="btn btn-secondary"
@@ -1089,13 +1136,13 @@ export default function GuestApp() {
           <div className="title">Ambil Foto</div>
           <p className="subtitle">
             {shotReviewUrl
-              ? `Review Pose ${currentShotIndex + 1} dari 3`
-              : `Pose ${currentShotIndex + 1} dari 3 — Siapkan gayamu! 📸`}
+              ? `Review Pose ${currentShotIndex + 1} dari ${totalShots}`
+              : `Pose ${currentShotIndex + 1} dari ${totalShots} — Siapkan gayamu! 📸`}
           </p>
 
           {/* Multi-pose progress badges */}
           <div className="pose-indicator-bar">
-            {[0, 1, 2].map((idx) => {
+            {Array.from({ length: totalShots }).map((_, idx) => {
               const isDone = capturedPhotos[idx] !== undefined;
               const isCurrent = idx === currentShotIndex;
               return (
@@ -1113,7 +1160,12 @@ export default function GuestApp() {
             })}
           </div>
 
-          <div className="camera-wrap">
+          <div
+            className="camera-wrap"
+            style={{
+              aspectRatio: `${currentSlot.width || 500} / ${currentSlot.height || 410}`,
+            }}
+          >
             {cameraError ? (
               <div className="cam-error">
                 <div className="cam-error-icon">📷</div>
@@ -1216,7 +1268,7 @@ export default function GuestApp() {
                 onClick={acceptCurrentShot}
                 style={{ width: "100%", marginBottom: "8px" }}
               >
-                {currentShotIndex < 2
+                {currentShotIndex < totalShots - 1
                   ? `✓ Gunakan, Lanjut Pose ${currentShotIndex + 2} →`
                   : "✓ Selesai, Lihat Frame →"}
               </button>
@@ -1244,7 +1296,7 @@ export default function GuestApp() {
         </div>
       </div>
 
-      {/* Preview Screen (1200x1800 Option B 6-Slot Output) */}
+      {/* Preview Screen */}
       <div
         className={`screen ${screen === "preview" ? "active" : ""}`}
         id="s-preview"
@@ -1252,14 +1304,19 @@ export default function GuestApp() {
         <div className="card">
           <div className="title">Hasil Photobooth</div>
           <p className="subtitle">
-            6 Foto (3 Pose terduplikasi) di dalam frame 1200×1800 px ✨
+            {activeLayout.slots.length} Foto ({totalShots} Pose) di dalam bingkai {activeLayout.width}×{activeLayout.height} px ✨
           </p>
 
-          <div className="preview-wrap-1200">
+          <div
+            className="preview-wrap-1200"
+            style={{
+              aspectRatio: `${activeLayout.width || 1200} / ${activeLayout.height || 1800}`,
+            }}
+          >
             {isGeneratingComposite ? (
               <div className="preview-loading">
                 <div className="preview-spinner"></div>
-                <span>Menyusun 6 foto ke dalam frame...</span>
+                <span>Menyusun foto ke dalam frame...</span>
               </div>
             ) : (
               <img
@@ -1275,7 +1332,7 @@ export default function GuestApp() {
             <div className="retake-strip">
               <div className="retake-strip-title">Ambil ulang pose tertentu:</div>
               <div className="retake-chip-group">
-                {[0, 1, 2].map((idx) => (
+                {Array.from({ length: totalShots }).map((_, idx) => (
                   <button
                     key={idx}
                     type="button"
@@ -1311,7 +1368,7 @@ export default function GuestApp() {
               disabled={isGeneratingComposite}
               onClick={retakeAllPhotos}
             >
-              🔄 Ambil Ulang Semua (3 Pose)
+              🔄 Ambil Ulang Semua ({totalShots} Pose)
             </button>
           )}
         </div>

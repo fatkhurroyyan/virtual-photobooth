@@ -29,14 +29,15 @@ CREATE TABLE IF NOT EXISTS public.events (
 -- 2. TABEL FRAMES (bingkai polaroid per event)
 -- ────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.frames (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id    UUID        REFERENCES public.events(id) ON DELETE CASCADE,
-  name        TEXT        NOT NULL,              -- "Garden Rose", "Vintage Gold", dll
-  svg_code    TEXT,                              -- SVG inline (jika bingkai SVG)
-  png_url     TEXT,                              -- URL PNG transparan (jika upload gambar)
-  is_active   BOOLEAN     DEFAULT TRUE,
-  sort_order  INTEGER     DEFAULT 0,
-  created_at  TIMESTAMPTZ DEFAULT NOW()
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id       UUID        REFERENCES public.events(id) ON DELETE CASCADE,
+  name           TEXT        NOT NULL,              -- "Garden Rose", "Vintage Gold", dll
+  svg_code       TEXT,                              -- SVG inline (jika bingkai SVG)
+  png_url        TEXT,                              -- URL PNG transparan (jika upload gambar)
+  layout_config  JSONB,                             -- Konfigurasi dinamis: { width, height, shot_count, slots: [{x,y,width,height,photo_index}] }
+  is_active      BOOLEAN     DEFAULT TRUE,
+  sort_order     INTEGER     DEFAULT 0,
+  created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ────────────────────────────────────────────────────────────────

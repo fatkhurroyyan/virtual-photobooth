@@ -423,6 +423,12 @@
   color: var(--rose);
   font-weight: 600;
 }
+.guest-app-body .frame-tag-below {
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.8;
+  margin-top: 1px;
+}
 
 /* ── CAMERA SECTION ── */
 .guest-app-body .pose-indicator-bar {
