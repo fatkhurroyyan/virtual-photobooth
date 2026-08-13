@@ -88,6 +88,7 @@ export default function GuestApp() {
   const [uploadError, setUploadError] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
   const [cameraError, setCameraError] = useState<boolean>(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [isEventNotFound, setIsEventNotFound] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -215,7 +216,7 @@ export default function GuestApp() {
   // Manage camera streaming based on screen
   useEffect(() => {
     if (screen === "camera") {
-      startCamera();
+      startCamera(facingMode);
     } else {
       stopCamera();
     }
@@ -236,12 +237,13 @@ export default function GuestApp() {
   const coupleName = eventConfig?.couple_name || "Ahmad & Siti";
 
   // Camera helpers
-  const startCamera = async () => {
+  const startCamera = async (mode: "user" | "environment" = facingMode) => {
     setCameraError(false);
+    stopCamera();
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "user",
+          facingMode: { ideal: mode },
           width: { ideal: 720 },
           height: { ideal: 960 },
         },
@@ -253,7 +255,20 @@ export default function GuestApp() {
       }
     } catch (e) {
       console.error("Camera access failed:", e);
-      setCameraError(true);
+      // Fallback: try default without facingMode constraint if ideal fails
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+        streamRef.current = fallbackStream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = fallbackStream;
+        }
+      } catch (fallbackErr) {
+        console.error("Fallback camera also failed:", fallbackErr);
+        setCameraError(true);
+      }
     }
   };
 
@@ -262,6 +277,12 @@ export default function GuestApp() {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
+  };
+
+  const toggleCameraFacing = () => {
+    const nextMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(nextMode);
+    startCamera(nextMode);
   };
 
   const takePhoto = () => {
@@ -296,12 +317,17 @@ export default function GuestApp() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Snapshot mirrored video with crop
-    ctx.save();
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-    ctx.restore();
+    if (facingMode === "user") {
+      // Snapshot mirrored video for front selfie camera
+      ctx.save();
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    } else {
+      // Normal orientation for back/rear camera
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+    }
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
     setPhotoDataUrl(dataUrl);
@@ -859,24 +885,46 @@ export default function GuestApp() {
                 <video
                   ref={videoRef}
                   id="video"
+                  className={facingMode === "user" ? "mirrored" : "normal"}
                   autoPlay
                   playsInline
                   muted
                 ></video>
                 <canvas ref={canvasRef} id="canvas"></canvas>
+                <button
+                  type="button"
+                  className="cam-flip-floating"
+                  onClick={toggleCameraFacing}
+                  title="Ganti Kamera Depan / Belakang"
+                >
+                  <i className="ti ti-camera-rotate" aria-hidden="true"></i>
+                </button>
                 <div className="camera-viewfinder-guides">
                   <div className="corner-guide top-left"></div>
                   <div className="corner-guide top-right"></div>
                   <div className="corner-guide bottom-left"></div>
                   <div className="corner-guide bottom-right"></div>
                 </div>
-                <div className="camera-hint">Posisikan diri di tengah kamera</div>
+                <div className="camera-hint">
+                  {facingMode === "user" ? "Kamera Depan (Selfie)" : "Kamera Belakang"}
+                </div>
               </>
             )}
           </div>
           {!cameraError && (
-            <div className="shutter-btn" onClick={takePhoto}>
-              <div className="shutter-inner"></div>
+            <div className="camera-controls-bar">
+              <div className="cam-ctrl-space"></div>
+              <div className="shutter-btn" onClick={takePhoto} title="Ambil Foto">
+                <div className="shutter-inner"></div>
+              </div>
+              <button
+                type="button"
+                className="cam-flip-btn"
+                onClick={toggleCameraFacing}
+                title="Ganti Kamera Depan / Belakang"
+              >
+                <i className="ti ti-camera-rotate" aria-hidden="true"></i>
+              </button>
             </div>
           )}
           <button

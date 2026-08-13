@@ -440,11 +440,44 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
   display: block;
+  transition: transform 0.2s ease;
+}
+.guest-app-body #video.mirrored {
+  transform: scaleX(-1);
+}
+.guest-app-body #video.normal {
+  transform: scaleX(1);
 }
 .guest-app-body #canvas {
   display: none;
+}
+.guest-app-body .cam-flip-floating {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 12;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.guest-app-body .cam-flip-floating:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: rotate(90deg) scale(1.08);
+}
+.guest-app-body .cam-flip-floating:active {
+  transform: rotate(180deg) scale(0.92);
 }
 .guest-app-body .camera-viewfinder-guides {
   position: absolute;
@@ -502,6 +535,45 @@
   pointer-events: none;
 }
 
+/* ── CAMERA CONTROLS BAR ── */
+.guest-app-body .camera-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto 14px;
+  padding: 0 10px;
+}
+.guest-app-body .cam-ctrl-space {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.guest-app-body .cam-flip-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--warm);
+  border: 1.5px solid var(--gold-light);
+  color: var(--brown);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.08);
+  -webkit-tap-highlight-color: transparent;
+}
+.guest-app-body .cam-flip-btn:hover {
+  background: var(--gold-light);
+  transform: rotate(90deg) scale(1.08);
+}
+.guest-app-body .cam-flip-btn:active {
+  transform: rotate(180deg) scale(0.92);
+}
+
 .guest-app-body .shutter-btn {
   width: 64px;
   height: 64px;
@@ -514,7 +586,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(201, 169, 110, 0.5);
-  margin: 0 auto 14px;
+  margin: 0;
   -webkit-tap-highlight-color: transparent;
 }
 .guest-app-body .shutter-btn:hover {
@@ -819,6 +891,15 @@
   .guest-app-body .shutter-inner {
     width: 42px;
     height: 42px;
+  }
+  .guest-app-body .cam-flip-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+  .guest-app-body .cam-ctrl-space {
+    width: 38px;
+    height: 38px;
   }
   .guest-app-body .voice-icon {
     width: 48px;
