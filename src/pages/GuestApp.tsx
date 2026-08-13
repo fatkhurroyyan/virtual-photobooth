@@ -945,18 +945,35 @@ export default function GuestApp() {
         const cType = getAudioContentType(audioMimeType);
         const audioPath = `${eventId}/${ts}_${safeName}.${ext}`;
 
-        const { error: voiceErr } = await db.storage
-          .from("photos")
+        let voiceBucket = "voices";
+        let uploadRes = await db.storage
+          .from(voiceBucket)
           .upload(audioPath, audioBlob, {
             contentType: cType,
             upsert: false,
           });
 
-        if (!voiceErr) {
+        if (uploadRes.error) {
+          console.warn(
+            "Upload to 'voices' bucket failed, attempting fallback to 'photos':",
+            uploadRes.error,
+          );
+          voiceBucket = "photos";
+          uploadRes = await db.storage
+            .from(voiceBucket)
+            .upload(audioPath, audioBlob, {
+              contentType: cType,
+              upsert: false,
+            });
+        }
+
+        if (!uploadRes.error) {
           const {
             data: { publicUrl: vUrl },
-          } = db.storage.from("photos").getPublicUrl(audioPath);
+          } = db.storage.from(voiceBucket).getPublicUrl(audioPath);
           voiceUrl = vUrl;
+        } else {
+          console.error("Gagal mengunggah file rekaman suara:", uploadRes.error);
         }
       }
 
